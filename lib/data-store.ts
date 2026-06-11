@@ -7,9 +7,13 @@ import {
   GALLERY_PHOTOS as initialGallery,
   PUBLIC_SERVICES as initialServices,
   OFFICE_INFO as initialOfficeInfo,
+  WELCOME_MESSAGE as initialWelcomeMessage,
+  HERO_SLIDES as initialHeroSlides,
   News,
   EventAgenda,
   PublicService,
+  WelcomeMessage,
+  HeroSlide,
 } from './data';
 
 // Helper to check if running in client-side
@@ -88,6 +92,32 @@ export const getStoredOfficeInfo = () => {
   } catch (e) {
     console.error('Error reading disporapar_office_info from localStorage', e);
     return initialOfficeInfo;
+  }
+};
+
+export const getStoredWelcomeMessage = (): WelcomeMessage => {
+  if (!isClient) return initialWelcomeMessage;
+  try {
+    const stored = localStorage.getItem('disporapar_welcome_message');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialWelcomeMessage;
+    const parsed = JSON.parse(stored);
+    return (parsed && typeof parsed === 'object') ? { ...initialWelcomeMessage, ...parsed } : initialWelcomeMessage;
+  } catch (e) {
+    console.error('Error reading disporapar_welcome_message from localStorage', e);
+    return initialWelcomeMessage;
+  }
+};
+
+export const getStoredHeroSlides = (): HeroSlide[] => {
+  if (!isClient) return initialHeroSlides;
+  try {
+    const stored = localStorage.getItem('disporapar_hero_slides');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialHeroSlides;
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : initialHeroSlides;
+  } catch (e) {
+    console.error('Error reading disporapar_hero_slides from localStorage', e);
+    return initialHeroSlides;
   }
 };
 
@@ -182,6 +212,87 @@ export const saveStoredOfficeInfo = (data: typeof initialOfficeInfo) => {
   }
 };
 
+export const saveStoredWelcomeMessage = (data: WelcomeMessage) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_welcome_message', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+
+      // Persist to server db.json via API route
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'welcomeMessage', data })
+      }).catch(err => console.error('Failed to save welcome message to server database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
+export const saveStoredHeroSlides = (data: HeroSlide[]) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_hero_slides', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+
+      // Persist to server db.json via API route
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'heroSlides', data })
+      }).catch(err => console.error('Failed to save hero slides to server database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
+export interface CategoryStore {
+  news: string[];
+  gallery: string[];
+  events: string[];
+  services: string[];
+}
+
+export const initialCategories: CategoryStore = {
+  news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
+  gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
+  events: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Dinas'],
+  services: ['SOP', 'Formulir', 'Berkas Layanan', 'Izin Usaha']
+};
+
+export const getStoredCategories = (): CategoryStore => {
+  if (!isClient) return initialCategories;
+  try {
+    const stored = localStorage.getItem('disporapar_categories');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialCategories;
+    const parsed = JSON.parse(stored);
+    return (parsed && typeof parsed === 'object') ? { ...initialCategories, ...parsed } : initialCategories;
+  } catch (e) {
+    console.error('Error reading disporapar_categories from localStorage', e);
+    return initialCategories;
+  }
+};
+
+export const saveStoredCategories = (data: CategoryStore) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_categories', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+
+      // Persist to server db.json via API route
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'categories', data })
+      }).catch(err => console.error('Failed to save categories to server database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
 // Global synchronization flag to avoid duplicate calls on initial render
 let hasSynced = false;
 
@@ -195,6 +306,9 @@ const syncWithServer = async () => {
       if (db.gallery) localStorage.setItem('disporapar_gallery', JSON.stringify(db.gallery));
       if (db.services) localStorage.setItem('disporapar_services', JSON.stringify(db.services));
       if (db.officeInfo) localStorage.setItem('disporapar_office_info', JSON.stringify(db.officeInfo));
+      if (db.categories) localStorage.setItem('disporapar_categories', JSON.stringify(db.categories));
+      if (db.welcomeMessage) localStorage.setItem('disporapar_welcome_message', JSON.stringify(db.welcomeMessage));
+      if (db.heroSlides) localStorage.setItem('disporapar_hero_slides', JSON.stringify(db.heroSlides));
       
       // Dispatch update to sync all states
       window.dispatchEvent(new Event('disporapar_data_update'));
@@ -350,3 +464,91 @@ export function useOfficeInfo() {
 
   return [data, updateData] as const;
 }
+
+export function useCategories() {
+  const [data, setData] = useState<CategoryStore>(initialCategories);
+
+  useEffect(() => {
+    setData(getStoredCategories());
+    
+    if (!hasSynced && isClient) {
+      hasSynced = true;
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredCategories());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: CategoryStore) => {
+    saveStoredCategories(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+
+export function useWelcomeMessage() {
+  const [data, setData] = useState<WelcomeMessage>(initialWelcomeMessage);
+
+  useEffect(() => {
+    setData(getStoredWelcomeMessage());
+    
+    if (!hasSynced && isClient) {
+      hasSynced = true;
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredWelcomeMessage());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: WelcomeMessage) => {
+    saveStoredWelcomeMessage(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+
+export function useHeroSlides() {
+  const [data, setData] = useState<HeroSlide[]>(initialHeroSlides);
+
+  useEffect(() => {
+    setData(getStoredHeroSlides());
+    
+    if (!hasSynced && isClient) {
+      hasSynced = true;
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredHeroSlides());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: HeroSlide[]) => {
+    saveStoredHeroSlides(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+

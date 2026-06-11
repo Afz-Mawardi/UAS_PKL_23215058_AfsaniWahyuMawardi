@@ -18,7 +18,7 @@ export interface News {
   title: string;
   excerpt: string;
   content: string;
-  category: 'Pariwisata' | 'Olahraga' | 'Kepemudaan' | 'Pengumuman' | 'Event';
+  category: string;
   date: string;
   imageUrl: string;
   author: string;
@@ -52,7 +52,7 @@ export interface EventAgenda {
   date: string;
   time: string;
   location: string;
-  category: 'Pariwisata' | 'Olahraga' | 'Kepemudaan' | 'Dinas';
+  category: string;
   description: string;
   imageUrl: string;
 }
@@ -61,10 +61,28 @@ export interface PublicService {
   id: string;
   title: string;
   description: string;
-  category: 'SOP' | 'Formulir' | 'Berkas Layanan' | 'Izin Usaha';
+  category: string;
   downloadUrl: string;
   fileSize: string;
 }
+
+export interface WelcomeMessage {
+  name: string;
+  nip?: string;
+  content: string;
+  imageUrl: string;
+}
+
+export interface HeroSlide {
+  id: string;
+  image: string;
+  tagline: string;
+  title: string;
+  cta: string;
+  href: string;
+}
+
+
 
 export const DESTINATIONS: Destination[] = [
   {
@@ -161,7 +179,7 @@ export const NEWS: News[] = [
     id: 'news-3',
     title: 'Kota Tegal Persiapkan GOR Wisanggeni Sebagai Pusat Pemusatan Latihan Atlet Berprestasi',
     excerpt: 'Revitalisasi fasilitas olahraga di GOR Wisanggeni mulai diimplementasikan demi mendukung pembinaan atlet muda berprestasi menyongsong PORPROV Jateng.',
-    content: 'Pit. Kepala DISPORAPAR Kota Tegal mengumumkan langkah baru peningkatan infrastruktur olahraga di GOR Wisanggeni. Revitalisasi ini meliputi perbaikan arena indoor futsal, badminton, basket, serta penyediaan asrama bagi para atlet berprestasi daerah. Hal ini diharapkan mampu menumbuhkan semangat latihan intensif demi memboyong medali emas bagi Kota Bahari.',
+    content: 'Kepala DISPORAPAR Kota Tegal mengumumkan langkah baru peningkatan infrastruktur olahraga di GOR Wisanggeni. Revitalisasi ini meliputi perbaikan arena indoor futsal, badminton, basket, serta penyediaan asrama bagi para atlet berprestasi daerah. Hal ini diharapkan mampu menumbuhkan semangat latihan intensif demi memboyong medali emas bagi Kota Bahari.',
     category: 'Olahraga',
     date: '15 Mei 2026',
     imageUrl: 'https://picsum.photos/seed/gor_wisanggeni_news/800/600',
@@ -461,3 +479,47 @@ export const FAQS = [
     answer: 'Sama sekali tidak. Seluruh pelayanan publik penerbitan surat rekomendasi kegiatan pariwisata, pemuda, dan olahraga di DISPORAPAR Kota Tegal adalah GRATIS (Rp 0) tanpa biaya sampingan apa pun.'
   }
 ];
+
+export const WELCOME_MESSAGE: WelcomeMessage = {
+  name: 'Khusnul Hidayati, S.E,. M.Si.',
+  nip: '197508122002122003',
+  content: 'Assalamualaikum Warahmatullahi Wabarakatuh, Salam sejahtera bagi kita semua, Shalom, Om Swastyastu, Namo Buddhaya, Salam Kebajikan.\n\nPuji syukur kehadirat Allah SWT, berkat kemudahan teknologi digital kini DISPORAPAR Kota Tegal meluncurkan portal informasi dan database modern terpusat dalam menyongsong Smart Government Kota Tegal. Website ini kami dedikasikan sebagai jembatan penghubung antara kebijakan publik dinas dengan keterlibatan aktif masyarakat secara terbuka.\n\nKami meyakini bahwa generasi muda Kota Tegal memiliki elan kreatif luar biasa, atlet kita memiliki stamina bahari tangguh pemburu prestasi, dan wisata pesisir kita memiliki pesona unik yang layak memperoleh sorotan nasional. Mari berkolaborasi membangun Kota Tegal menjadi episentrum prestasi wisata dan kepemudaan.\n\nWassalamualaikum Warahmatullahi Wabarakatuh.',
+  imageUrl: '/images/kabid Image 5 Jun 2026, 14.29.31.webp'
+};
+
+export const HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 'slide-1',
+    image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&q=80&w=2000',
+    tagline: 'WONDERFUL INDONESIA',
+    title: 'Gerbang Pesona Maritim & Keindahan Pesisir Tegal',
+    cta: 'Jelajahi Pariwisata',
+    href: '/pariwisata'
+  },
+  {
+    id: 'slide-2',
+    image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=2000',
+    tagline: 'PRESTASI KEOLAHRAGAAN',
+    title: 'Kobarkan Semangat Juara di Gelanggang Terbaik',
+    cta: 'Sarana Olahraga',
+    href: '/olahraga'
+  },
+  {
+    id: 'slide-3',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000',
+    tagline: 'PEMBERDAYAAN PEMUDA',
+    title: 'Kolaborasi Pemuda Pelopor & Wirausaha Kreatif',
+    cta: 'Program Kepemudaan',
+    href: '/kepemudaan'
+  },
+  {
+    id: 'slide-4',
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=2000',
+    tagline: 'PELAYANAN PUBLIK',
+    title: 'Sistem Informasi & Berkas Layanan Transparan',
+    cta: 'Layanan Publik',
+    href: '/pelayanan'
+  }
+];
+
+

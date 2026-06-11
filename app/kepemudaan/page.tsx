@@ -11,18 +11,11 @@ export default function KepemudaanPage() {
     <div id="kepemudaan-page" className="w-full bg-[#F8FAFC] pb-24 font-sans text-slate-800">
       
       {/* Immersive Editorial Header */}
-      <section className="relative py-20 sm:py-24 bg-slate-950 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-65">
-          <Image
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000"
-            alt="Kepemudaan Kota Tegal"
-            fill
-            priority
-            className="object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/40 to-transparent z-10" />
+      <section className="relative py-20 sm:py-24 bg-gradient-to-br from-primary-950 via-primary-900 to-primary-950 text-white overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 bg-grid-lines opacity-10" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,14 +30,16 @@ export default function KepemudaanPage() {
 
       {/* CORE PROGRAMS GRID LIST */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="text-center md:text-left mb-12">
-          <span className="text-xs font-bold text-secondary tracking-widest uppercase font-mono bg-blue-100/50 border border-blue-200/40 px-3 py-1 rounded-full inline-block">
-            Program Kerja Strategis
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
-            Inkubasi Inovasi & Agenda Kepemudaan
-          </h2>
-          <p className="text-sm sm:text-base text-slate-500 mt-2 font-inter font-light">
+        <div className="space-y-8 text-left mb-8">
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-secondary tracking-widest uppercase font-mono bg-blue-100/50 border border-blue-200/40 px-3 py-1 rounded-full inline-block w-fit">
+              Program Kerja Strategis
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Inkubasi Inovasi & Agenda Kepemudaan
+            </h2>
+          </div>
+          <p className="text-sm sm:text-base text-slate-500 font-inter font-light">
             Daftar program resmi pembinaan karakter kepemimpinan, kepeloporan, wirausaha, serta pendelegasian pemuda yang dijalankan secara berskala tahunan oleh DISPORAPAR.
           </p>
         </div>
@@ -130,14 +125,16 @@ export default function KepemudaanPage() {
       {/* CORE STRUCTURES & CIVIC ORGANIZATIONS SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
         <div className="bg-white rounded-3xl border border-slate-100 p-8 sm:p-14 shadow-md">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs font-bold text-accent tracking-widest uppercase bg-orange-100/50 border border-orange-200/40 px-3.5 py-1.5 rounded-full inline-block font-mono">
-              Ekosistem Kemitraan Pemuda
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
-              Kemitraan Organisasi Kepemudaan (OK)
-            </h2>
-            <p className="text-sm border-t border-slate-50 pt-2.5 text-slate-500 font-inter font-light">
+          <div className="text-center max-w-2xl mx-auto space-y-8 mb-8">
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-accent tracking-widest uppercase bg-orange-100/50 border border-orange-200/40 px-3.5 py-1.5 rounded-full inline-block font-mono">
+                Ekosistem Kemitraan Pemuda
+              </span>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Kemitraan Organisasi Kepemudaan (OK)
+              </h2>
+            </div>
+            <p className="text-sm text-slate-500 font-inter font-light">
               DISPORAPAR memandu, mendata, memonitor, dan membina legalitas ormas dan wadah kreativitas karang taruna serta himpunan pemuda di Kota Tegal demi sinergi kemajuan daerah.
             </p>
           </div>

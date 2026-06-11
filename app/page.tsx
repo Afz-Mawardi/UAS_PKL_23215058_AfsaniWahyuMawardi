@@ -10,6 +10,7 @@ import {
   Trophy,
   Users,
   User,
+  Eye,
   FileText,
   Shield,
   MessageSquare,
@@ -39,52 +40,25 @@ import {
   useEvents,
   useGallery,
   usePublicServices,
-  useOfficeInfo
+  useOfficeInfo,
+  useHeroSlides
 } from '@/lib/data-store';
 import { parseIndonesianDate } from '@/lib/utils';
 
 export default function HomePage() {
-  // Slideshow state
-  const heroSlides = [
-    {
-      image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&q=80&w=2000',
-      tagline: 'WONDERFUL INDONESIA',
-      title: 'Gerbang Pesona Maritim & Keindahan Pesisir Tegal',
-      cta: 'Jelajahi Pariwisata',
-      href: '/pariwisata'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=2000',
-      tagline: 'PRESTASI KEOLAHRAGAAN',
-      title: 'Kobarkan Semangat Juara di Gelanggang Terbaik',
-      cta: 'Sarana Olahraga',
-      href: '/olahraga'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000',
-      tagline: 'PEMBERDAYAAN PEMUDA',
-      title: 'Kolaborasi Pemuda Pelopor & Wirausaha Kreatif',
-      cta: 'Program Kepemudaan',
-      href: '/kepemudaan'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=2000',
-      tagline: 'PELAYANAN PUBLIK',
-      title: 'Sistem Informasi & Berkas Layanan Transparan',
-      cta: 'Layanan Publik',
-      href: '/pelayanan'
-    }
-  ];
-
   const [newsList] = useNews();
   const [eventsList] = useEvents();
   const [galleryPhotos] = useGallery();
   const [publicServices] = usePublicServices();
   const [officeInfo] = useOfficeInfo();
+  const [heroSlides] = useHeroSlides();
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [activeNewsDetail, setActiveNewsDetail] = useState<any>(null);
+  const [isGalleryPaused, setIsGalleryPaused] = useState(false);
+
+
 
   // Lock background body scroll when modal is active
   useEffect(() => {
@@ -99,6 +73,7 @@ export default function HomePage() {
   }, [selectedPhoto, activeNewsDetail]);
 
   useEffect(() => {
+    if (heroSlides.length === 0) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
@@ -106,122 +81,148 @@ export default function HomePage() {
   }, [heroSlides.length]);
 
   const handlePrevSlide = () => {
+    if (heroSlides.length === 0) return;
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
   const handleNextSlide = () => {
+    if (heroSlides.length === 0) return;
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   };
+
+  // Get 4 closest upcoming events for Homepage (June 8, 2026 is today in mock context)
+  const hpToday = new Date(2026, 5, 8);
+  const hpSortedEvents = [...eventsList].sort((a, b) => {
+    try {
+      return parseIndonesianDate(a.date).getTime() - parseIndonesianDate(b.date).getTime();
+    } catch {
+      return 0;
+    }
+  });
+
+  const hpUpcomingEvents = hpSortedEvents.filter(event => {
+    try {
+      return parseIndonesianDate(event.date).getTime() >= hpToday.getTime();
+    } catch {
+      return false;
+    }
+  });
+
+  const homepageEvents = hpUpcomingEvents.length >= 4
+    ? hpUpcomingEvents.slice(0, 4)
+    : hpSortedEvents.slice(0, 4);
 
   return (
     <div className="w-full min-h-screen bg-[#F8FAFC] selection:bg-primary selection:text-white font-sans overflow-x-hidden">
 
-      {/* 1. CINEMATIC HERO BANNER - UNCHANGED */}
-      <section className="relative h-[95vh] flex items-center justify-center bg-slate-950 overflow-hidden">
+      {/* 1. CINEMATIC HERO BANNER - DYNAMIC */}
+      <section className="relative h-[78vh] sm:h-[80vh] lg:h-[82vh] min-h-[500px] sm:min-h-[560px] lg:min-h-[620px] flex items-center justify-center bg-slate-950 overflow-hidden">
         {/* Slide backgrounds */}
-        <AnimatePresence>
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 0.70, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="absolute inset-0"
-          >
-            <Image
-              src={heroSlides[currentSlide].image}
-              alt="Visual DISPORAPAR"
-              fill
-              priority
-              className="object-cover"
-              sizes="100vw"
-              referrerPolicy="no-referrer"
-            />
-          </motion.div>
-        </AnimatePresence>
+        {heroSlides.length > 0 && heroSlides[currentSlide] && (
+          <AnimatePresence>
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 0.70, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={heroSlides[currentSlide].image}
+                alt="Visual DISPORAPAR"
+                fill
+                priority
+                className="object-cover"
+                sizes="100vw"
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
+          </AnimatePresence>
+        )}
 
         {/* Ambient Overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/30 to-slate-950/10 z-10" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/65 via-transparent to-transparent z-10" />
 
         {/* Main Hero Container */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col items-center justify-center text-center pt-14">
-          <div className="flex flex-col items-center max-w-4xl">
-            {/* Tagline */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-              <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-white font-mono">
-                Portal Resmi DISPORAPAR Kota Tegal
-              </span>
-            </div>
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col items-center justify-center text-center pt-20 sm:pt-24 pb-16">
+          {heroSlides.length > 0 && heroSlides[currentSlide] ? (
+            <div className="flex flex-col items-center max-w-4xl">
+              {/* Tagline */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-5">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-white font-mono">
+                  {heroSlides[currentSlide].tagline}
+                </span>
+              </div>
 
-            {/* Static Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight mb-8">
-              Membangun Pemuda Kreatif, Prestasi Olahraga & Pariwisata Bahari
-            </h1>
+              {/* Headline */}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-6xl font-extrabold tracking-tight text-white leading-tight mb-6">
+                {heroSlides[currentSlide].title}
+              </h1>
 
-            {/* Prominent CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-2">
-              <Link
-                href="/kepemudaan"
-                className="inline-flex items-center gap-2.5 px-5 py-3.5 bg-white/10 hover:bg-[#7C3AED] hover:border-[#7C3AED] text-white rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all border border-white/20 backdrop-blur-md cursor-pointer w-full sm:w-auto justify-center hover:shadow-lg hover:shadow-violet-600/20 active:scale-95"
-              >
-                <Users className="w-4 h-4 shrink-0 text-white" />
-                <span>Kepemudaan</span>
-              </Link>
-              <Link
-                href="/olahraga"
-                className="inline-flex items-center gap-2.5 px-5 py-3.5 bg-white/10 hover:bg-[#0284C7] hover:border-[#0284C7] text-white rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all border border-white/20 backdrop-blur-md cursor-pointer w-full sm:w-auto justify-center hover:shadow-lg hover:shadow-sky-500/20 active:scale-95"
-              >
-                <Trophy className="w-4 h-4 shrink-0 text-white" />
-                <span>Olahraga</span>
-              </Link>
-              <Link
-                href="/pariwisata"
-                className="inline-flex items-center gap-2.5 px-5 py-3.5 bg-white/10 hover:bg-[#F2994A] hover:border-[#F2994A] text-white rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all border border-white/20 backdrop-blur-md cursor-pointer w-full sm:w-auto justify-center hover:shadow-lg hover:shadow-orange-500/20 active:scale-95"
-              >
-                <Compass className="w-4 h-4 shrink-0 text-white" />
-                <span>Pariwisata</span>
-              </Link>
+              {/* Dynamic CTA Button */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-0">
+                <Link
+                  href={heroSlides[currentSlide].href}
+                  className="inline-flex items-center gap-2.5 px-6.5 py-3.5 bg-accent hover:bg-orange-500 text-white rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all border border-transparent shadow-lg shadow-orange-500/20 active:scale-95 cursor-pointer"
+                >
+                  <span>{heroSlides[currentSlide].cta}</span>
+                  <ArrowRight className="w-4 h-4 text-white" />
+                </Link>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex flex-col items-center max-w-4xl">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-6xl font-extrabold tracking-tight text-white leading-tight mb-6">
+                DISPORAPAR Kota Tegal
+              </h1>
+            </div>
+          )}
         </div>
 
         {/* Left & Right Navigation Buttons */}
-        <button
-          onClick={handlePrevSlide}
-          className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 flex items-center justify-center transition-all backdrop-blur-md cursor-pointer group active:scale-95"
-          aria-label="Slide Sebelumnya"
-        >
-          <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
-        </button>
-        <button
-          onClick={handleNextSlide}
-          className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 flex items-center justify-center transition-all backdrop-blur-md cursor-pointer group active:scale-95"
-          aria-label="Slide Berikutnya"
-        >
-          <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
-        </button>
+        {heroSlides.length > 1 && (
+          <>
+            <button
+              onClick={handlePrevSlide}
+              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 hidden sm:flex items-center justify-center transition-all backdrop-blur-md cursor-pointer group active:scale-95"
+              aria-label="Slide Sebelumnya"
+            >
+              <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+            </button>
+            <button
+              onClick={handleNextSlide}
+              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 hidden sm:flex items-center justify-center transition-all backdrop-blur-md cursor-pointer group active:scale-95"
+              aria-label="Slide Berikutnya"
+            >
+              <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </>
+        )}
 
         {/* Playful Bottom Fade Overlay */}
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-50 to-transparent z-10 pointer-events-none" />
 
         {/* Slide Indicators */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30">
-          {heroSlides.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              className={`h-1.5 rounded-full transition-all duration-500 ${currentSlide === idx ? 'w-8 bg-accent' : 'w-2 bg-white/40'
-                }`}
-              aria-label={`Slide ${idx + 1}`}
-            />
-          ))}
-        </div>
+        {heroSlides.length > 1 && (
+          <div className="absolute bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-30 px-3.5 py-2 rounded-full bg-slate-950/35 border border-white/10 backdrop-blur-md shadow-lg">
+            {heroSlides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${currentSlide === idx ? 'w-6 bg-accent' : 'w-1.5 bg-white/55 hover:bg-white/80'
+                  }`}
+                aria-label={`Slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 2. QUICK ACCESS SERVICES */}
-      <section className="relative z-30 -mt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative z-30 -mt-12 sm:-mt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-xl border border-slate-100/80">
           <div className="text-center md:text-left mb-6">
             <span className="text-[10px] font-bold tracking-widest text-[#F2994A] uppercase bg-orange-50 border border-orange-100/50 px-3 py-1 rounded-full inline-block font-mono mb-2">
@@ -236,97 +237,79 @@ export default function HomePage() {
             {/* PPID Card */}
             <Link
               href="/profil"
-              className="group flex flex-col items-center text-center p-5 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-blue-50 group-hover:bg-white/10 flex items-center justify-center text-primary group-hover:text-blue-300 mb-4 transition-colors duration-300">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 group-hover:bg-white/10 flex items-center justify-center text-primary group-hover:text-blue-300 mb-3 transition-colors duration-300">
                 <Shield className="w-6 h-6" />
               </div>
               <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
                 Profil
               </h3>
-              <p className="mt-1 text-[10px] text-slate-400 group-hover:text-slate-200 font-inter font-light hidden sm:block">
-                Informasi Publik
-              </p>
             </Link>
 
             {/* Layanan Publik */}
             <Link
               href="/pelayanan"
-              className="group flex flex-col items-center text-center p-5 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 group-hover:bg-white/10 flex items-center justify-center text-emerald-600 group-hover:text-emerald-300 mb-4 transition-colors duration-300">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 group-hover:bg-white/10 flex items-center justify-center text-emerald-600 group-hover:text-emerald-300 mb-3 transition-colors duration-300">
                 <Activity className="w-6 h-6" />
               </div>
               <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
                 Layanan Publik
               </h3>
-              <p className="mt-1 text-[10px] text-slate-400 group-hover:text-slate-200 font-inter font-light hidden sm:block">
-                SOP & Regulasi
-              </p>
             </Link>
 
             {/* Formulir & Unduhan */}
             <Link
               href="/pelayanan/standar"
-              className="group flex flex-col items-center text-center p-5 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-white/10 flex items-center justify-center text-[#F2994A] group-hover:text-orange-350 mb-4 transition-colors duration-300">
+              <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-white/10 flex items-center justify-center text-[#F2994A] group-hover:text-orange-350 mb-3 transition-colors duration-300">
                 <FileText className="w-6 h-6" />
               </div>
               <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
                 Formulir & Unduhan
               </h3>
-              <p className="mt-1 text-[10px] text-slate-400 group-hover:text-slate-200 font-inter font-light hidden sm:block">
-                Dokumen Resmi
-              </p>
             </Link>
 
             {/* Agenda Kegiatan */}
             <a
               href="#agenda-section"
-              className="group flex flex-col items-center text-center p-5 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 group-hover:bg-white/10 flex items-center justify-center text-indigo-600 group-hover:text-indigo-300 mb-4 transition-colors duration-300">
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 group-hover:bg-white/10 flex items-center justify-center text-indigo-600 group-hover:text-indigo-300 mb-3 transition-colors duration-300">
                 <Calendar className="w-6 h-6" />
               </div>
               <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
                 Agenda Kegiatan
               </h3>
-              <p className="mt-1 text-[10px] text-slate-400 group-hover:text-slate-200 font-inter font-light hidden sm:block">
-                Event Disporapar
-              </p>
             </a>
 
             {/* Destinasi Wisata */}
             <Link
               href="/pariwisata"
-              className="group flex flex-col items-center text-center p-5 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-teal-50 group-hover:bg-white/10 flex items-center justify-center text-teal-600 group-hover:text-teal-300 mb-4 transition-colors duration-300">
+              <div className="w-12 h-12 rounded-xl bg-teal-50 group-hover:bg-white/10 flex items-center justify-center text-teal-600 group-hover:text-teal-300 mb-3 transition-colors duration-300">
                 <Compass className="w-6 h-6" />
               </div>
               <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
                 Destinasi Wisata
               </h3>
-              <p className="mt-1 text-[10px] text-slate-400 group-hover:text-slate-200 font-inter font-light hidden sm:block">
-                Bahari & Kuliner
-              </p>
             </Link>
 
-            {/* Kontak Disporapar */}
+            {/* Kontak Dinas */}
             <Link
               href="/hubungi-kami"
-              className="group flex flex-col items-center text-center p-5 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-rose-50 group-hover:bg-white/10 flex items-center justify-center text-rose-500 group-hover:text-rose-350 mb-4 transition-colors duration-300">
+              <div className="w-12 h-12 rounded-xl bg-rose-50 group-hover:bg-white/10 flex items-center justify-center text-rose-500 group-hover:text-rose-350 mb-3 transition-colors duration-300">
                 <Phone className="w-6 h-6" />
               </div>
               <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
                 Kontak Dinas
               </h3>
-              <p className="mt-1 text-[10px] text-slate-400 group-hover:text-slate-200 font-inter font-light hidden sm:block">
-                Hubungi Kami
-              </p>
             </Link>
           </div>
         </div>
@@ -362,7 +345,7 @@ export default function HomePage() {
             </div>
 
             {/* Stats Dashboard on Right */}
-            <div className="lg:col-span-7 grid grid-cols-2 gap-6">
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {/* Stat 1 */}
               <div className="flex gap-4 p-5 bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-100/80 hover:shadow-md transition-all duration-300 text-left items-start">
                 <div className="w-10 h-10 rounded-xl bg-orange-50/80 border border-orange-100 flex items-center justify-center text-accent shrink-0 mt-0.5">
@@ -529,19 +512,19 @@ export default function HomePage() {
       </section>
 
       {/* 5. UPCOMING EVENTS & AGENDA */}
-      <section id="agenda-section" className="py-24 bg-white bg-grid-dots relative scroll-mt-20 border-t border-slate-100 overflow-hidden">
-        {/* Ambient Decorative Glows */}
+      <section id="agenda-section" className="py-24 bg-white relative scroll-mt-20 border-t border-slate-100 overflow-hidden">
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-primary/3 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-10 right-10 w-80 h-80 bg-accent/4 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute top-10 left-10 w-72 h-72 bg-primary/3 rounded-full blur-[100px] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+          {/* Section Header — matches Destinasi layout */}
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
             <div className="max-w-xl text-left">
-              <span className="text-[10px] font-bold tracking-widest text-[#2D9CDB] uppercase bg-blue-50 border border-blue-100 px-3 py-1 rounded-full inline-block mb-3 font-mono">
+              <span className="text-[10px] font-bold tracking-widest text-[#F2994A] uppercase bg-orange-50 border border-orange-100 px-3 py-1 rounded-full inline-block mb-3 font-mono">
                 AGENDA UTAMA DINAS
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                Event & Agenda Mendatang
+                Event &amp; Agenda Mendatang
               </h2>
               <p className="mt-3 text-slate-500 font-light text-sm sm:text-base leading-relaxed font-inter">
                 Agenda resmi, festival tahunan pemuda kreatif, kompetisi olahraga, serta forum rapat terbuka DISPORAPAR Kota Tegal.
@@ -549,66 +532,74 @@ export default function HomePage() {
             </div>
             <Link
               href="/agenda"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group self-start md:self-end"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#353086] hover:text-primary uppercase tracking-widest font-mono transition-colors group shrink-0"
             >
               <span>Semua Agenda</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {eventsList.slice(0, 4).map((event) => (
-              <div
-                key={event.id}
-                className="group bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/60 shadow-xs hover:shadow-md transition-all duration-300 flex flex-row gap-4 sm:gap-6 items-stretch text-left w-full"
-              >
-                {/* Calendar Sheet Icon Box Wrapper */}
-                <div className="flex items-center justify-center shrink-0">
-                  <div className="flex flex-col items-center justify-center text-center w-20 h-20 sm:w-24 sm:h-24 bg-slate-50 border border-slate-200/60 rounded-2xl shrink-0 transition-colors duration-300">
-                    <span className="text-2xl sm:text-3xl font-black text-[#353086] leading-none">
-                      {event.date.split(' ')[0]}
-                    </span>
-                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#353086] mt-1">
-                      {event.date.split(' ')[1].slice(0, 3).toUpperCase()}
-                    </span>
-                    <span className="text-[8px] sm:text-[9px] font-bold text-slate-400 mt-0.5">
-                      {event.date.split(' ')[2] || '2026'}
-                    </span>
-                  </div>
-                </div>
+          {/* Event Cards Grid — full width 2x2 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {homepageEvents.map((event) => {
+              let parsedDate: Date | null = null;
+              try { parsedDate = parseIndonesianDate(event.date); } catch { }
+              const dayNum = parsedDate ? parsedDate.getDate().toString().padStart(2, '0') : '--';
+              const monthShort = parsedDate ? parsedDate.toLocaleDateString('id-ID', { month: 'short' }).toUpperCase() : '';
+              const yearNum = parsedDate ? parsedDate.getFullYear() : '';
 
-                {/* Event info details on the right */}
-                <div className="flex-grow min-w-0 flex flex-col justify-between">
-                  {/* Top Row: Category badge on left, Time on right */}
-                  <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
-                    <span className="px-2.5 py-1 text-[10px] font-bold text-[#F3702A] bg-[#FFF7ED] border border-[#FEE8DD] uppercase tracking-wider rounded-lg font-mono leading-none">
-                      {event.category}
-                    </span>
-                    <div className="flex items-center gap-1.5 text-[#353086] font-mono text-[10px] sm:text-xs font-bold whitespace-nowrap">
-                      <Clock className="w-3.5 h-3.5 text-[#353086] shrink-0" />
-                      <span>{event.time}</span>
+              // Category color map
+              const categoryColors: Record<string, { text: string; bg: string; border: string }> = {
+                'Olahraga': { text: 'text-[#F3702A]', bg: 'bg-orange-50', border: 'border-orange-200' },
+                'Pariwisata': { text: 'text-[#353086]', bg: 'bg-indigo-50', border: 'border-indigo-200' },
+                'Kepemudaan': { text: 'text-[#0E3B66]', bg: 'bg-blue-50', border: 'border-blue-200' },
+                'Dinas': { text: 'text-[#353086]', bg: 'bg-violet-50', border: 'border-violet-200' },
+              };
+              const catStyle = categoryColors[event.category] || categoryColors['Olahraga'];
+
+              return (
+                <div
+                  key={event.id}
+                  className="flex bg-white border border-slate-100 rounded-2xl transition-all duration-300 hover:shadow-lg hover:border-slate-200 group overflow-hidden"
+                >
+                  {/* Date block — fixed width column */}
+                  <div className="shrink-0 w-[100px] flex flex-col items-center justify-center select-none border-r border-slate-100 py-6">
+                    <div className="text-[42px] font-black text-[#353086] leading-none tracking-tighter">{dayNum}</div>
+                    <div className="text-[11px] font-extrabold text-[#F3702A] uppercase tracking-widest mt-1.5">{monthShort}</div>
+                    <div className="text-[13px] font-semibold text-slate-400 mt-0.5">{yearNum}</div>
+                  </div>
+
+                  {/* Details — flexible right side */}
+                  <div className="flex-1 min-w-0 px-6 py-5 flex flex-col justify-center">
+                    {/* Category + Time row */}
+                    <div className="flex items-center justify-between gap-3 mb-2.5">
+                      <span className={`text-[9px] font-bold tracking-[0.12em] uppercase ${catStyle.text} ${catStyle.bg} border ${catStyle.border} px-2.5 py-1 rounded-md font-mono leading-none`}>
+                        {event.category}
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1 shrink-0 whitespace-nowrap">
+                        <Clock className="w-3.5 h-3.5" />
+                        {event.time}
+                      </span>
                     </div>
-                  </div>
 
-                  {/* Middle Row: Title & Description */}
-                  <div className="py-2.5 space-y-1">
-                    <h3 className="text-sm sm:text-base font-extrabold text-[#353086] hover:text-[#4f4ab6] transition-colors leading-snug line-clamp-1 sm:line-clamp-2">
+                    {/* Title */}
+                    <h4 className="font-extrabold text-base sm:text-lg text-[#0E3B66] leading-snug group-hover:text-primary transition-colors line-clamp-2">
                       {event.title}
-                    </h3>
-                    <p className="text-[11px] sm:text-xs text-slate-500 font-light font-inter leading-relaxed line-clamp-2">
-                      {event.description}
-                    </p>
-                  </div>
+                    </h4>
 
-                  {/* Bottom Row: Location */}
-                  <div className="pt-2.5 border-t border-slate-100 flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-600 font-inter">
-                    <MapPin className="w-3.5 h-3.5 text-[#F3702A] shrink-0" />
-                    <span className="font-medium truncate text-slate-600">{event.location}</span>
+                    {/* Location */}
+                    {event.location && (
+                      <div className="flex items-start gap-1.5 mt-3 text-[13px] text-slate-400 font-inter">
+                        <MapPin className="w-4 h-4 text-[#F3702A] shrink-0 mt-px" />
+                        <span className="line-clamp-1">{event.location}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
         </div>
       </section>
 
@@ -783,15 +774,15 @@ export default function HomePage() {
               .map((item) => (
                 <div
                   key={item.id}
-                  className="group bg-slate-55 rounded-2xl overflow-hidden border border-slate-100 hover:border-blue-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full"
+                  className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group"
                 >
                   {/* Thumbnail */}
-                  <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
                     <Image
                       src={item.imageUrl}
                       alt={item.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover group-hover:scale-103 transition-transform duration-500"
                       sizes="(max-w-768px) 100vw, 33vw"
                       referrerPolicy="no-referrer"
                     />
@@ -803,22 +794,27 @@ export default function HomePage() {
                   </div>
 
                   {/* News Details */}
-                  <div className="p-6 flex-grow flex flex-col justify-between text-left">
+                  <div className="p-6 sm:p-8 flex-grow flex flex-col justify-between text-left">
                     <div>
-                      <span className="text-[10px] font-bold text-[#F2994A] font-mono tracking-wider">{item.date}</span>
-                      <h3 className="text-base font-bold text-[#0E3B66] group-hover:text-primary transition-colors leading-snug tracking-tight mt-2 line-clamp-3">
+                      <div className="flex items-center gap-3 text-[10px] sm:text-xs text-slate-400 mb-3.5 font-mono">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5 shrink-0" />
+                          <span>{item.date}</span>
+                        </div>
+                      </div>
+                      <h3 className="font-extrabold text-base sm:text-lg text-[#0E3B66] font-sans tracking-tight group-hover:text-primary transition-colors leading-snug line-clamp-3">
                         {item.title}
                       </h3>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-slate-200 flex">
+                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end">
                       <button
                         type="button"
                         onClick={() => setActiveNewsDetail(item)}
-                        className="inline-flex items-center gap-1.5 font-extrabold text-xs text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors cursor-pointer"
+                        className="text-xs font-bold text-primary hover:text-accent transition-colors flex items-center gap-1 uppercase tracking-wider font-mono bg-slate-50 hover:bg-slate-100 px-3.5 py-2 rounded-xl cursor-pointer"
                       >
-                        <span>Baca Selengkapnya</span>
-                        <ChevronRight className="h-3.5 w-3.5" />
+                        <span>Baca Rilis</span>
+                        <ChevronRight className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -828,51 +824,91 @@ export default function HomePage() {
 
           {/* Activity Gallery Inline */}
           <div className="mt-16 pt-16 border-t border-slate-200">
-            <h3 className="text-xl font-bold text-[#0E3B66] text-center mb-8">
-              Suasana & Dokumentasi Nyata
-            </h3>
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-105 px-3 py-1 rounded-full inline-block font-mono">
+                GALERI VISUAL KEGIATAN
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight mt-4">
+                Suasana &amp; Dokumentasi Nyata
+              </h2>
+              <p className="mt-4 text-slate-500 text-sm font-light leading-relaxed font-inter">
+                Dokumentasi visual dari berbagai program, festival, dan aktivitas kedinasan di lingkungan DISPORAPAR Kota Tegal.
+              </p>
+            </div>
+          </div>
+        </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {galleryPhotos.slice(0, 4).map((photo) => (
+        {/* Full-width Gallery Marquee Container (Edge to Edge) */}
+        <div className="w-full overflow-hidden py-4 select-none">
+          <div 
+            className="flex overflow-hidden"
+            onMouseEnter={() => setIsGalleryPaused(true)}
+            onMouseLeave={() => setIsGalleryPaused(false)}
+            onTouchStart={() => setIsGalleryPaused(true)}
+            onTouchEnd={() => setIsGalleryPaused(false)}
+          >
+            <div
+              className={`flex gap-4 w-max animate-marquee ${
+                isGalleryPaused || selectedPhoto ? 'animate-marquee-paused' : 'hover:animate-marquee-paused'
+              }`}
+            >
+              {/* Duplicated list of gallery photos for infinite loop */}
+              {[...galleryPhotos, ...galleryPhotos].map((photo, idx) => (
                 <div
-                  key={photo.id}
-                  onClick={() => setSelectedPhoto(photo)}
-                  className="group relative aspect-square rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm cursor-pointer"
+                  key={`${photo.id}-${idx}`}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent toggling the marquee state
+                    setSelectedPhoto(photo);
+                  }}
+                  className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 aspect-square w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 flex-shrink-0"
                 >
-                  <Image
-                    src={photo.imageUrl}
-                    alt={photo.title}
-                    fill
-                    className="object-cover group-hover:scale-103 transition-transform duration-500"
-                    sizes="(max-w-768px) 50vw, 25vw"
-                    referrerPolicy="no-referrer"
-                  />
+                  {/* Visual Image container with Next.js Image component */}
+                  <div className="relative w-full h-full overflow-hidden bg-slate-50">
+                    <Image
+                      src={photo.imageUrl}
+                      alt={photo.title}
+                      fill
+                      className="object-cover group-hover:scale-104 transition-transform duration-500"
+                      sizes="(max-w-640px) 50vw, (max-w-1024px) 33vw, 20vw"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between text-left">
+                      <div>
+                        <span className="px-2 py-0.5 rounded text-[8.5px] font-extrabold text-white bg-primary hover:bg-opacity-90 w-max uppercase tracking-widest font-mono">
+                          {photo.category}
+                        </span>
+                      </div>
 
-                  <div className="absolute inset-0 bg-slate-950/40 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between text-left">
-                    <span className="px-2 py-0.5 rounded text-[8.5px] font-extrabold text-white bg-[#0E3B66] hover:bg-opacity-90 w-max uppercase tracking-widest font-mono">
-                      {photo.category}
-                    </span>
-                    <div className="flex items-center gap-1.5 text-white">
-                      <ImageIcon className="w-3.5 h-3.5 shrink-0 text-white" />
-                      <span className="text-[10px] font-bold truncate tracking-wider font-mono uppercase leading-none">Buka Detail</span>
+                      <div className="flex flex-col gap-1.5">
+                        <h4 className="font-bold text-xs sm:text-sm text-white leading-snug tracking-tight line-clamp-2">
+                          {photo.title}
+                        </h4>
+                        <div className="flex items-center gap-1 text-white self-end mt-1">
+                          <Eye className="w-3.5 h-3.5 shrink-0 text-white" />
+                          <span className="text-[10px] font-bold tracking-wider font-mono uppercase leading-none">Buka Detail</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-
-            <div className="text-center mt-10">
-              <Link
-                href="/galeri"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all font-mono"
-              >
-                <span>Seluruh Galeri Foto</span>
-                <ImageIcon className="w-4 h-4 text-slate-500" />
-              </Link>
-            </div>
           </div>
-
         </div>
+
+        {/* Start a new max-w-7xl container for the "Seluruh Galeri Foto" button */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="text-center">
+            <Link
+              href="/galeri"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all font-mono"
+            >
+              <span>Seluruh Galeri Foto</span>
+              <ImageIcon className="w-4 h-4 text-slate-500" />
+            </Link>
+          </div>
+        </div>
+
       </section>
 
       {/* 8. PUBLIC SERVICES & DOWNLOADS */}
@@ -1021,7 +1057,7 @@ export default function HomePage() {
               <div className="pt-8 border-t border-slate-200/70 mt-8">
                 <Link
                   href="/hubungi-kami"
-                  className="w-full text-center py-3.5 rounded-xl bg-primary text-white font-bold text-xs uppercase tracking-widest hover:bg-primary-900 shadow-md block transition-all font-mono"
+                  className="w-full text-center py-3.5 rounded-xl bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] text-white font-bold text-xs uppercase tracking-widest shadow-md block transition-all font-mono"
                 >
                   Hubungi Kami
                 </Link>
@@ -1045,10 +1081,6 @@ export default function HomePage() {
                 />
               </div>
 
-              <p className="mt-4 text-[13px] text-[#4F5E74] leading-relaxed font-sans font-medium text-left">
-                Kantor kami berlokasi di distrik Kejambon, Tegal Timur. Sangat strategis dan mudah dijangkau dengan kendaraan roda dua maupun roda empat.
-              </p>
-
               {/* Maps Navigation buttons */}
               <div className="mt-8 pt-8 border-t border-slate-200/70 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <a
@@ -1056,7 +1088,7 @@ export default function HomePage() {
                   href="https://www.google.com/maps/dir/?api=1&destination=Jl.+Melati+No.30a,+Kejambon,+Kec.+Tegal+Tim.,+Kota+Tegal,+Jawa+Tengah+52124"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3.5 px-6 rounded-xl bg-[#0E3B66] hover:bg-[#072440] text-white font-bold text-xs uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-all hover:shadow-lg cursor-pointer font-mono"
+                  className="py-3.5 px-6 rounded-xl bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] text-white font-bold text-xs uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-all hover:shadow-lg cursor-pointer font-mono"
                 >
                   <Compass className="h-4 w-4 shrink-0 text-white" />
                   <span>PETUNJUK RUTE ARAH</span>

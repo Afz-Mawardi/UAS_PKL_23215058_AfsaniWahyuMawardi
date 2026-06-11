@@ -6,8 +6,11 @@ import {
   EVENTS,
   GALLERY_PHOTOS,
   PUBLIC_SERVICES,
-  OFFICE_INFO
+  OFFICE_INFO,
+  WELCOME_MESSAGE,
+  HERO_SLIDES
 } from '@/lib/data';
+export const dynamic = 'force-dynamic';
 
 const dbPath = path.join(process.cwd(), 'lib', 'db.json');
 
@@ -20,7 +23,15 @@ function getDbData() {
         events: EVENTS,
         gallery: GALLERY_PHOTOS,
         services: PUBLIC_SERVICES,
-        officeInfo: OFFICE_INFO
+        officeInfo: OFFICE_INFO,
+        welcomeMessage: WELCOME_MESSAGE,
+        heroSlides: HERO_SLIDES,
+        categories: {
+          news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
+          gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
+          events: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Dinas'],
+          services: ['SOP', 'Formulir', 'Berkas Layanan', 'Izin Usaha']
+        }
       };
       // Ensure the directory exists
       const dir = path.dirname(dbPath);
@@ -31,7 +42,28 @@ function getDbData() {
       return initialData;
     }
     const fileContent = fs.readFileSync(dbPath, 'utf-8');
-    return JSON.parse(fileContent);
+    const parsed = JSON.parse(fileContent);
+    // Ensure categories key exists on read
+    if (!parsed.categories) {
+      parsed.categories = {
+        news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
+        gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
+        events: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Dinas'],
+        services: ['SOP', 'Formulir', 'Berkas Layanan', 'Izin Usaha']
+      };
+      saveDbData(parsed);
+    }
+    // Ensure welcomeMessage key exists on read
+    if (!parsed.welcomeMessage) {
+      parsed.welcomeMessage = WELCOME_MESSAGE;
+      saveDbData(parsed);
+    }
+    // Ensure heroSlides key exists on read
+    if (!parsed.heroSlides) {
+      parsed.heroSlides = HERO_SLIDES;
+      saveDbData(parsed);
+    }
+    return parsed;
   } catch (error) {
     console.error('Failed to read database file, using fallback initial data', error);
     return {
@@ -39,7 +71,15 @@ function getDbData() {
       events: EVENTS,
       gallery: GALLERY_PHOTOS,
       services: PUBLIC_SERVICES,
-      officeInfo: OFFICE_INFO
+      officeInfo: OFFICE_INFO,
+      welcomeMessage: WELCOME_MESSAGE,
+      heroSlides: HERO_SLIDES,
+      categories: {
+        news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
+        gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
+        events: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Dinas'],
+        services: ['SOP', 'Formulir', 'Berkas Layanan', 'Izin Usaha']
+      }
     };
   }
 }
@@ -84,6 +124,12 @@ export async function POST(request: Request) {
       currentData.services = data;
     } else if (type === 'officeInfo') {
       currentData.officeInfo = data;
+    } else if (type === 'categories') {
+      currentData.categories = data;
+    } else if (type === 'welcomeMessage') {
+      currentData.welcomeMessage = data;
+    } else if (type === 'heroSlides') {
+      currentData.heroSlides = data;
     } else {
       return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });
     }

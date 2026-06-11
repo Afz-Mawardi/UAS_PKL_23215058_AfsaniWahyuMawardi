@@ -39,11 +39,27 @@ export default function Header() {
         setScrolled(false);
       }
     };
-    
+
     handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    setOpenDropdown(null);
+    setIsOpen(false);
+  }, [pathname]);
 
   // Structural groupings requested to make navbar compact
   const navigationMenu: MenuGroup[] = [
@@ -99,7 +115,7 @@ export default function Header() {
     },
   ];
 
-  const isWhiteNav = scrolled;
+  const isWhiteNav = scrolled || !isHome;
 
   const isGroupActive = (group: MenuGroup) => {
     if (group.href) return pathname === group.href;
@@ -120,21 +136,20 @@ export default function Header() {
   }
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-305 ${
-      isWhiteNav
-        ? 'bg-white/95 backdrop-blur-md shadow-md py-3 text-slate-850'
-        : 'bg-gradient-to-b from-black/70 via-black/20 to-transparent py-4.5 text-white'
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
-          
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isWhiteNav
+        ? 'bg-white/95 backdrop-blur-md shadow-md py-2 lg:py-1.5 text-slate-850'
+        : 'bg-gradient-to-b from-black/75 via-black/20 to-transparent py-2 lg:py-2.5 text-white'
+      }`}>
+      <div className="max-w-7xl mx-auto px-4 lg:px-4 xl:px-8">
+        <div className="flex items-center justify-between h-12">
+
           {/* Logo Brand Title */}
           <Link href="/" className="flex items-center gap-3.5 group">
             <Logo isWhiteNav={isWhiteNav} />
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-2">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
             {navigationMenu.map((group) => {
               const active = isGroupActive(group);
               const hasDropdown = !!group.items;
@@ -151,15 +166,14 @@ export default function Header() {
                   >
                     <button
                       type="button"
-                      className={`flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl text-xs sm:text-[13px] font-bold tracking-wide transition-all duration-200 uppercase font-mono cursor-pointer focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                        isHighlighted
+                      className={`flex items-center justify-center gap-1 lg:gap-1.5 h-9 px-2 lg:px-2.5 xl:px-3.5 rounded-xl text-[11px] lg:text-[11.5px] xl:text-[13px] font-bold tracking-wide transition-all duration-200 uppercase font-mono cursor-pointer focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isHighlighted
                           ? isWhiteNav
                             ? 'text-accent bg-[#0E3B66]/5 font-black border border-accent/15'
                             : 'text-accent bg-[#0E3B66]/60 font-black border border-accent/20'
                           : isWhiteNav
                             ? 'text-[#0E3B66] hover:text-accent hover:bg-[#0E3B66]/5 border border-transparent'
                             : 'text-white hover:text-accent hover:bg-white/10 border border-transparent'
-                      }`}
+                        }`}
                     >
                       <span>{group.name}</span>
                       <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -173,33 +187,48 @@ export default function Header() {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute left-0 top-full pt-1.5 w-64 z-50 origin-top-left"
+                          className="absolute left-0 top-full pt-2.5 w-56 z-50 origin-top-left"
                         >
-                          <div className="overflow-hidden rounded-2xl shadow-2xl border p-2 bg-[#0E3B66]/98 backdrop-blur-xl border-[#2D9CDB]/35 text-white">
+                          <div className="overflow-hidden rounded-2xl shadow-2xl border p-1.5 bg-[#0E3B66]/98 backdrop-blur-xl border-[#2D9CDB]/35 text-white">
                             <div className="flex flex-col gap-0.5">
                               {group.items?.map((item) => {
                                 const isSubActive = pathname === item.href;
                                 const LinkComponent = item.isExternal ? 'a' : Link;
-                                const linkProps = item.isExternal
+                                const isInternalProfilOrPelayanan = !item.isExternal && (item.href.startsWith('/profil') || item.href.startsWith('/pelayanan'));
+                                const linkProps: any = item.isExternal
                                   ? { href: item.href, target: "_blank", rel: "noopener noreferrer" }
-                                  : { href: item.href };
+                                  : { href: item.href, scroll: !isInternalProfilOrPelayanan };
 
                                 return (
                                   <LinkComponent
                                     key={item.name}
                                     {...linkProps}
-                                    className={`flex flex-col gap-0.5 px-4 py-2.5 rounded-xl transition-all border-l-2 border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                                      isSubActive
+                                    onClick={() => {
+                                      if (pathname === item.href) {
+                                        setOpenDropdown(null);
+                                        if (item.href === '/profil' || item.href === '/pelayanan') {
+                                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        } else if (item.href === '/profil/struktur-organisasi') {
+                                          const element = document.getElementById('struktur-organisasi');
+                                          if (element) element.scrollIntoView({ behavior: 'smooth' });
+                                        } else if (item.href === '/profil/tupoksi') {
+                                          const element = document.getElementById('tupoksi-dan-fungsi');
+                                          if (element) element.scrollIntoView({ behavior: 'smooth' });
+                                        } else if (item.href.startsWith('/pelayanan/')) {
+                                          const element = document.getElementById('pelayanan-tabs-section');
+                                          if (element) element.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                      }
+                                    }}
+                                    className={`flex flex-col gap-0.5 px-4 py-2 rounded-xl transition-all border-l-2 border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isSubActive
                                         ? 'bg-accent/20 text-accent border-accent'
                                         : 'hover:bg-[#2D9CDB]/15 text-slate-200 hover:text-white'
-                                    }`}
+                                      }`}
                                   >
                                     <div className="flex items-center justify-between text-xs sm:text-[13px] font-bold">
                                       <span>{item.name}</span>
-                                      {item.isExternal ? (
+                                      {item.isExternal && (
                                         <ExternalLink className="w-3.5 h-3.5 text-accent opacity-90 block" />
-                                      ) : (
-                                        <ChevronRight className="w-3.5 h-3.5 text-secondary opacity-80" />
                                       )}
                                     </div>
                                   </LinkComponent>
@@ -218,22 +247,28 @@ export default function Header() {
               const LinkComponent = group.isExternal ? 'a' : Link;
               const linkProps = group.isExternal
                 ? { href: group.href || '/', target: "_blank", rel: "noopener noreferrer" }
-                : { href: group.href || '/' };
+                : {
+                  href: group.href || '/',
+                  onClick: () => {
+                    if (pathname === group.href) {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }
+                };
 
               return (
                 <LinkComponent
                   key={group.name}
                   id={`nav-link-${group.name.toLowerCase().replace(/\s+/g, '-')}`}
                   {...linkProps}
-                  className={`px-3.5 rounded-xl text-xs sm:text-[13px] font-bold tracking-wide transition-all duration-200 uppercase font-mono flex items-center justify-center gap-1.5 h-10 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                    active
+                  className={`px-2 lg:px-2.5 xl:px-3.5 rounded-xl text-[11px] lg:text-[11.5px] xl:text-[13px] font-bold tracking-wide transition-all duration-200 uppercase font-mono flex items-center justify-center gap-1 lg:gap-1.5 h-9 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${active
                       ? isWhiteNav
                         ? 'text-accent bg-[#0E3B66]/5 font-black border border-accent/15'
                         : 'text-accent bg-[#0E3B66]/60 font-black border border-accent/20'
                       : isWhiteNav
                         ? 'text-[#0E3B66] hover:text-accent hover:bg-[#0E3B66]/5 border border-transparent'
                         : 'text-white hover:text-accent hover:bg-white/10 border border-transparent'
-                  }`}
+                    }`}
                 >
                   <span>{group.name}</span>
                   {group.isExternal && <ExternalLink className="w-3 h-3 opacity-80" />}
@@ -246,13 +281,17 @@ export default function Header() {
           <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/hubungi-kami"
-              className={`px-4 py-2.5 rounded-xl text-xs sm:text-[13px] font-bold tracking-wide uppercase border font-mono transition-all duration-300 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                isHubungiActive
+              onClick={() => {
+                if (pathname === '/hubungi-kami') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              className={`px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-[11px] lg:text-[11.5px] xl:text-[13px] font-bold tracking-wide uppercase border font-mono transition-all duration-300 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isHubungiActive
                   ? 'bg-accent text-white border-accent shadow-md shadow-accent/20'
                   : isWhiteNav
                     ? 'border-accent text-accent hover:bg-accent hover:text-white shadow-xs'
                     : 'border-accent text-accent hover:bg-accent hover:text-white drop-shadow-xs'
-              }`}
+                }`}
             >
               HUBUNGI KAMI
             </Link>
@@ -264,9 +303,8 @@ export default function Header() {
               id="mobile-menu-toggle"
               type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className={`inline-flex items-center justify-center p-2 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                isWhiteNav ? 'text-[#0E3B66] hover:bg-slate-50' : 'text-white hover:bg-white/5'
-              }`}
+              className={`inline-flex items-center justify-center p-2 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isWhiteNav ? 'text-[#0E3B66] hover:bg-slate-50' : 'text-white hover:bg-white/5'
+                }`}
               aria-label="Toggle Menu"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -299,11 +337,10 @@ export default function Header() {
                         <button
                           type="button"
                           onClick={() => toggleMobileMenuExpansion(group.name)}
-                          className={`flex items-center justify-between px-4 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider text-left transition-all focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                            active
+                          className={`flex items-center justify-between px-4 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider text-left transition-all focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${active
                               ? 'bg-accent/15 text-accent font-bold'
                               : 'text-slate-200 hover:bg-white/5'
-                          }`}
+                            }`}
                         >
                           <span>{group.name}</span>
                           <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isMobileExpanded ? 'rotate-180 text-accent' : ''}`} />
@@ -321,20 +358,37 @@ export default function Header() {
                               {group.items?.map((item) => {
                                 const isSubActive = pathname === item.href;
                                 const LinkComponent = item.isExternal ? 'a' : Link;
-                                const linkProps = item.isExternal
+                                const isInternalProfilOrPelayanan = !item.isExternal && (item.href.startsWith('/profil') || item.href.startsWith('/pelayanan'));
+                                const linkProps: any = item.isExternal
                                   ? { href: item.href, target: "_blank", rel: "noopener noreferrer" }
-                                  : { href: item.href };
+                                  : { href: item.href, scroll: !isInternalProfilOrPelayanan };
 
                                 return (
                                   <LinkComponent
                                     key={item.name}
                                     {...linkProps}
-                                    onClick={() => !item.isExternal && setIsOpen(false)}
-                                    className={`flex flex-col px-4 py-2.5 rounded-xl transition-all focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                                      isSubActive
+                                    onClick={() => {
+                                      if (item.isExternal) return;
+                                      if (pathname === item.href) {
+                                        setIsOpen(false);
+                                        if (item.href === '/profil' || item.href === '/pelayanan') {
+                                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        } else if (item.href === '/profil/struktur-organisasi') {
+                                          const element = document.getElementById('struktur-organisasi');
+                                          if (element) element.scrollIntoView({ behavior: 'smooth' });
+                                        } else if (item.href === '/profil/tupoksi') {
+                                          const element = document.getElementById('tupoksi-dan-fungsi');
+                                          if (element) element.scrollIntoView({ behavior: 'smooth' });
+                                        } else if (item.href.startsWith('/pelayanan/')) {
+                                          const element = document.getElementById('pelayanan-tabs-section');
+                                          if (element) element.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                      }
+                                    }}
+                                    className={`flex flex-col px-4 py-2.5 rounded-xl transition-all focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isSubActive
                                         ? 'text-accent font-bold'
                                         : 'text-slate-300 hover:text-white hover:bg-white/5'
-                                    }`}
+                                      }`}
                                   >
                                     <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase font-mono">
                                       <span>{item.name}</span>
@@ -354,17 +408,24 @@ export default function Header() {
                   const MobLinkComponent = group.isExternal ? 'a' : Link;
                   const mobLinkProps = group.isExternal
                     ? { href: group.href || '/', target: "_blank", rel: "noopener noreferrer" }
-                    : { href: group.href || '/', onClick: () => setIsOpen(false) };
+                    : {
+                      href: group.href || '/',
+                      onClick: () => {
+                        if (pathname === group.href) {
+                          setIsOpen(false);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }
+                    };
 
                   return (
                     <MobLinkComponent
                       key={group.name}
                       {...mobLinkProps}
-                      className={`px-4 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-between focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                        active
+                      className={`px-4 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-between focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${active
                           ? 'bg-accent/20 text-accent border-l-4 border-accent'
                           : 'text-slate-200 hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       <span>{group.name}</span>
                       {group.isExternal && <ExternalLink className="w-3.5 h-3.5 text-slate-500" />}
@@ -375,12 +436,16 @@ export default function Header() {
                 {/* Direct Link to Kontak */}
                 <Link
                   href="/hubungi-kami"
-                  onClick={() => setIsOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all mt-1 border focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
-                    isHubungiActive
+                  onClick={() => {
+                    if (pathname === '/hubungi-kami') {
+                      setIsOpen(false);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all mt-1 border focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isHubungiActive
                       ? 'bg-accent text-white border-accent shadow-md shadow-accent/15'
                       : 'text-slate-200 hover:text-white hover:bg-white/5 border-white/10'
-                  }`}
+                    }`}
                 >
                   <span>HUBUNGI KAMI</span>
                   <ChevronRight className={`w-3.5 h-3.5 ${isHubungiActive ? 'text-white' : 'text-slate-400'}`} />

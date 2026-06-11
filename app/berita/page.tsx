@@ -4,18 +4,19 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { News } from '@/lib/data';
-import { useNews } from '@/lib/data-store';
+import { useNews, useCategories } from '@/lib/data-store';
 import { Search, Calendar, User, ChevronRight, Newspaper, X, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { parseIndonesianDate } from '@/lib/utils';
 
 export default function BeritaPage() {
   const [newsList] = useNews();
+  const [categoriesStore] = useCategories();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeNewsDetail, setActiveNewsDetail] = useState<News | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
 
-  const categories = ['Semua', 'Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'];
+  const categories = ['Semua', ...categoriesStore.news];
 
   // Lock background body scroll when modal is active
   useEffect(() => {
@@ -46,18 +47,11 @@ export default function BeritaPage() {
     <div id="berita-page" className="w-full bg-[#F8FAFC] pb-24 font-sans text-slate-800">
       
       {/* Editorial Page Header */}
-      <section className="relative py-20 sm:py-24 bg-slate-950 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-65">
-          <Image
-            src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=2000"
-            alt="Koran Digital Kota Tegal"
-            fill
-            priority
-            className="object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/40 to-transparent z-10" />
+      <section className="relative py-20 sm:py-24 bg-gradient-to-br from-primary-950 via-primary-900 to-primary-950 text-white overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 bg-grid-lines opacity-10" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,8 +65,8 @@ export default function BeritaPage() {
       </section>
 
       {/* FILTER & SEARCH INTERACTIVE BAR */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <section className="sticky top-[68px] lg:top-[76px] z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 pb-4">
+        <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-slate-100/80 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between transition-all duration-300">
           
           {/* Category Chips Tab Panel */}
           <div className="flex flex-wrap gap-2 items-center">
@@ -102,7 +96,7 @@ export default function BeritaPage() {
               placeholder="Cari rilis berita atau berita terkini..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary text-slate-800 transition-all font-medium font-inter"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary text-slate-800 transition-all font-medium font-inter"
             />
           </div>
 
@@ -112,66 +106,58 @@ export default function BeritaPage() {
       {/* BERITA GRID */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         {filteredNews.length > 0 ? (
-          <div className="w-full max-h-[680px] overflow-y-auto pr-2 scrollbar-thin">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredNews.map((news) => (
-                <div
-                  key={news.id}
-                  className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group"
-                >
-                  {/* Visual Card Image */}
-                  <div className="relative aspect-16/10 w-full overflow-hidden bg-slate-50">
-                    <Image
-                      src={news.imageUrl}
-                      alt={news.title}
-                      fill
-                      className="object-cover group-hover:scale-103 transition-transform duration-500"
-                      sizes="(max-w-711px) 100vw, 33vw"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className="px-2.5 py-1 text-[9px] font-bold text-white bg-[#0E3B66]/90 tracking-widest uppercase rounded-lg shadow-sm backdrop-blur-md font-mono">
-                        {news.category}
-                      </span>
-                    </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredNews.map((news) => (
+              <div
+                key={news.id}
+                className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group"
+              >
+                {/* Visual Card Image */}
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
+                  <Image
+                    src={news.imageUrl}
+                    alt={news.title}
+                    fill
+                    className="object-cover group-hover:scale-103 transition-transform duration-500"
+                    sizes="(max-w-711px) 100vw, 33vw"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className="px-2.5 py-1 text-[9px] font-bold text-white bg-[#0E3B66]/90 tracking-widest uppercase rounded-lg shadow-sm backdrop-blur-md font-mono">
+                      {news.category}
+                    </span>
                   </div>
-
-                  {/* Info Text detail panel */}
-                  <div className="p-6 sm:p-8 flex-grow flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-3 text-[10px] sm:text-xs text-slate-400 mb-3.5 font-mono">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="h-3.5 w-3.5 shrink-0" />
-                          <span>{news.date}</span>
-                        </div>
-                        <span>•</span>
-                        <div className="flex items-center gap-1.5">
-                          <User className="h-3.5 w-3.5 shrink-0" />
-                          <span>{news.author}</span>
-                        </div>
-                      </div>
-
-                      <h3 className="font-extrabold text-base sm:text-lg text-[#0E3B66] font-sans tracking-tight group-hover:text-primary transition-colors leading-snug line-clamp-3">
-                        {news.title}
-                      </h3>
-                    </div>
-
-                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider font-mono">Humas Tegal Pers</span>
-                      <button
-                        type="button"
-                        onClick={() => setActiveNewsDetail(news)}
-                        className="text-xs font-bold text-primary hover:text-accent transition-colors flex items-center gap-1 uppercase tracking-wider font-mono bg-slate-50 hover:bg-slate-100 px-3.5 py-2 rounded-xl"
-                      >
-                        <span>Baca Rilis</span>
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-
                 </div>
-              ))}
-            </div>
+
+                {/* Info Text detail panel */}
+                <div className="p-6 sm:p-8 flex-grow flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-3 text-[10px] sm:text-xs text-slate-400 mb-3.5 font-mono">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 shrink-0" />
+                        <span>{news.date}</span>
+                      </div>
+                    </div>
+
+                    <h3 className="font-extrabold text-base sm:text-lg text-[#0E3B66] font-sans tracking-tight group-hover:text-primary transition-colors leading-snug line-clamp-3">
+                      {news.title}
+                    </h3>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setActiveNewsDetail(news)}
+                      className="text-xs font-bold text-primary hover:text-accent transition-colors flex items-center gap-1 uppercase tracking-wider font-mono bg-slate-50 hover:bg-slate-100 px-3.5 py-2 rounded-xl cursor-pointer"
+                    >
+                      <span>Baca Rilis</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            ))}
           </div>
         ) : (
           <div className="bg-white p-12 text-center rounded-3xl border border-slate-100 max-w-md mx-auto shadow-sm">

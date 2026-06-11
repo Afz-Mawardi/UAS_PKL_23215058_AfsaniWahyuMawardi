@@ -12,18 +12,11 @@ export default function KontakPage() {
     <div id="kontak-page" className="w-full bg-slate-50 pb-24 font-sans text-slate-800">
 
       {/* Immersive Editorial Header */}
-      <section className="relative py-20 sm:py-24 bg-slate-950 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-65">
-          <Image
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1600"
-            alt="Kontak DISPORAPAR"
-            fill
-            priority
-            className="object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/40 to-transparent z-10" />
+      <section className="relative py-20 sm:py-24 bg-gradient-to-br from-primary-950 via-primary-900 to-primary-950 text-white overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 bg-grid-lines opacity-10" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-slate-50 to-transparent z-10" />
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -299,9 +292,6 @@ export default function KontakPage() {
               Peta Lokasi Interaktif
             </span>
             <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Kunjungi Kantor Utama</h3>
-            <p className="text-xs sm:text-sm text-slate-500 font-inter font-light">
-              Terletak strategis bersebelahan dengan kompleks olahraga Stadion Yos Sudarso, Tegal Timur, Jawa Tengah.
-            </p>
           </div>
 
           <div className="relative w-full h-[280px] sm:h-[300px] rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
@@ -325,7 +315,7 @@ export default function KontakPage() {
               href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(officeInfo.address)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 px-6 rounded-xl bg-primary hover:bg-primary-900 text-white font-bold text-xs uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-all hover:shadow-lg cursor-pointer"
+              className="w-full py-3 px-6 rounded-xl bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] text-white font-bold text-xs uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-all hover:shadow-lg cursor-pointer"
             >
               <Compass className="h-4 w-4 shrink-0 text-white" />
               <span>Petunjuk Arah</span>

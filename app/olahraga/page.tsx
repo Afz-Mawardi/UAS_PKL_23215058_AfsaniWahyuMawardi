@@ -11,18 +11,11 @@ export default function OlahragaPage() {
     <div id="olahraga-page" className="w-full bg-[#F8FAFC] pb-24 font-sans text-slate-800">
       
       {/* Immersive Editorial Header */}
-      <section className="relative py-20 sm:py-24 bg-slate-950 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-65">
-          <Image
-            src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=2000"
-            alt="Olahraga Kota Tegal"
-            fill
-            priority
-            className="object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/40 to-transparent z-10" />
+      <section className="relative py-20 sm:py-24 bg-gradient-to-br from-primary-950 via-primary-900 to-primary-950 text-white overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 bg-grid-lines opacity-10" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,14 +30,16 @@ export default function OlahragaPage() {
 
       {/* CORE SPORTS VENUES SHOWCASE SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="text-center md:text-left mb-12">
-          <span className="text-xs font-bold text-secondary tracking-widest uppercase font-mono bg-blue-100/50 border border-blue-200/40 px-3 py-1 rounded-full inline-block">
-            Sarana Prasarana Daerah
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
-            Sewa Lapangan & Gelanggang Olahraga
-          </h2>
-          <p className="text-sm sm:text-base text-slate-500 mt-2 font-inter font-light">
+        <div className="space-y-8 text-left mb-8">
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-secondary tracking-widest uppercase font-mono bg-blue-100/50 border border-blue-200/40 px-3 py-1 rounded-full inline-block">
+              Sarana Prasarana Daerah
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Sewa Lapangan & Gelanggang Olahraga
+            </h2>
+          </div>
+          <p className="text-sm sm:text-base text-slate-500 font-inter font-light">
             Daftar sarana prasarana olahraga milik Pemerintah Daerah Kota Tegal yang beroperasi secara resmi di bawah pengelolaan terpadu DISPORAPAR.
           </p>
         </div>
@@ -133,13 +128,15 @@ export default function OlahragaPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Coach Details Column */}
-            <div className="lg:col-span-7 space-y-6">
-              <span className="text-xs font-bold text-accent tracking-widest uppercase bg-orange-100/50 border border-orange-200/40 px-3.5 py-1.5 rounded-full inline-block font-mono">
-                Pemberdayaan Atlet Daerah
-              </span>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none">
-                Pemusatan Latihan & Pembinaan Olahraga Berkelanjutan
-              </h2>
+            <div className="lg:col-span-7 space-y-8 text-left">
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-accent tracking-widest uppercase bg-orange-100/50 border border-orange-200/40 px-3.5 py-1.5 rounded-full inline-block font-mono">
+                  Pemberdayaan Atlet Daerah
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                  Pemusatan Latihan & Pembinaan Olahraga Berkelanjutan
+                </h2>
+              </div>
               <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-inter font-light">
                 DISPORAPAR bersinergi erat bersama KONI (Komite Olahraga Nasional Indonesia) Kota Tegal secara terpadu mengelola pemusatan latihan atlet usia dini berkala, peningkatan kualifikasi lisensi pelatih nasional, serta penyelenggaraan bonus apresiasi kejuaraan PORPROV & PON.
               </p>

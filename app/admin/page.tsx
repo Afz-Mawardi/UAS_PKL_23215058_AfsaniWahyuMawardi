@@ -7,7 +7,10 @@ import {
   useEvents,
   useGallery,
   usePublicServices,
-  useOfficeInfo
+  useOfficeInfo,
+  useCategories,
+  useWelcomeMessage,
+  useHeroSlides
 } from '@/lib/data-store';
 import {
   ShieldAlert,
@@ -22,6 +25,7 @@ import {
   Edit2,
   Trash2,
   Eye,
+  EyeOff,
   Search,
   CheckCircle,
   X,
@@ -32,11 +36,14 @@ import {
   MapPin,
   Clock,
   Mail,
-  Menu
+  Menu,
+  User,
+  Sliders
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
+import { HeroSlide } from '@/lib/data';
 
 // Helper to parse Indonesian date format (e.g. "24 Mei 2026") to YYYY-MM-DD
 const parseIndonesianDateToYYYYMMDD = (dateStr: string): string => {
@@ -82,7 +89,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState<string>('');
 
   // Active Tab State
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'berita' | 'galeri' | 'agenda' | 'berkas' | 'kontak'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'berita' | 'galeri' | 'agenda' | 'berkas' | 'kontak' | 'sambutan' | 'beranda'>('dashboard');
 
   // Dynamic Data States
   const [news, setNews] = useNews();
@@ -90,6 +97,24 @@ export default function AdminPage() {
   const [gallery, setGallery] = useGallery();
   const [services, setServices] = usePublicServices();
   const [officeInfo, setOfficeInfo] = useOfficeInfo();
+  const [categoriesStore, setCategoriesStore] = useCategories();
+  const [welcomeMessage, setWelcomeMessage] = useWelcomeMessage();
+  const [heroSlides, setHeroSlides] = useHeroSlides();
+
+  // Welcome message states
+  const [isEditingWelcome, setIsEditingWelcome] = useState<boolean>(false);
+
+  // Custom enhancement states
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isEditingContact, setIsEditingContact] = useState<boolean>(false);
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('Semua');
+
+  // Category Manager Modal States
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState<boolean>(false);
+  const [categoryManagerTab, setCategoryManagerTab] = useState<'news' | 'gallery' | 'events' | 'services'>('news');
+  const [newCategoryName, setNewCategoryName] = useState<string>('');
+  const [editingCategoryIndex, setEditingCategoryIndex] = useState<number | null>(null);
+  const [editingCategoryName, setEditingCategoryName] = useState<string>('');
 
   // CRUD Editing States
   const [editingItem, setEditingItem] = useState<any | null>(null);
@@ -170,14 +195,14 @@ export default function AdminPage() {
         showNotification('Ukuran berkas maksimal 5MB.', 'error');
         return;
       }
-      
+
       let sizeStr = '';
       if (file.size >= 1024 * 1024) {
         sizeStr = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
       } else {
         sizeStr = Math.round(file.size / 1024) + ' KB';
       }
-      
+
       setUploadedFileSize(sizeStr);
       setUploadedFileName(file.name);
 
@@ -202,7 +227,7 @@ export default function AdminPage() {
     setUploadedFileName('');
     setUploadedFileSize('');
     if (type === 'edit') {
-      setUploadedImageBase64(item.imageUrl || '');
+      setUploadedImageBase64(item.imageUrl || item.image || '');
       if (activeTab === 'berkas' && item) {
         setUploadedFileSize(item.fileSize || '');
         if (item.downloadUrl && item.downloadUrl.startsWith('data:')) {
@@ -236,6 +261,8 @@ export default function AdminPage() {
         setEvents(events.filter((ev) => ev.id !== editingItem.id));
       } else if (activeTab === 'berkas') {
         setServices(services.filter((s) => s.id !== editingItem.id));
+      } else if (activeTab === 'beranda') {
+        setHeroSlides(heroSlides.filter((s) => s.id !== editingItem.id));
       }
       showNotification('Data berhasil dihapus.', 'success');
       setIsModalOpen(false);
@@ -325,8 +352,8 @@ export default function AdminPage() {
       const endTime = formData.get('endTime') as string || '12:00';
       const time = `${startTime} - ${endTime} WIB`;
       const location = formData.get('location') as string;
-      const category = formData.get('category') as any;
-      const description = formData.get('description') as string;
+      const category = '';
+      const description = '';
 
       // Format YYYY-MM-DD to Indonesian "DD Bulan YYYY"
       let dateString = dateVal;
@@ -347,7 +374,7 @@ export default function AdminPage() {
           location,
           category,
           description,
-          imageUrl: 'https://picsum.photos/seed/agenda_def/800/600'
+          imageUrl: ''
         };
         setEvents([newItem, ...events]);
         showNotification('Agenda berhasil ditambahkan.', 'success');
@@ -400,6 +427,35 @@ export default function AdminPage() {
         } : item));
         showNotification('Berkas berhasil diubah.', 'success');
       }
+    } else if (activeTab === 'beranda') {
+      const tagline = formData.get('tagline') as string;
+      const title = formData.get('title') as string;
+      const cta = formData.get('cta') as string;
+      const href = formData.get('href') as string;
+      const image = uploadedImageBase64 || formData.get('imageUrl') as string || 'https://picsum.photos/seed/default_hero/2000/1000';
+
+      if (modalType === 'add') {
+        const newItem: HeroSlide = {
+          id: `slide-${Date.now()}`,
+          tagline,
+          title,
+          cta,
+          href,
+          image
+        };
+        setHeroSlides([...heroSlides, newItem]);
+        showNotification('Slide Beranda berhasil ditambahkan.', 'success');
+      } else {
+        setHeroSlides(heroSlides.map((item) => item.id === editingItem.id ? {
+          ...item,
+          tagline,
+          title,
+          cta,
+          href,
+          image
+        } : item));
+        showNotification('Slide Beranda berhasil diubah.', 'success');
+      }
     }
 
     setIsModalOpen(false);
@@ -435,33 +491,139 @@ export default function AdminPage() {
       gmapsEmbedUrl
     });
 
+    setIsEditingContact(false);
     showNotification('Informasi kontak dinas berhasil diperbarui!', 'success');
+  };
+
+  // Handle Welcome Message Update
+  const handleUpdateWelcomeMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const name = formData.get('name') as string;
+    const nip = formData.get('nip') as string || '';
+    const content = formData.get('content') as string;
+    const imageUrl = uploadedImageBase64 || formData.get('imageUrl') as string || welcomeMessage.imageUrl;
+
+    setWelcomeMessage({
+      name,
+      nip,
+      content,
+      imageUrl
+    });
+
+    setIsEditingWelcome(false);
+    showNotification('Sambutan Kepala Dinas berhasil diperbarui!', 'success');
+  };
+
+  // Cascade Category Changes
+  const cascadeRenameCategory = (moduleType: 'news' | 'gallery' | 'events' | 'services', oldName: string, newName: string) => {
+    if (moduleType === 'news') {
+      setNews(news.map(item => item.category === oldName ? { ...item, category: newName } : item));
+    } else if (moduleType === 'gallery') {
+      setGallery(gallery.map(item => item.category === oldName ? { ...item, category: newName } : item));
+    } else if (moduleType === 'events') {
+      setEvents(events.map(item => item.category === oldName ? { ...item, category: newName } : item));
+    } else if (moduleType === 'services') {
+      setServices(services.map(item => item.category === oldName ? { ...item, category: newName } : item));
+    }
+  };
+
+  const cascadeDeleteCategory = (moduleType: 'news' | 'gallery' | 'events' | 'services', catName: string, fallback: string) => {
+    if (moduleType === 'news') {
+      setNews(news.map(item => item.category === catName ? { ...item, category: fallback } : item));
+    } else if (moduleType === 'gallery') {
+      setGallery(gallery.map(item => item.category === catName ? { ...item, category: fallback } : item));
+    } else if (moduleType === 'events') {
+      setEvents(events.map(item => item.category === catName ? { ...item, category: fallback } : item));
+    } else if (moduleType === 'services') {
+      setServices(services.map(item => item.category === catName ? { ...item, category: fallback } : item));
+    }
+  };
+
+  const handleCreateCategory = () => {
+    if (!newCategoryName.trim()) return;
+    const name = newCategoryName.trim();
+    const currentList = categoriesStore[categoryManagerTab] || [];
+    if (currentList.includes(name)) {
+      showNotification('Kategori sudah ada.', 'error');
+      return;
+    }
+    const updated = {
+      ...categoriesStore,
+      [categoryManagerTab]: [...currentList, name]
+    };
+    setCategoriesStore(updated);
+    setNewCategoryName('');
+    showNotification('Kategori berhasil ditambahkan.', 'success');
+  };
+
+  const handleSaveCategoryRename = (oldName: string, index: number) => {
+    if (!editingCategoryName.trim()) return;
+    const newName = editingCategoryName.trim();
+    if (oldName === newName) {
+      setEditingCategoryIndex(null);
+      return;
+    }
+    const currentList = categoriesStore[categoryManagerTab] || [];
+    if (currentList.includes(newName)) {
+      showNotification('Nama kategori sudah digunakan.', 'error');
+      return;
+    }
+    const updatedList = currentList.map((c, i) => i === index ? newName : c);
+    const updated = {
+      ...categoriesStore,
+      [categoryManagerTab]: updatedList
+    };
+    setCategoriesStore(updated);
+    setEditingCategoryIndex(null);
+    cascadeRenameCategory(categoryManagerTab, oldName, newName);
+    showNotification('Kategori berhasil diubah.', 'success');
+  };
+
+  const handleDeleteCategory = (catName: string) => {
+    const currentList = categoriesStore[categoryManagerTab] || [];
+    const updatedList = currentList.filter(c => c !== catName);
+    const updated = {
+      ...categoriesStore,
+      [categoryManagerTab]: updatedList
+    };
+    setCategoriesStore(updated);
+    cascadeDeleteCategory(categoryManagerTab, catName, updatedList[0] || '');
+    showNotification('Kategori berhasil dihapus.', 'success');
   };
 
   // Filter lists based on search query
   const getFilteredData = () => {
     if (activeTab === 'berita') {
-      return news.filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      return news.filter((item) => {
+        const matchesCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
     } else if (activeTab === 'galeri') {
-      return gallery.filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      return gallery.filter((item) => {
+        const matchesCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
     } else if (activeTab === 'agenda') {
-      return events.filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      return events.filter((item) => {
+        const matchesCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
     } else if (activeTab === 'berkas') {
-      return services.filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      return services.filter((item) => {
+        const matchesCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
     }
     return [];
   };
@@ -509,14 +671,23 @@ export default function AdminPage() {
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-slate-200 tracking-wider uppercase font-mono">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Masukkan password admin123"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-slate-400 transition-all font-medium"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Masukkan password admin123"
+                  className="w-full pl-4 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-slate-400 transition-all font-medium animate-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+                >
+                  {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                </button>
+              </div>
             </div>
 
             <div className="pt-2">
@@ -566,16 +737,15 @@ export default function AdminPage() {
 
       {/* Sidebar backdrop overlay for mobile */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-30 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* 1. SIDEBAR NAVIGATION */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#051424] text-white flex flex-col justify-between shrink-0 shadow-lg border-r border-white/5 transition-transform duration-300 md:translate-x-0 md:static md:h-full ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#051424] text-white flex flex-col justify-between shrink-0 shadow-lg border-r border-white/5 transition-transform duration-300 md:translate-x-0 md:static md:h-full ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
         <div>
           {/* Brand header */}
           <div className="p-6 border-b border-white/5 flex items-center justify-between">
@@ -599,6 +769,8 @@ export default function AdminPage() {
           <nav className="p-4 space-y-1 font-mono text-xs uppercase tracking-wider">
             {[
               { id: 'dashboard', name: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+              { id: 'beranda', name: 'Slide Beranda', icon: <Sliders className="w-4 h-4" /> },
+              { id: 'sambutan', name: 'Sambutan', icon: <User className="w-4 h-4" /> },
               { id: 'berita', name: 'Berita', icon: <Newspaper className="w-4 h-4" /> },
               { id: 'galeri', name: 'Galeri Foto', icon: <ImageIcon className="w-4 h-4" /> },
               { id: 'agenda', name: 'Agenda Event', icon: <Calendar className="w-4 h-4" /> },
@@ -612,7 +784,12 @@ export default function AdminPage() {
                   onClick={() => {
                     setActiveTab(tab.id as any);
                     setSearchQuery('');
+                    setSelectedCategoryFilter('Semua');
                     setIsSidebarOpen(false); // Close sidebar on mobile after selecting tab
+                    if (tab.id === 'sambutan') {
+                      setUploadedImageBase64(welcomeMessage.imageUrl || '');
+                      setIsEditingWelcome(false);
+                    }
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer font-bold text-left ${active
                     ? 'bg-accent text-white shadow-md shadow-accent/15'
@@ -668,13 +845,12 @@ export default function AdminPage() {
                 <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                 <span className="text-slate-500 capitalize truncate">{activeTab}</span>
               </h2>
-              <p className="text-[10px] text-slate-450 font-inter mt-1.5 truncate">Manajemen integrasi data visual dinas DISPORAPAR Kota Tegal</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
             <span className="hidden sm:inline bg-blue-50 text-[#0E3B66] border border-blue-100 text-[10px] font-extrabold px-3 py-1.5 rounded-lg font-mono uppercase">
-              STATUS ADMIN: AKTIF
+              admin disporapar
             </span>
           </div>
         </header>
@@ -683,560 +859,814 @@ export default function AdminPage() {
         <section className="flex-1 p-6 sm:p-8 overflow-y-auto flex flex-col justify-between">
           <div className="flex-grow">
 
-          {/* A. DASHBOARD VIEW WITH GRAPHS */}
-          {activeTab === 'dashboard' && (
-            <div className="space-y-8 animate-fade-in text-left">
+            {/* A. DASHBOARD VIEW WITH GRAPHS */}
+            {activeTab === 'dashboard' && (
+              <div className="space-y-8 animate-fade-in text-left">
 
-              {/* Stat summary cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  { title: 'Total Berita', count: news.length, desc: 'Rilis pers & berita', icon: <Newspaper className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50/50 border-blue-100' },
-                  { title: 'Dokumentasi Galeri', count: gallery.length, desc: 'Foto publikasi', icon: <ImageIcon className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50/50 border-purple-100' },
-                  { title: 'Agenda Terdaftar', count: events.length, desc: 'Event dinas mendatanng', icon: <Calendar className="w-5 h-5 text-amber-600" />, bg: 'bg-amber-50/50 border-amber-100' },
-                  { title: 'Berkas Unduhan', count: services.length, desc: 'Formulir & SOP layanan', icon: <FileText className="w-5 h-5 text-emerald-600" />, bg: 'bg-emerald-50/50 border-emerald-100' }
-                ].map((stat, i) => (
-                  <div key={i} className={`p-5 rounded-2xl bg-white border shadow-xs flex items-start justify-between ${stat.bg}`}>
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block leading-none">{stat.title}</span>
-                      <span className="text-3xl font-black text-[#0E3B66] font-mono block mt-2.5">{stat.count}</span>
-                      <p className="text-[9px] text-slate-400 font-inter mt-1.5 font-light">{stat.desc}</p>
-                    </div>
-                    <div className="p-2.5 bg-white border border-slate-100 rounded-xl shadow-xs shrink-0">
-                      {stat.icon}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* ========================================================================= */}
-              {/* VISUAL CHARTS (GRAPH) ROW - PREMIUM CUSTOM SVG CHARTS */}
-              {/* ========================================================================= */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-                {/* 1. Monthly Activity Line Chart (7 columns) */}
-                <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-accent" />
-                        <span>Tren Aktivitas Bulanan (2026)</span>
-                      </h3>
-                      <p className="text-[10px] text-slate-400 font-inter mt-1">Akumulasi posting berita & agenda per bulan</p>
-                    </div>
-                    <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">LINE CHART</span>
-                  </div>
-
-                  {/* Line Chart Draw Area */}
-                  <div className="relative w-full h-64 border border-slate-100/50 bg-slate-50/50 rounded-2xl p-4 flex items-center justify-center select-none font-inter text-[9px] font-medium text-slate-400">
-                    <svg viewBox="0 0 500 220" className="w-full h-full overflow-visible">
-                      {/* Grid Lines */}
-                      <line x1="40" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-                      <line x1="40" y1="65" x2="480" y2="65" stroke="#f1f5f9" strokeWidth="1" />
-                      <line x1="40" y1="110" x2="480" y2="110" stroke="#f1f5f9" strokeWidth="1" />
-                      <line x1="40" y1="155" x2="480" y2="155" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
-                      <line x1="40" y1="180" x2="480" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
-
-                      {/* Y-Axis Labels */}
-                      <text x="30" y="24" textAnchor="end">12</text>
-                      <text x="30" y="69" textAnchor="end">9</text>
-                      <text x="30" y="114" textAnchor="end">6</text>
-                      <text x="30" y="159" textAnchor="end">3</text>
-                      <text x="30" y="184" textAnchor="end">0</text>
-
-                      {/* X-Axis Labels (Months Jan-Jun) */}
-                      {['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'].map((month, idx) => {
-                        const x = 40 + idx * 80;
-                        return (
-                          <text key={idx} x={x} y="202" textAnchor="middle" className="font-bold text-slate-500 fill-current">{month}</text>
-                        );
-                      })}
-
-                      {/* SVG Gradient definition */}
-                      <defs>
-                        <linearGradient id="line-gradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#F2994A" stopOpacity="0.45" />
-                          <stop offset="100%" stopColor="#F2994A" stopOpacity="0" />
-                        </linearGradient>
-                      </defs>
-
-                      {/* Area under line */}
-                      <path
-                        d="M 40,165 C 80,150 80,120 120,120 C 160,120 160,150 200,135 C 240,120 280,45 320,50 C 360,55 360,95 400,80 C 440,65 440,30 480,30 L 480,180 L 40,180 Z"
-                        fill="url(#line-gradient)"
-                        className="transition-all duration-1000 ease-out"
-                      />
-
-                      {/* Glowing Line */}
-                      <path
-                        d="M 40,165 C 80,150 80,120 120,120 C 160,120 160,150 200,135 C 240,120 280,45 320,50 C 360,55 360,95 400,80 C 440,65 440,30 480,30"
-                        fill="none"
-                        stroke="#F2994A"
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                        className="transition-all duration-1000 ease-out"
-                        style={{ filter: 'drop-shadow(0px 3px 6px rgba(242,153,74,0.3))' }}
-                      />
-
-                      {/* Interactive Data Dots */}
-                      {[
-                        { x: 40, y: 165, val: 2 },
-                        { x: 120, y: 120, val: 5 },
-                        { x: 200, y: 135, val: 4 },
-                        { x: 320, y: 50, val: 10 },
-                        { x: 400, y: 80, val: 8 },
-                        { x: 480, y: 30, val: 12 }
-                      ].map((pt, idx) => (
-                        <g key={idx} className="group cursor-pointer">
-                          <circle
-                            cx={pt.x}
-                            cy={pt.y}
-                            r="7"
-                            className="fill-white stroke-accent stroke-[3] group-hover:r-[9] transition-all"
-                          />
-                          <circle
-                            cx={pt.x}
-                            cy={pt.y}
-                            r="14"
-                            className="fill-accent/20 opacity-0 group-hover:opacity-100 transition-opacity"
-                          />
-                          {/* Tooltip on top */}
-                          <text
-                            x={pt.x}
-                            y={pt.y - 14}
-                            textAnchor="middle"
-                            className="opacity-0 group-hover:opacity-100 fill-[#0E3B66] font-bold text-[10px] transition-opacity"
-                          >
-                            {pt.val} Kegiatan
-                          </text>
-                        </g>
-                      ))}
-                    </svg>
-                  </div>
-                </div>
-
-                {/* 2. Category Distribution Bar Chart (5 columns) */}
-                <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
-                        <ImageIcon className="w-5 h-5 text-primary" />
-                        <span>Kategori Distribusi</span>
-                      </h3>
-                      <p className="text-[10px] text-slate-400 font-inter mt-1">Komparasi data berdasarkan rumpun bidang</p>
-                    </div>
-                    <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">BAR CHART</span>
-                  </div>
-
-                  {/* Bar Chart Draw Area */}
-                  <div className="relative w-full h-64 border border-slate-100/50 bg-slate-50/50 rounded-2xl p-5 flex items-center justify-center select-none font-inter text-[9px] font-medium text-slate-400">
-                    <svg viewBox="0 0 350 200" className="w-full h-full overflow-visible">
-                      {/* Grid Lines */}
-                      <line x1="30" y1="20" x2="330" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-                      <line x1="30" y1="70" x2="330" y2="70" stroke="#f1f5f9" strokeWidth="1" />
-                      <line x1="30" y1="120" x2="330" y2="120" stroke="#f1f5f9" strokeWidth="1" />
-                      <line x1="30" y1="160" x2="330" y2="160" stroke="#cbd5e1" strokeWidth="1" />
-
-                      {/* X-Axis Labels */}
-                      {[
-                        { name: 'Wisata', x: 75, val: news.filter(n => n.category === 'Pariwisata').length + gallery.filter(g => g.category === 'Pariwisata').length, color: '#F2994A' },
-                        { name: 'Olahraga', x: 155, val: news.filter(n => n.category === 'Olahraga').length + gallery.filter(g => g.category === 'Olahraga').length, color: '#2D9CDB' },
-                        { name: 'Pemuda', x: 235, val: news.filter(n => n.category === 'Kepemudaan').length + gallery.filter(g => g.category === 'Kepemudaan').length, color: '#27AE60' },
-                        { name: 'Dinas', x: 300, val: events.filter(e => e.category === 'Dinas').length, color: '#9B51E0' }
-                      ].map((bar, idx) => {
-                        // Calculate bar height dynamically
-                        const maxVal = Math.max(10, ...[
-                          news.filter(n => n.category === 'Pariwisata').length + gallery.filter(g => g.category === 'Pariwisata').length,
-                          news.filter(n => n.category === 'Olahraga').length + gallery.filter(g => g.category === 'Olahraga').length,
-                          news.filter(n => n.category === 'Kepemudaan').length + gallery.filter(g => g.category === 'Kepemudaan').length,
-                          events.filter(e => e.category === 'Dinas').length
-                        ]);
-                        const barHeight = Math.max(15, (bar.val / maxVal) * 125);
-                        const y = 160 - barHeight;
-
-                        return (
-                          <g key={idx} className="group cursor-pointer">
-                            {/* Bar gradient definitions inside group is fine */}
-                            <defs>
-                              <linearGradient id={`bar-gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={bar.color} />
-                                <stop offset="100%" stopColor={bar.color} stopOpacity="0.3" />
-                              </linearGradient>
-                            </defs>
-
-                            {/* Bar Graphic */}
-                            <rect
-                              x={bar.x - 18}
-                              y={y}
-                              width="36"
-                              height={barHeight}
-                              rx="6"
-                              fill={`url(#bar-gradient-${idx})`}
-                              className="transition-all duration-1000 group-hover:fill-opacity-90"
-                            />
-
-                            {/* Count on top of bar */}
-                            <text
-                              x={bar.x}
-                              y={y - 8}
-                              textAnchor="middle"
-                              className="font-bold fill-slate-800 font-mono text-[10px]"
-                            >
-                              {bar.val}
-                            </text>
-
-                            {/* Label */}
-                            <text
-                              x={bar.x}
-                              y="180"
-                              textAnchor="middle"
-                              className="font-bold text-slate-500 fill-current"
-                            >
-                              {bar.name}
-                            </text>
-                          </g>
-                        );
-                      })}
-                    </svg>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Recent Activity List */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Kabar Rilis Berita Terbaru</h3>
-                    <p className="text-[10px] text-slate-400 font-inter mt-1">Data sinkronisasi portal publik</p>
-                  </div>
-                  <button
-                    onClick={() => setActiveTab('berita')}
-                    className="text-xs font-bold text-primary hover:text-accent font-mono uppercase tracking-wider transition-colors flex items-center gap-1"
-                  >
-                    <span>Kelola Berita</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {news.slice(0, 3).map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl hover:border-blue-100 transition-colors">
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                          <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
-                        </div>
-                        <div className="text-left min-w-0">
-                          <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
-                          <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.date}</span>
-                        </div>
+                {/* Stat summary cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[
+                    { title: 'Total Berita', count: news.length, desc: 'Rilis pers & berita', icon: <Newspaper className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50/50 border-blue-100' },
+                    { title: 'Dokumentasi Galeri', count: gallery.length, desc: 'Foto publikasi', icon: <ImageIcon className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50/50 border-purple-100' },
+                    { title: 'Agenda Terdaftar', count: events.length, desc: 'Event dinas mendatanng', icon: <Calendar className="w-5 h-5 text-amber-600" />, bg: 'bg-amber-50/50 border-amber-100' },
+                    { title: 'Berkas Unduhan', count: services.length, desc: 'Formulir & SOP layanan', icon: <FileText className="w-5 h-5 text-emerald-600" />, bg: 'bg-emerald-50/50 border-emerald-100' }
+                  ].map((stat, i) => (
+                    <div key={i} className={`p-5 rounded-2xl bg-white border shadow-xs flex items-start justify-between ${stat.bg}`}>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block leading-none">{stat.title}</span>
+                        <span className="text-3xl font-black text-[#0E3B66] font-mono block mt-2.5">{stat.count}</span>
+                        <p className="text-[9px] text-slate-400 font-inter mt-1.5 font-light">{stat.desc}</p>
                       </div>
-                      <span className="hidden sm:inline-block bg-emerald-50 text-emerald-700 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">Terbit</span>
+                      <div className="p-2.5 bg-white border border-slate-100 rounded-xl shadow-xs shrink-0">
+                        {stat.icon}
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
 
-            </div>
-          )}
+                {/* ========================================================================= */}
+                {/* VISUAL CHARTS (GRAPH) ROW - PREMIUM CUSTOM SVG CHARTS */}
+                {/* ========================================================================= */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-          {/* B. CRUD TABVIEWS (BERITA, GALERI, AGENDA, BERKAS) */}
-          {['berita', 'galeri', 'agenda', 'berkas'].includes(activeTab) && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Control Action bar */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+                  {/* 1. Monthly Activity Line Chart (7 columns) */}
+                  <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
+                          <TrendingUp className="w-5 h-5 text-accent" />
+                          <span>Tren Aktivitas Bulanan (2026)</span>
+                        </h3>
+                        <p className="text-[10px] text-slate-400 font-inter mt-1">Akumulasi posting berita & agenda per bulan</p>
+                      </div>
+                      <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">LINE CHART</span>
+                    </div>
 
-                {/* Search Bar */}
-                <div className="relative w-full sm:w-80">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-                    <Search className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder={`Cari ${activeTab}...`}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium font-inter"
-                  />
+                    {/* Line Chart Draw Area */}
+                    <div className="relative w-full h-64 border border-slate-100/50 bg-slate-50/50 rounded-2xl p-4 flex items-center justify-center select-none font-inter text-[9px] font-medium text-slate-400">
+                      <svg viewBox="0 0 500 220" className="w-full h-full overflow-visible">
+                        {/* Grid Lines */}
+                        <line x1="40" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="40" y1="65" x2="480" y2="65" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="40" y1="110" x2="480" y2="110" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="40" y1="155" x2="480" y2="155" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
+                        <line x1="40" y1="180" x2="480" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
+
+                        {/* Y-Axis Labels */}
+                        <text x="30" y="24" textAnchor="end">12</text>
+                        <text x="30" y="69" textAnchor="end">9</text>
+                        <text x="30" y="114" textAnchor="end">6</text>
+                        <text x="30" y="159" textAnchor="end">3</text>
+                        <text x="30" y="184" textAnchor="end">0</text>
+
+                        {/* X-Axis Labels (Months Jan-Jun) */}
+                        {['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'].map((month, idx) => {
+                          const x = 40 + idx * 80;
+                          return (
+                            <text key={idx} x={x} y="202" textAnchor="middle" className="font-bold text-slate-500 fill-current">{month}</text>
+                          );
+                        })}
+
+                        {/* SVG Gradient definition */}
+                        <defs>
+                          <linearGradient id="line-gradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#F2994A" stopOpacity="0.45" />
+                            <stop offset="100%" stopColor="#F2994A" stopOpacity="0" />
+                          </linearGradient>
+                        </defs>
+
+                        {/* Area under line */}
+                        <path
+                          d="M 40,165 C 80,150 80,120 120,120 C 160,120 160,150 200,135 C 240,120 280,45 320,50 C 360,55 360,95 400,80 C 440,65 440,30 480,30 L 480,180 L 40,180 Z"
+                          fill="url(#line-gradient)"
+                          className="transition-all duration-1000 ease-out"
+                        />
+
+                        {/* Glowing Line */}
+                        <path
+                          d="M 40,165 C 80,150 80,120 120,120 C 160,120 160,150 200,135 C 240,120 280,45 320,50 C 360,55 360,95 400,80 C 440,65 440,30 480,30"
+                          fill="none"
+                          stroke="#F2994A"
+                          strokeWidth="3.5"
+                          strokeLinecap="round"
+                          className="transition-all duration-1000 ease-out"
+                          style={{ filter: 'drop-shadow(0px 3px 6px rgba(242,153,74,0.3))' }}
+                        />
+
+                        {/* Interactive Data Dots */}
+                        {[
+                          { x: 40, y: 165, val: 2 },
+                          { x: 120, y: 120, val: 5 },
+                          { x: 200, y: 135, val: 4 },
+                          { x: 320, y: 50, val: 10 },
+                          { x: 400, y: 80, val: 8 },
+                          { x: 480, y: 30, val: 12 }
+                        ].map((pt, idx) => (
+                          <g key={idx} className="group cursor-pointer">
+                            <circle
+                              cx={pt.x}
+                              cy={pt.y}
+                              r="7"
+                              className="fill-white stroke-accent stroke-[3] group-hover:r-[9] transition-all"
+                            />
+                            <circle
+                              cx={pt.x}
+                              cy={pt.y}
+                              r="14"
+                              className="fill-accent/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                            />
+                            {/* Tooltip on top */}
+                            <text
+                              x={pt.x}
+                              y={pt.y - 14}
+                              textAnchor="middle"
+                              className="opacity-0 group-hover:opacity-100 fill-[#0E3B66] font-bold text-[10px] transition-opacity"
+                            >
+                              {pt.val} Kegiatan
+                            </text>
+                          </g>
+                        ))}
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* 2. Category Distribution Bar Chart (5 columns) */}
+                  <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
+                          <ImageIcon className="w-5 h-5 text-primary" />
+                          <span>Kategori Distribusi</span>
+                        </h3>
+                        <p className="text-[10px] text-slate-400 font-inter mt-1">Komparasi data berdasarkan rumpun bidang</p>
+                      </div>
+                      <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">BAR CHART</span>
+                    </div>
+
+                    {/* Bar Chart Draw Area */}
+                    <div className="relative w-full h-64 border border-slate-100/50 bg-slate-50/50 rounded-2xl p-5 flex items-center justify-center select-none font-inter text-[9px] font-medium text-slate-400">
+                      <svg viewBox="0 0 350 200" className="w-full h-full overflow-visible">
+                        {/* Grid Lines */}
+                        <line x1="30" y1="20" x2="330" y2="20" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="30" y1="70" x2="330" y2="70" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="30" y1="120" x2="330" y2="120" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="30" y1="160" x2="330" y2="160" stroke="#cbd5e1" strokeWidth="1" />
+
+                        {/* X-Axis Labels */}
+                        {[
+                          { name: 'Wisata', x: 75, val: news.filter(n => n.category === 'Pariwisata').length + gallery.filter(g => g.category === 'Pariwisata').length, color: '#F2994A' },
+                          { name: 'Olahraga', x: 155, val: news.filter(n => n.category === 'Olahraga').length + gallery.filter(g => g.category === 'Olahraga').length, color: '#2D9CDB' },
+                          { name: 'Pemuda', x: 235, val: news.filter(n => n.category === 'Kepemudaan').length + gallery.filter(g => g.category === 'Kepemudaan').length, color: '#27AE60' },
+                          { name: 'Dinas', x: 300, val: events.filter(e => e.category === 'Dinas').length, color: '#9B51E0' }
+                        ].map((bar, idx) => {
+                          // Calculate bar height dynamically
+                          const maxVal = Math.max(10, ...[
+                            news.filter(n => n.category === 'Pariwisata').length + gallery.filter(g => g.category === 'Pariwisata').length,
+                            news.filter(n => n.category === 'Olahraga').length + gallery.filter(g => g.category === 'Olahraga').length,
+                            news.filter(n => n.category === 'Kepemudaan').length + gallery.filter(g => g.category === 'Kepemudaan').length,
+                            events.filter(e => e.category === 'Dinas').length
+                          ]);
+                          const barHeight = Math.max(15, (bar.val / maxVal) * 125);
+                          const y = 160 - barHeight;
+
+                          return (
+                            <g key={idx} className="group cursor-pointer">
+                              {/* Bar gradient definitions inside group is fine */}
+                              <defs>
+                                <linearGradient id={`bar-gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor={bar.color} />
+                                  <stop offset="100%" stopColor={bar.color} stopOpacity="0.3" />
+                                </linearGradient>
+                              </defs>
+
+                              {/* Bar Graphic */}
+                              <rect
+                                x={bar.x - 18}
+                                y={y}
+                                width="36"
+                                height={barHeight}
+                                rx="6"
+                                fill={`url(#bar-gradient-${idx})`}
+                                className="transition-all duration-1000 group-hover:fill-opacity-90"
+                              />
+
+                              {/* Count on top of bar */}
+                              <text
+                                x={bar.x}
+                                y={y - 8}
+                                textAnchor="middle"
+                                className="font-bold fill-slate-800 font-mono text-[10px]"
+                              >
+                                {bar.val}
+                              </text>
+
+                              {/* Label */}
+                              <text
+                                x={bar.x}
+                                y="180"
+                                textAnchor="middle"
+                                className="font-bold text-slate-500 fill-current"
+                              >
+                                {bar.name}
+                              </text>
+                            </g>
+                          );
+                        })}
+                      </svg>
+                    </div>
+                  </div>
+
                 </div>
 
-                {/* Add Button */}
-                <button
-                  onClick={() => openForm('add')}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
-                >
-                  <Plus className="w-4 h-4 text-white" />
-                  <span>Tambah {activeTab}</span>
-                </button>
-              </div>
+                {/* Recent Activity List */}
+                <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Kabar Rilis Berita Terbaru</h3>
+                      <p className="text-[10px] text-slate-400 font-inter mt-1">Data sinkronisasi portal publik</p>
+                    </div>
+                    <button
+                      onClick={() => setActiveTab('berita')}
+                      className="text-xs font-bold text-primary hover:text-accent font-mono uppercase tracking-wider transition-colors flex items-center gap-1"
+                    >
+                      <span>Kelola Berita</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
 
-              {/* Data Table / List */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
-                    <thead>
-                      <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
-                        {activeTab === 'berita' && (
-                          <>
-                            <th className="py-4.5 px-6">Berita</th>
-                            <th className="py-4.5 px-6">Kategori</th>
-                            <th className="py-4.5 px-6">Tanggal</th>
-                            <th className="py-4.5 px-6">Penulis</th>
-                            <th className="py-4.5 px-6 text-center">Aksi</th>
-                          </>
-                        )}
-                        {activeTab === 'galeri' && (
-                          <>
-                            <th className="py-4.5 px-6">Media</th>
-                            <th className="py-4.5 px-6">Judul Foto</th>
-                            <th className="py-4.5 px-6">Kategori</th>
-                            <th className="py-4.5 px-6 text-center">Aksi</th>
-                          </>
-                        )}
-                        {activeTab === 'agenda' && (
-                          <>
-                            <th className="py-4.5 px-6">Agenda</th>
-                            <th className="py-4.5 px-6">Waktu &amp; Tanggal</th>
-                            <th className="py-4.5 px-6">Lokasi</th>
-                            <th className="py-4.5 px-6">Kategori</th>
-                            <th className="py-4.5 px-6 text-center">Aksi</th>
-                          </>
-                        )}
-                        {activeTab === 'berkas' && (
-                          <>
-                            <th className="py-4.5 px-6">Nama Berkas</th>
-                            <th className="py-4.5 px-6">Kategori</th>
-                            <th className="py-4.5 px-6">Ukuran</th>
-                            <th className="py-4.5 px-6 text-center">Aksi</th>
-                          </>
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                      {getFilteredData().length > 0 ? (
-                        (getFilteredData() as any[]).map((item) => (
-                          <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                            {/* Berita Row rendering */}
-                            {activeTab === 'berita' && (
-                              <>
-                                <td className="py-4.5 px-6 max-w-xs">
-                                  <div className="flex items-center gap-3 min-w-0">
-                                    <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0">
+                  <div className="space-y-4">
+                    {news.slice(0, 3).map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl hover:border-blue-100 transition-colors">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                            <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.date}</span>
+                          </div>
+                        </div>
+                        <span className="hidden sm:inline-block bg-emerald-50 text-emerald-700 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">Terbit</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* B. CRUD TABVIEWS (BERITA, GALERI, AGENDA, BERKAS) */}
+            {['berita', 'galeri', 'agenda', 'berkas'].includes(activeTab) && (
+              <div className="space-y-6 animate-fade-in">
+                {/* Control Action bar - STICKY SEARCH & FILTERS */}
+                <div className="sticky top-0 z-20 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md transition-all duration-300">
+
+                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                    {/* Search Bar */}
+                    <div className="relative w-full sm:w-72">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                        <Search className="w-4 h-4" />
+                      </span>
+                      <input
+                        type="text"
+                        placeholder={`Cari ${activeTab}...`}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium font-inter"
+                      />
+                    </div>
+
+                    {/* Category Filter Dropdown */}
+                    <div className="w-full sm:w-44">
+                      <select
+                        value={selectedCategoryFilter}
+                        onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                        className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium font-inter cursor-pointer"
+                      >
+                        <option value="Semua">Semua Kategori</option>
+                        {activeTab === 'berita' && categoriesStore.news.map(c => <option key={c} value={c}>{c}</option>)}
+                        {activeTab === 'galeri' && categoriesStore.gallery.map(c => <option key={c} value={c}>{c}</option>)}
+                        {activeTab === 'agenda' && categoriesStore.events.map(c => <option key={c} value={c}>{c}</option>)}
+                        {activeTab === 'berkas' && categoriesStore.services.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Actions Group */}
+                  <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const moduleMap: Record<string, 'news' | 'gallery' | 'events' | 'services'> = {
+                          'berita': 'news',
+                          'galeri': 'gallery',
+                          'agenda': 'events',
+                          'berkas': 'services'
+                        };
+                        setCategoryManagerTab(moduleMap[activeTab] || 'news');
+                        setIsCategoryModalOpen(true);
+                      }}
+                      className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[#0E3B66] font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5 font-mono text-xs uppercase tracking-wider cursor-pointer"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-[#0E3B66]" />
+                      <span>Kategori</span>
+                    </button>
+                    <button
+                      onClick={() => openForm('add')}
+                      className="w-full sm:w-auto px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4 text-white" />
+                      <span>Tambah {activeTab}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Data Table / List */}
+                <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
+                      <thead>
+                        <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
+                          {activeTab === 'berita' && (
+                            <>
+                              <th className="py-4.5 px-6">Berita</th>
+                              <th className="py-4.5 px-6">Kategori</th>
+                              <th className="py-4.5 px-6">Tanggal</th>
+                              <th className="py-4.5 px-6">Penulis</th>
+                              <th className="py-4.5 px-6 text-center">Aksi</th>
+                            </>
+                          )}
+                          {activeTab === 'galeri' && (
+                            <>
+                              <th className="py-4.5 px-6">Media</th>
+                              <th className="py-4.5 px-6">Judul Foto</th>
+                              <th className="py-4.5 px-6">Kategori</th>
+                              <th className="py-4.5 px-6 text-center">Aksi</th>
+                            </>
+                          )}
+                          {activeTab === 'agenda' && (
+                            <>
+                              <th className="py-4.5 px-6">Agenda</th>
+                              <th className="py-4.5 px-6">Waktu &amp; Tanggal</th>
+                              <th className="py-4.5 px-6">Lokasi</th>
+                              <th className="py-4.5 px-6 text-center">Aksi</th>
+                            </>
+                          )}
+                          {activeTab === 'berkas' && (
+                            <>
+                              <th className="py-4.5 px-6">Nama Berkas</th>
+                              <th className="py-4.5 px-6">Kategori</th>
+                              <th className="py-4.5 px-6">Ukuran</th>
+                              <th className="py-4.5 px-6 text-center">Aksi</th>
+                            </>
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                        {getFilteredData().length > 0 ? (
+                          (getFilteredData() as any[]).map((item) => (
+                            <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                              {/* Berita Row rendering */}
+                              {activeTab === 'berita' && (
+                                <>
+                                  <td className="py-4.5 px-6 max-w-xs">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                      <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0">
+                                        <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <h4 className="font-bold text-[#0E3B66] truncate leading-tight">{item.title}</h4>
+                                        <p className="text-[10px] text-slate-400 truncate mt-1">{item.excerpt}</p>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
+                                  <td className="py-4.5 px-6 text-slate-550 font-mono text-[11px] whitespace-nowrap">{item.date}</td>
+                                  <td className="py-4.5 px-6 text-[#0E3B66] font-bold">{item.author}</td>
+                                </>
+                              )}
+
+                              {/* Galeri Row rendering */}
+                              {activeTab === 'galeri' && (
+                                <>
+                                  <td className="py-4.5 px-6 whitespace-nowrap">
+                                    <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-slate-100 shadow-xs border border-slate-100">
                                       <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
                                     </div>
-                                    <div className="min-w-0">
-                                      <h4 className="font-bold text-[#0E3B66] truncate leading-tight">{item.title}</h4>
-                                      <p className="text-[10px] text-slate-400 truncate mt-1">{item.excerpt}</p>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
-                                <td className="py-4.5 px-6 text-slate-550 font-mono text-[11px] whitespace-nowrap">{item.date}</td>
-                                <td className="py-4.5 px-6 text-[#0E3B66] font-bold">{item.author}</td>
-                              </>
-                            )}
+                                  </td>
+                                  <td className="py-4.5 px-6 max-w-xs font-bold text-[#0E3B66]">{item.title}</td>
+                                  <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
+                                </>
+                              )}
 
-                            {/* Galeri Row rendering */}
-                            {activeTab === 'galeri' && (
-                              <>
-                                <td className="py-4.5 px-6 whitespace-nowrap">
-                                  <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-slate-100 shadow-xs border border-slate-100">
-                                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
-                                  </div>
-                                </td>
-                                <td className="py-4.5 px-6 max-w-xs font-bold text-[#0E3B66]">{item.title}</td>
-                                <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
-                              </>
-                            )}
+                              {activeTab === 'agenda' && (
+                                <>
+                                  <td className="py-4.5 px-6 max-w-xs">
+                                    <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
+                                  </td>
+                                  <td className="py-4.5 px-6 text-slate-550 whitespace-nowrap">
+                                    <div className="font-bold text-[11px]">{item.date}</div>
+                                    <div className="text-[10px] mt-0.5 font-mono text-slate-400">{item.time}</div>
+                                  </td>
+                                  <td className="py-4.5 px-6 text-slate-600 font-inter">{item.location}</td>
+                                </>
+                              )}
 
-                            {/* Agenda Row rendering */}
-                            {activeTab === 'agenda' && (
-                              <>
-                                <td className="py-4.5 px-6 max-w-xs">
-                                  <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
-                                  <p className="text-[10px] text-slate-400 truncate mt-1">{item.description}</p>
-                                </td>
-                                <td className="py-4.5 px-6 text-slate-550 whitespace-nowrap">
-                                  <div className="font-bold text-[11px]">{item.date}</div>
-                                  <div className="text-[10px] mt-0.5 font-mono text-slate-400">{item.time}</div>
-                                </td>
-                                <td className="py-4.5 px-6 text-slate-600 font-inter">{item.location}</td>
-                                <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
-                              </>
-                            )}
+                              {/* Berkas Row rendering */}
+                              {activeTab === 'berkas' && (
+                                <>
+                                  <td className="py-4.5 px-6 max-w-xs">
+                                    <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
+                                    <p className="text-[10px] text-slate-400 truncate mt-1">{item.description}</p>
+                                  </td>
+                                  <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
+                                  <td className="py-4.5 px-6 font-mono text-[11px] text-slate-500 whitespace-nowrap">{item.fileSize}</td>
+                                </>
+                              )}
 
-                            {/* Berkas Row rendering */}
-                            {activeTab === 'berkas' && (
-                              <>
-                                <td className="py-4.5 px-6 max-w-xs">
-                                  <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
-                                  <p className="text-[10px] text-slate-400 truncate mt-1">{item.description}</p>
-                                </td>
-                                <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
-                                <td className="py-4.5 px-6 font-mono text-[11px] text-slate-500 whitespace-nowrap">{item.fileSize}</td>
-                              </>
-                            )}
-
-                            {/* Actions Column */}
-                            <td className="py-4.5 px-6 text-center whitespace-nowrap">
-                              <div className="flex items-center justify-center gap-2">
-                                <button
-                                  onClick={() => openForm('edit', item)}
-                                  className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
-                                  title="Ubah data"
-                                >
-                                  <Edit2 className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => openDeleteConfirm(item)}
-                                  className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
-                                  title="Hapus data"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
+                              {/* Actions Column */}
+                              <td className="py-4.5 px-6 text-center whitespace-nowrap">
+                                <div className="flex items-center justify-center gap-2">
+                                  <button
+                                    onClick={() => openForm('edit', item)}
+                                    className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
+                                    title="Ubah data"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => openDeleteConfirm(item)}
+                                    className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                                    title="Hapus data"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={10} className="py-16 text-center text-slate-400">
+                              <ShieldAlert className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                              <h4 className="font-extrabold text-slate-800 text-sm">Tidak ada data ditemukan</h4>
+                              <p className="text-xs text-slate-400 mt-1 font-light">Coba ubah kata kunci pencarian Anda.</p>
                             </td>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={10} className="py-16 text-center text-slate-400">
-                            <ShieldAlert className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                            <h4 className="font-extrabold text-slate-800 text-sm">Tidak ada data ditemukan</h4>
-                            <p className="text-xs text-slate-400 mt-1 font-light">Coba ubah kata kunci pencarian Anda.</p>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* C. INFO KONTAK EDIT VIEW */}
-          {activeTab === 'kontak' && (
-            <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-10 animate-fade-in text-left">
-              <span className="text-xs font-bold text-secondary tracking-widest uppercase font-mono bg-blue-150/15 border border-blue-200/40 px-3 py-1 rounded-full inline-block mb-4">
-                Ubah Detail Kantor Dinas
-              </span>
-              <h3 className="text-2xl font-black text-primary tracking-tight mb-8">Informasi Kontak & Operasional</h3>
+            {/* C. INFO KONTAK EDIT VIEW */}
+            {activeTab === 'kontak' && (
+              <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-10 animate-fade-in text-left">
+                <form onSubmit={handleUpdateContact} className="space-y-6 font-inter">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-extrabold text-[#0E3B66]">Informasi Kontak Dinas</h3>
+                    </div>
+                    <button
+                      type={isEditingContact ? "submit" : "button"}
+                      onClick={(e) => {
+                        if (!isEditingContact) {
+                          e.preventDefault();
+                          setIsEditingContact(true);
+                        }
+                      }}
+                      className={`w-56 h-11 px-4 flex items-center justify-center font-extrabold rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0 ${isEditingContact
+                        ? 'bg-accent hover:bg-orange-500 text-white'
+                        : 'bg-[#0E3B66] hover:bg-[#0c3359] text-white'
+                        }`}
+                    >
+                      {isEditingContact ? 'Simpan Kontak' : 'Edit Kontak'}
+                    </button>
+                  </div>
 
-              <form onSubmit={handleUpdateContact} className="space-y-6 font-inter">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Alamat Lengkap Kantor</label>
-                  <textarea
-                    required
-                    rows={3}
-                    name="address"
-                    defaultValue={officeInfo.address}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">No. Telepon Resmi</label>
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Alamat Lengkap Kantor</label>
+                    <textarea
+                      required
+                      rows={3}
+                      name="address"
+                      defaultValue={officeInfo.address}
+                      disabled={!isEditingContact}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">No. Telepon Resmi</label>
+                      <input
+                        type="text"
+                        required
+                        name="phone"
+                        defaultValue={officeInfo.phone}
+                        disabled={!isEditingContact}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Alamat Email Resmi</label>
+                      <input
+                        type="email"
+                        required
+                        name="email"
+                        defaultValue={officeInfo.email}
+                        disabled={!isEditingContact}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Jam Kerja Operasional</label>
                     <input
                       type="text"
                       required
-                      name="phone"
-                      defaultValue={officeInfo.phone}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
+                      name="operationalHours"
+                      defaultValue={officeInfo.operationalHours}
+                      disabled={!isEditingContact}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
                     />
                   </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Instagram Resmi</label>
+                      <input
+                        type="url"
+                        name="instagramResmi"
+                        defaultValue={officeInfo.socialMedia?.instagramResmi || ''}
+                        disabled={!isEditingContact}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Instagram Pariwisata & Event</label>
+                      <input
+                        type="url"
+                        name="instagramTourism"
+                        defaultValue={officeInfo.socialMedia?.instagramTourism || ''}
+                        disabled={!isEditingContact}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Instagram Bidang Kepemudaan</label>
+                      <input
+                        type="url"
+                        name="instagramPemuda"
+                        defaultValue={officeInfo.socialMedia?.instagramPemuda || ''}
+                        disabled={!isEditingContact}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Youtube Link</label>
+                      <input
+                        type="url"
+                        name="youtube"
+                        defaultValue={officeInfo.socialMedia?.youtube || ''}
+                        disabled={!isEditingContact}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Alamat Email Resmi</label>
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Google Maps Embed URL</label>
                     <input
-                      type="email"
+                      type="url"
                       required
-                      name="email"
-                      defaultValue={officeInfo.email}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
+                      name="gmapsEmbedUrl"
+                      defaultValue={officeInfo.gmapsEmbedUrl}
+                      disabled={!isEditingContact}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
                     />
                   </div>
-                </div>
+                </form>
+              </div>
+            )}
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Jam Kerja Operasional</label>
-                  <input
-                    type="text"
-                    required
-                    name="operationalHours"
-                    defaultValue={officeInfo.operationalHours}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Instagram Resmi</label>
-                    <input
-                      type="url"
-                      name="instagramResmi"
-                      defaultValue={officeInfo.socialMedia?.instagramResmi || ''}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
-                    />
+            {/* SLIDE BERANDA CRUD VIEW */}
+            {activeTab === 'beranda' && (
+              <div className="space-y-6 animate-fade-in text-left">
+                {/* Control Action bar */}
+                <div className="sticky top-0 z-20 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md">
+                  <div>
+                    <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Kelola Slide Hero Beranda</h3>
+                    <p className="text-[10px] text-slate-400 font-inter mt-1">Ubah background hero, tagline, judul, tombol CTA dan tautannya</p>
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Instagram Pariwisata & Event</label>
-                    <input
-                      type="url"
-                      name="instagramTourism"
-                      defaultValue={officeInfo.socialMedia?.instagramTourism || ''}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Instagram Bidang Kepemudaan</label>
-                    <input
-                      type="url"
-                      name="instagramPemuda"
-                      defaultValue={officeInfo.socialMedia?.instagramPemuda || ''}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Youtube Link</label>
-                    <input
-                      type="url"
-                      name="youtube"
-                      defaultValue={officeInfo.socialMedia?.youtube || ''}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Google Maps Embed URL</label>
-                  <input
-                    type="url"
-                    required
-                    name="gmapsEmbedUrl"
-                    defaultValue={officeInfo.gmapsEmbedUrl}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium"
-                  />
-                </div>
-
-                <div className="pt-4">
                   <button
-                    type="submit"
-                    className="w-full sm:w-auto px-8 py-3.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer"
+                    onClick={() => openForm('add')}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
                   >
-                    Simpan Perubahan Kontak
+                    <Plus className="w-4 h-4 text-white" />
+                    <span>Tambah Slide</span>
                   </button>
                 </div>
-              </form>
-            </div>
-          )}
+
+                {/* Data Table */}
+                <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
+                      <thead>
+                        <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
+                          <th className="py-4.5 px-6 w-24">Gambar</th>
+                          <th className="py-4.5 px-6">Tagline & Judul</th>
+                          <th className="py-4.5 px-6">Tombol CTA</th>
+                          <th className="py-4.5 px-6">Tautan (Link)</th>
+                          <th className="py-4.5 px-6 text-center">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                        {heroSlides.length > 0 ? (
+                          heroSlides.map((slide) => (
+                            <tr key={slide.id} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="py-4.5 px-6 whitespace-nowrap">
+                                <div className="relative w-20 h-12 rounded-lg overflow-hidden bg-slate-100 shadow-xs border border-slate-100">
+                                  <Image src={slide.image} alt={slide.title} fill className="object-cover" />
+                                </div>
+                              </td>
+                              <td className="py-4.5 px-6 max-w-xs">
+                                <span className="text-[10px] font-bold text-accent uppercase tracking-wider block font-mono">{slide.tagline}</span>
+                                <h4 className="font-bold text-[#0E3B66] leading-tight mt-1">{slide.title}</h4>
+                              </td>
+                              <td className="py-4.5 px-6 text-slate-650 font-bold">{slide.cta}</td>
+                              <td className="py-4.5 px-6 font-mono text-[11px] text-slate-500 truncate max-w-[150px]" title={slide.href}>
+                                {slide.href}
+                              </td>
+                              <td className="py-4.5 px-6 text-center whitespace-nowrap">
+                                <div className="flex items-center justify-center gap-2">
+                                  <button
+                                    onClick={() => openForm('edit', slide)}
+                                    className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
+                                    title="Ubah slide"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => openDeleteConfirm(slide)}
+                                    className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                                    title="Hapus slide"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="py-16 text-center text-slate-400">
+                              <ShieldAlert className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                              <h4 className="font-extrabold text-slate-800 text-sm">Tidak ada slide hero</h4>
+                              <p className="text-xs text-slate-400 mt-1 font-light">Tambahkan slide untuk menampilkan banner di Beranda.</p>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* D. SAMBUTAN EDIT VIEW */}
+            {activeTab === 'sambutan' && (
+              <div className="max-w-4xl mx-auto bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-10 animate-fade-in text-left">
+                <form onSubmit={handleUpdateWelcomeMessage} className="space-y-6 font-inter">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-extrabold text-[#0E3B66]">Kelola Sambutan Kepala Dinas</h3>
+                    </div>
+                    <button
+                      type={isEditingWelcome ? "submit" : "button"}
+                      onClick={(e) => {
+                        if (!isEditingWelcome) {
+                          e.preventDefault();
+                          setIsEditingWelcome(true);
+                          setUploadedImageBase64(welcomeMessage.imageUrl || '');
+                        }
+                      }}
+                      className={`w-56 h-11 px-4 flex items-center justify-center font-extrabold rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0 ${isEditingWelcome
+                        ? 'bg-accent hover:bg-orange-500 text-white'
+                        : 'bg-[#0E3B66] hover:bg-[#0c3359] text-white'
+                        }`}
+                    >
+                      {isEditingWelcome ? 'Simpan Perubahan' : 'Edit Sambutan'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* Left side: Photo upload & preview */}
+                    <div className="lg:col-span-4 space-y-4">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono block">Foto Kepala Dinas</label>
+
+                      <div className="relative aspect-[4/5] w-full max-w-[240px] mx-auto rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center p-4 group">
+                        {uploadedImageBase64 ? (
+                          <>
+                            <Image src={uploadedImageBase64} alt="Pratinjau Foto" fill className="object-cover" />
+                            {isEditingWelcome && (
+                              <button
+                                type="button"
+                                onClick={() => setUploadedImageBase64('')}
+                                className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-colors cursor-pointer"
+                                title="Hapus Gambar"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-center space-y-2">
+                            <Upload className="w-8 h-8 text-slate-400 mx-auto" />
+                            <span className="text-[11px] text-slate-500 font-bold block">Pilih File Foto</span>
+                            <span className="text-[9px] text-slate-400 block font-light">Maksimal 2MB (JPG/PNG)</span>
+                          </div>
+                        )}
+                        {isEditingWelcome && !uploadedImageBase64 && (
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                        )}
+                      </div>
+
+                      {isEditingWelcome && (
+                        <div className="space-y-1 text-left">
+                          <label className="text-[9px] font-bold text-slate-455 uppercase tracking-wider font-mono">Atau Tautan URL Gambar</label>
+                          <input
+                            type="text"
+                            name="imageUrl"
+                            placeholder="https://..."
+                            defaultValue={welcomeMessage.imageUrl}
+                            disabled={!isEditingWelcome}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right side: Texts form */}
+                    <div className="lg:col-span-8 space-y-4 text-left">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono block">Nama Kepala Dinas</label>
+                          <input
+                            type="text"
+                            required
+                            name="name"
+                            defaultValue={welcomeMessage.name}
+                            disabled={!isEditingWelcome}
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono block">NIP Kepala Dinas</label>
+                          <input
+                            type="text"
+                            name="nip"
+                            defaultValue={welcomeMessage.nip}
+                            disabled={!isEditingWelcome}
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono block">Isi Teks Sambutan</label>
+                        <textarea
+                          required
+                          rows={8}
+                          name="content"
+                          defaultValue={welcomeMessage.content}
+                          disabled={!isEditingWelcome}
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 font-medium font-inter leading-relaxed disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50 whitespace-pre-wrap"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
           </div>
 
           {/* Footer info in workspace */}
           <footer className="mt-8 border-t border-slate-200 pt-5 pb-2 text-center text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-            © 2026 DISPORAPAR KOTA TEGAL. PANEL INTERNAL ADMINISTRATOR.
+            © 2026 DISPORAPAR KOTA TEGAL. PANEL INTERNAL ADMINISTRATOR
           </footer>
         </section>
       </main>
@@ -1301,6 +1731,106 @@ export default function AdminPage() {
                 </div>
               )}
 
+              {/* SLIDE BERANDA FORM */}
+              {activeTab === 'beranda' && modalType !== 'delete' && (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Tagline Slide</label>
+                    <input
+                      type="text"
+                      required
+                      name="tagline"
+                      defaultValue={editingItem?.tagline || ''}
+                      placeholder="Contoh: WONDERFUL INDONESIA"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Judul Banner (Title)</label>
+                    <input
+                      type="text"
+                      required
+                      name="title"
+                      defaultValue={editingItem?.title || ''}
+                      placeholder="Contoh: Gerbang Pesona Maritim & Keindahan Pesisir Tegal"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Teks Tombol CTA</label>
+                      <input
+                        type="text"
+                        required
+                        name="cta"
+                        defaultValue={editingItem?.cta || ''}
+                        placeholder="Contoh: Jelajahi Pariwisata"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Tautan Tombol (href)</label>
+                      <input
+                        type="text"
+                        required
+                        name="href"
+                        defaultValue={editingItem?.href || ''}
+                        placeholder="Contoh: /pariwisata"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Image input: support local file and url link */}
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Gambar Background Hero</label>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Local Upload */}
+                      <div className="p-4 border border-dashed border-slate-350 bg-slate-50/50 hover:bg-slate-50 rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors relative">
+                        <Upload className="w-5 h-5 text-slate-400" />
+                        <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Gambar</span>
+                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (jpg/png)</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+
+                      {/* URL input */}
+                      <div className="space-y-1.5 flex flex-col justify-center">
+                        <span className="text-[8.5px] font-bold text-slate-400 font-mono">Atau Masukkan URL Link:</span>
+                        <input
+                          type="url"
+                          name="imageUrl"
+                          defaultValue={editingItem?.image && !editingItem.image.startsWith('data:') ? editingItem.image : ''}
+                          placeholder="https://images.unsplash.com/..."
+                          className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                        />
+                      </div>
+                    </div>
+
+                    {uploadedImageBase64 && (
+                      <div className="relative w-full aspect-video rounded-xl overflow-hidden mt-3 border border-slate-100 shadow-xs">
+                        <Image src={uploadedImageBase64} alt="Pratinjau Background" fill className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setUploadedImageBase64('')}
+                          className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white text-xs hover:bg-black transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
               {/* BERITA FORM */}
               {activeTab === 'berita' && modalType !== 'delete' && (
                 <>
@@ -1334,14 +1864,12 @@ export default function AdminPage() {
                       <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Kategori</label>
                       <select
                         name="category"
-                        defaultValue={editingItem?.category || 'Pariwisata'}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                        defaultValue={editingItem?.category || (categoriesStore.news[0] || 'Pariwisata')}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 cursor-pointer"
                       >
-                        <option value="Pariwisata">Pariwisata</option>
-                        <option value="Olahraga">Olahraga</option>
-                        <option value="Kepemudaan">Kepemudaan</option>
-                        <option value="Pengumuman">Pengumuman</option>
-                        <option value="Event">Event</option>
+                        {categoriesStore.news.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
                       </select>
                     </div>
 
@@ -1451,12 +1979,12 @@ export default function AdminPage() {
                     <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Kategori Kegiatan</label>
                     <select
                       name="category"
-                      defaultValue={editingItem?.category || 'Pariwisata'}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                      defaultValue={editingItem?.category || (categoriesStore.gallery[0] || 'Pariwisata')}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 cursor-pointer"
                     >
-                      <option value="Pariwisata">Pariwisata</option>
-                      <option value="Olahraga">Olahraga</option>
-                      <option value="Kepemudaan">Kepemudaan</option>
+                      {categoriesStore.gallery.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -1522,18 +2050,6 @@ export default function AdminPage() {
                     />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Deskripsi Acara</label>
-                    <textarea
-                      required
-                      rows={3}
-                      name="description"
-                      defaultValue={editingItem?.description || ''}
-                      placeholder="Tulis rincian singkat agenda..."
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
-                    />
-                  </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Tanggal Acara</label>
@@ -1572,32 +2088,16 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Lokasi Penyelenggaraan</label>
-                      <input
-                        type="text"
-                        required
-                        name="location"
-                        defaultValue={editingItem?.location || ''}
-                        placeholder="Nama gedung / lapangan"
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Kategori Agenda</label>
-                      <select
-                        name="category"
-                        defaultValue={editingItem?.category || 'Pariwisata'}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
-                      >
-                        <option value="Pariwisata">Pariwisata</option>
-                        <option value="Olahraga">Olahraga</option>
-                        <option value="Kepemudaan">Kepemudaan</option>
-                        <option value="Dinas">Dinas</option>
-                      </select>
-                    </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Lokasi Penyelenggaraan</label>
+                    <input
+                      type="text"
+                      required
+                      name="location"
+                      defaultValue={editingItem?.location || ''}
+                      placeholder="Nama gedung / lapangan"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                    />
                   </div>
                 </>
               )}
@@ -1632,13 +2132,12 @@ export default function AdminPage() {
                     <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Kategori Layanan</label>
                     <select
                       name="category"
-                      defaultValue={editingItem?.category || 'SOP'}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                      defaultValue={editingItem?.category || (categoriesStore.services[0] || 'SOP')}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 cursor-pointer"
                     >
-                      <option value="SOP">SOP</option>
-                      <option value="Formulir">Formulir</option>
-                      <option value="Berkas Layanan">Berkas Layanan</option>
-                      <option value="Izin Usaha">Izin Usaha</option>
+                      {categoriesStore.services.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
                     </select>
                   </div>
                   {/* File input: support local file and url link */}
@@ -1733,6 +2232,147 @@ export default function AdminPage() {
               )}
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================
+          CATEGORY MANAGEMENT MODAL
+      ========================================== */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in font-inter text-slate-700">
+          <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[85vh]">
+
+            {/* Modal Header */}
+            <div className="bg-[#051424] px-6 py-4 flex items-center justify-between text-white shrink-0">
+              <h3 className="font-extrabold text-sm sm:text-base uppercase tracking-tight font-sans">
+                Kelola Kategori
+              </h3>
+              <button
+                onClick={() => {
+                  setIsCategoryModalOpen(false);
+                  setNewCategoryName('');
+                  setEditingCategoryIndex(null);
+                  setEditingCategoryName('');
+                }}
+                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="overflow-y-auto p-6 space-y-6 text-left flex-grow">
+
+              {/* Category tabs selection */}
+              <div className="flex gap-1 border-b border-slate-200 pb-2.5">
+                {[
+                  { id: 'news', name: 'Berita' },
+                  { id: 'gallery', name: 'Galeri' },
+                  { id: 'events', name: 'Agenda' },
+                  { id: 'services', name: 'Berkas' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => {
+                      setCategoryManagerTab(tab.id as any);
+                      setEditingCategoryIndex(null);
+                      setNewCategoryName('');
+                    }}
+                    className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider font-mono transition-colors text-center cursor-pointer ${categoryManagerTab === tab.id
+                      ? 'bg-[#0E3B66]/10 text-[#0E3B66]'
+                      : 'text-slate-400 hover:bg-slate-50 hover:text-slate-700'
+                      }`}
+                  >
+                    {tab.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Category List */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Daftar Kategori</span>
+
+                <div className="space-y-1.5 max-h-[35vh] overflow-y-auto pr-1">
+                  {categoriesStore[categoryManagerTab]?.map((cat, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-xl hover:border-blue-100 transition-colors">
+                      {editingCategoryIndex === idx ? (
+                        <div className="flex items-center gap-2 w-full">
+                          <input
+                            type="text"
+                            value={editingCategoryName}
+                            onChange={(e) => setEditingCategoryName(e.target.value)}
+                            className="flex-grow px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleSaveCategoryRename(cat, idx)}
+                            className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold rounded-lg uppercase transition-colors cursor-pointer"
+                          >
+                            Simpan
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingCategoryIndex(null)}
+                            className="px-2.5 py-1 bg-slate-200 hover:bg-slate-350 text-slate-700 text-[10px] font-bold rounded-lg uppercase transition-colors cursor-pointer"
+                          >
+                            Batal
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-xs font-bold text-[#0E3B66]">{cat}</span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingCategoryIndex(idx);
+                                setEditingCategoryName(cat);
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-[#0E3B66] transition-colors cursor-pointer"
+                              title="Ubah nama"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCategory(cat)}
+                              className="p-1.5 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                              title="Hapus"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Add New Category form */}
+              <div className="pt-4 border-t border-slate-100 space-y-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Tambah Kategori Baru</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Nama kategori baru..."
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    className="flex-grow px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateCategory}
+                    className="px-4 py-2 bg-[#0E3B66] hover:bg-sky-900 text-white text-[11px] font-bold uppercase tracking-wider font-mono rounded-xl transition-all cursor-pointer shadow-xs active:scale-95"
+                  >
+                    Tambah
+                  </button>
+                </div>
+              </div>
+
+            </div>
 
           </div>
         </div>
