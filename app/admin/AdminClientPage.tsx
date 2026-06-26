@@ -13,7 +13,11 @@ import {
   useWelcomeMessage,
   useHeroSlides,
   useHomepageSettings,
-  usePriorityPrograms
+  usePriorityPrograms,
+  useKepemudaanCards,
+  useOlahragaCards,
+  usePariwisataCards,
+  useBidangBottomCards
 } from '@/lib/data-store';
 import {
   ShieldAlert,
@@ -143,6 +147,115 @@ const isValidUrlOrPath = (url?: string): boolean => {
   return false;
 };
 
+const getFileFormat = (downloadUrl?: string, title?: string): 'pdf' | 'zip' | 'word' | 'unknown' => {
+  if (!downloadUrl || downloadUrl === '#' || downloadUrl === '') return 'unknown';
+  const urlLower = downloadUrl.toLowerCase();
+  const titleLower = title ? title.toLowerCase() : '';
+
+  if (urlLower.includes('.pdf') || titleLower.includes('pdf')) return 'pdf';
+  if (urlLower.includes('.zip') || urlLower.includes('.rar') || titleLower.includes('zip') || titleLower.includes('rar')) return 'zip';
+  if (urlLower.includes('.doc') || urlLower.includes('.docx') || titleLower.includes('word') || titleLower.includes('doc') || titleLower.includes('docx')) return 'word';
+
+  if (urlLower.startsWith('data:application/pdf')) return 'pdf';
+  if (urlLower.startsWith('data:application/zip') || urlLower.startsWith('data:application/x-zip-compressed')) return 'zip';
+  if (urlLower.startsWith('data:application/msword') || urlLower.startsWith('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document')) return 'word';
+
+  return 'unknown';
+};
+
+interface FileFormatIconProps {
+  className?: string;
+  downloadUrl?: string;
+  title?: string;
+  colorClasses?: string;
+}
+
+const FileFormatIcon: React.FC<FileFormatIconProps> = ({ className = "w-5 h-5", downloadUrl, title, colorClasses }) => {
+  const format = getFileFormat(downloadUrl, title);
+  const color = colorClasses !== undefined ? colorClasses : (
+    format === 'pdf' ? 'text-red-500' :
+      format === 'word' ? 'text-blue-650' :
+        format === 'zip' ? 'text-amber-500' :
+          'text-slate-400'
+  );
+
+  switch (format) {
+    case 'pdf':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M9 15H7v-4h2" />
+          <path d="M9 13H7" />
+          <path d="M12 11v4h1a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 13 11h-1z" />
+          <path d="M17 11h2" />
+          <path d="M17 13h1.5" />
+        </svg>
+      );
+    case 'zip':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M10 6v2" />
+          <path d="M10 10v2" />
+          <path d="M10 14v2" />
+          <path d="M10 18h2" />
+        </svg>
+      );
+    case 'word':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M9 11.5l1.5 4 1.5-4 1.5 4 1.5-4.5" />
+        </svg>
+      );
+    default:
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <line x1="10" y1="9" x2="8" y2="9" />
+        </svg>
+      );
+  }
+};
+
 export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: { initialIsLoggedIn: boolean; initialUsername?: string }) {
   const router = useRouter();
 
@@ -170,7 +283,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
   const [newAdminSuccess, setNewAdminSuccess] = useState<string>('');
 
   // Active Tab State
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'berita' | 'galeri' | 'agenda' | 'berkas' | 'kontak' | 'sambutan' | 'beranda' | 'akun'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'kepemudaan' | 'olahraga' | 'pariwisata' | 'berita' | 'galeri' | 'agenda' | 'berkas' | 'Kontak' | 'sambutan' | 'beranda' | 'akun'>('dashboard');
 
   // Dynamic Data States
   const [news, setNews] = useNews();
@@ -183,13 +296,60 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
   const [heroSlides, setHeroSlides] = useHeroSlides();
   const [homepageSettings, setHomepageSettings] = useHomepageSettings();
   const [priorityPrograms, setPriorityPrograms] = usePriorityPrograms();
+  const [kepemudaanCards, setKepemudaanCards] = useKepemudaanCards();
+  const [olahragaCards, setOlahragaCards] = useOlahragaCards();
+  const [pariwisataCards, setPariwisataCards] = usePariwisataCards();
+  const [bidangBottomCards, setBidangBottomCards] = useBidangBottomCards();
   const [formPoints, setFormPoints] = useState<string[]>(['']);
+  const [modalDetails, setModalDetails] = useState<{ value: string; icon: string }[]>([]);
+
+  const handleAddDetail = () => {
+    setModalDetails([...modalDetails, { value: '', icon: 'MapPin' }]);
+  };
+
+  const handleRemoveDetail = (index: number) => {
+    setModalDetails(modalDetails.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateDetailField = (index: number, field: 'value' | 'icon', val: string) => {
+    setModalDetails(modalDetails.map((item, i) => i === index ? { ...item, [field]: val } : item));
+  };
+
+  const handleMoveDetail = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === modalDetails.length - 1) return;
+    const newDetails = [...modalDetails];
+    const swapWith = direction === 'up' ? index - 1 : index + 1;
+    const temp = newDetails[index];
+    newDetails[index] = newDetails[swapWith];
+    newDetails[swapWith] = temp;
+    setModalDetails(newDetails);
+  };
 
   // Beranda settings states
   const [isEditingBeranda, setIsEditingBeranda] = useState<boolean>(false);
   const [berandaSubTab, setBerandaSubTab] = useState<'hero' | 'programs'>('hero');
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
   const [previewSettings, setPreviewSettings] = useState<any>(null);
+
+  // Today in WIB (UTC+7) — updates daily
+  const getTodayWIB = () => {
+    const now = new Date();
+    const wibMs = now.getTime() + (7 * 60 + now.getTimezoneOffset()) * 60000;
+    const d = new Date(wibMs);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  };
+  const [todayWIB, setTodayWIB] = useState<Date>(getTodayWIB);
+  useEffect(() => {
+    const refresh = () => setTodayWIB(getTodayWIB());
+    refresh();
+    const now = new Date();
+    const wibMs = now.getTime() + (7 * 60 + now.getTimezoneOffset()) * 60000;
+    const wibNow = new Date(wibMs);
+    const msLeft = (24 * 3600 - wibNow.getHours() * 3600 - wibNow.getMinutes() * 60 - wibNow.getSeconds()) * 1000;
+    const t = setTimeout(refresh, msLeft);
+    return () => clearTimeout(t);
+  }, []);
 
   // Sync preview settings with homepageSettings
   useEffect(() => {
@@ -250,6 +410,52 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
 
   // Notification States
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const notificationTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Global click listener to close notification when active
+  useEffect(() => {
+    if (!notification) return;
+    const handleGlobalClick = () => {
+      setNotification(null);
+    };
+    const timer = setTimeout(() => {
+      window.addEventListener('click', handleGlobalClick);
+    }, 50);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('click', handleGlobalClick);
+    };
+  }, [notification]);
+
+  // Global session check for 12-hour auto-logout
+  useEffect(() => {
+    if (!isLoggedIn) {
+      localStorage.removeItem('disporapar_admin_login_time');
+      return;
+    }
+
+    let loginTimeStr = localStorage.getItem('disporapar_admin_login_time');
+    if (!loginTimeStr) {
+      loginTimeStr = Date.now().toString();
+      localStorage.setItem('disporapar_admin_login_time', loginTimeStr);
+    }
+
+    const loginTime = parseInt(loginTimeStr, 10);
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+
+    const checkSession = () => {
+      const elapsed = Date.now() - loginTime;
+      if (elapsed >= TWELVE_HOURS) {
+        handleLogout(true);
+        showNotification('Sesi Anda telah berakhir (lebih dari 12 jam). Silakan masuk kembali.', 'error');
+      }
+    };
+
+    checkSession();
+    const intervalId = setInterval(checkSession, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [isLoggedIn]);
 
   // File Upload Helper State
   const [uploadedImageBase64, setUploadedImageBase64] = useState<string>('');
@@ -366,7 +572,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
       });
 
       if (res?.error) {
-        setLoginError('Username atau password salah.');
+        showNotification('Username atau password salah.', 'error');
       } else {
         setIsLoggedIn(true);
         setCurrentAdminUsername(username);
@@ -374,35 +580,47 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
         // Clean up old session triggers
         document.cookie = "disporapar_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         sessionStorage.removeItem('disporapar_admin_session');
+        localStorage.setItem('disporapar_admin_login_time', Date.now().toString());
         showNotification('Berhasil masuk ke panel admin!', 'success');
         router.refresh();
       }
     } catch (err) {
       console.error(err);
-      setLoginError('Terjadi kesalahan sistem.');
+      showNotification('Terjadi kesalahan sistem.', 'error');
     }
   };
 
   // Handle Logout
-  const handleLogout = async () => {
+  const handleLogout = async (skipNotification = false) => {
     try {
+      setIsAccountModalOpen(false);
+      setIsProfileDropdownOpen(false);
+      localStorage.removeItem('disporapar_admin_login_time');
       await signOut({ redirect: false });
       setIsLoggedIn(false);
       sessionStorage.removeItem('disporapar_admin_session');
-      showNotification('Berhasil keluar.', 'success');
+      if (!skipNotification) {
+        showNotification('Berhasil keluar.', 'success');
+      }
       router.refresh();
     } catch (err) {
       console.error(err);
-      showNotification('Gagal keluar dari sesi.', 'error');
+      if (!skipNotification) {
+        showNotification('Gagal keluar dari sesi.', 'error');
+      }
     }
   };
 
   // Notification Trigger
   const showNotification = (message: string, type: 'success' | 'error') => {
+    if (notificationTimerRef.current) {
+      clearTimeout(notificationTimerRef.current);
+    }
     setNotification({ message, type });
-    setTimeout(() => {
+    notificationTimerRef.current = setTimeout(() => {
       setNotification(null);
-    }, 4000);
+      notificationTimerRef.current = null;
+    }, 3000);
   };
 
   // Convert File and automatically convert to WebP
@@ -524,6 +742,21 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
         setFormPoints(item.points ? [...item.points] : ['']);
       }
     }
+    if (['kepemudaan', 'olahraga', 'pariwisata'].includes(activeTab)) {
+      if (type === 'add') {
+        setModalDetails([
+          { value: '', icon: 'MapPin' },
+          { value: '', icon: activeTab === 'pariwisata' ? 'Clock' : 'Users' },
+          { value: '', icon: 'Ticket' }
+        ]);
+      } else if (type === 'edit' && item) {
+        setModalDetails(item.details ? [...item.details] : [
+          { value: item.location || '', icon: item.locationIcon || 'MapPin' },
+          { value: item.capacity || '', icon: item.capacityIcon || (activeTab === 'pariwisata' ? 'Clock' : 'Users') },
+          { value: item.price || '', icon: item.priceIcon || 'Ticket' }
+        ]);
+      }
+    }
     if (type === 'edit') {
       setUploadedImageBase64(item.imageUrl || item.image || '');
       if (activeTab === 'berkas' && item) {
@@ -559,6 +792,12 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
         setEvents(events.filter((ev) => ev.id !== editingItem.id));
       } else if (activeTab === 'berkas') {
         setServices(services.filter((s) => s.id !== editingItem.id));
+      } else if (activeTab === 'kepemudaan') {
+        setKepemudaanCards(kepemudaanCards.filter((c) => c.id !== editingItem.id));
+      } else if (activeTab === 'olahraga') {
+        setOlahragaCards(olahragaCards.filter((c) => c.id !== editingItem.id));
+      } else if (activeTab === 'pariwisata') {
+        setPariwisataCards(pariwisataCards.filter((c) => c.id !== editingItem.id));
       } else if (activeTab === 'beranda') {
         if (editingItem && (editingItem.points || editingItem.id.startsWith('prog-'))) {
           setPriorityPrograms(priorityPrograms.filter((p) => p.id !== editingItem.id));
@@ -619,7 +858,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
           date,
           imageUrl,
           author,
-          featured: formData.get('featured') === 'on'
+          featured: false
         };
         setNews([newItem, ...news]);
         showNotification('Berita berhasil ditambahkan.', 'success');
@@ -633,7 +872,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
           author,
           date,
           imageUrl,
-          featured: formData.get('featured') === 'on'
+          featured: editingItem?.featured || false
         } : item));
         showNotification('Berita berhasil diubah.', 'success');
       }
@@ -733,6 +972,66 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
           fileSize
         } : item));
         showNotification('Berkas berhasil diubah.', 'success');
+      }
+    } else if (activeTab === 'kepemudaan' || activeTab === 'olahraga' || activeTab === 'pariwisata') {
+      const title = formData.get('title') as string;
+      const description = formData.get('description') as string;
+      const facilitiesRaw = formData.get('facilities') as string;
+      const facilities = facilitiesRaw ? facilitiesRaw.split(',').map((f: string) => f.trim()).filter(Boolean) : [];
+      const imageUrl = uploadedImageBase64 || formData.get('imageUrl') as string || '';
+      const facilitiesTitle = formData.get('facilitiesTitle') as string || 'Fasilitas Area';
+
+      // Capture dynamic details
+      const details = modalDetails.filter(d => d.value.trim() !== '');
+
+      // Derive legacy values for backward compatibility
+      const location = details[0]?.value || '';
+      const capacity = details[1]?.value || '';
+      const price = details[2]?.value || '';
+      const locationIcon = details[0]?.icon || 'MapPin';
+      const capacityIcon = details[1]?.icon || 'Clock';
+      const priceIcon = details[2]?.icon || 'Ticket';
+
+      if (modalType === 'add') {
+        const newItem = {
+          id: `${activeTab === 'kepemudaan' ? 'kc' : activeTab === 'olahraga' ? 'oc' : 'pc'}-${Date.now()}`,
+          title,
+          description,
+          location,
+          capacity,
+          price,
+          facilities,
+          imageUrl,
+          locationIcon,
+          capacityIcon,
+          priceIcon,
+          facilitiesTitle,
+          details
+        };
+        if (activeTab === 'kepemudaan') setKepemudaanCards([newItem, ...kepemudaanCards]);
+        else if (activeTab === 'olahraga') setOlahragaCards([newItem, ...olahragaCards]);
+        else setPariwisataCards([newItem, ...pariwisataCards]);
+        showNotification('Data berhasil ditambahkan.', 'success');
+      } else {
+        const updatedItem = {
+          ...editingItem,
+          title,
+          description,
+          location,
+          capacity,
+          price,
+          facilities,
+          imageUrl,
+          locationIcon,
+          capacityIcon,
+          priceIcon,
+          facilitiesTitle,
+          details
+        };
+        if (activeTab === 'kepemudaan') setKepemudaanCards(kepemudaanCards.map(c => c.id === editingItem.id ? updatedItem : c));
+        else if (activeTab === 'olahraga') setOlahragaCards(olahragaCards.map(c => c.id === editingItem.id ? updatedItem : c));
+        else setPariwisataCards(pariwisataCards.map(c => c.id === editingItem.id ? updatedItem : c));
+        showNotification('Data berhasil diubah.', 'success');
       }
     } else if (activeTab === 'beranda') {
       if (berandaSubTab === 'programs') {
@@ -856,13 +1155,11 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
       if (!res.ok) {
         setAccountError(resData.error || 'Gagal memperbarui akun.');
       } else {
-        setAccountSuccess('Akun admin berhasil diperbarui! Anda akan dialihkan keluar...');
         setCurrentAdminUsername(newUsername);
         showNotification('Akun admin berhasil diperbarui!', 'success');
-
-        setTimeout(() => {
-          handleLogout();
-        }, 1500);
+        setIsAccountModalOpen(false);
+        setIsProfileDropdownOpen(false);
+        handleLogout(true);
       }
     } catch (err) {
       console.error(err);
@@ -1007,7 +1304,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
     });
 
     setIsEditingContact(false);
-    showNotification('Informasi kontak dinas berhasil diperbarui!', 'success');
+    showNotification('Informasi Kontak dinas berhasil diperbarui!', 'success');
   };
 
   // Handle Delete Social Media Item (saves immediately when not in edit mode)
@@ -1057,6 +1354,61 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
 
     setIsEditingWelcome(false);
     showNotification('Sambutan berhasil diperbarui!', 'success');
+  };
+
+  const handleUpdateBottomCard = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const tag = formData.get('tag') as string;
+    const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
+    const buttonText = formData.get('buttonText') as string;
+    const buttonLink = formData.get('buttonLink') as string || '/pelayanan';
+    const imageUrl = uploadedImageBase64 || formData.get('imageUrl') as string || '';
+    const sectionTag = formData.get('sectionTag') as string;
+    const sectionTitle = formData.get('sectionTitle') as string;
+
+    if (!tag.trim() || !title.trim() || !description.trim() || !buttonText.trim() || !sectionTag.trim() || !sectionTitle.trim()) {
+      showNotification('Semua kolom wajib diisi.', 'error');
+      return;
+    }
+
+    let exists = false;
+    const updated = bidangBottomCards.map(c => {
+      if (c.id === activeTab) {
+        exists = true;
+        return {
+          id: c.id,
+          tag,
+          title,
+          description,
+          buttonText,
+          buttonLink,
+          imageUrl,
+          sectionTag,
+          sectionTitle
+        };
+      }
+      return c;
+    });
+
+    if (!exists) {
+      updated.push({
+        id: activeTab as 'kepemudaan' | 'olahraga' | 'pariwisata',
+        tag,
+        title,
+        description,
+        buttonText,
+        buttonLink,
+        imageUrl,
+        sectionTag,
+        sectionTitle
+      });
+    }
+
+    setBidangBottomCards(updated);
+    showNotification('Konten informasi bawah berhasil diperbarui!', 'success');
+    setUploadedImageBase64('');
   };
 
   // Cascade Category Changes
@@ -1194,6 +1546,21 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
           item.category.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
       });
+    } else if (activeTab === 'kepemudaan') {
+      return kepemudaanCards.filter((item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    } else if (activeTab === 'olahraga') {
+      return olahragaCards.filter((item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    } else if (activeTab === 'pariwisata') {
+      return pariwisataCards.filter((item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
     return [];
   };
@@ -1335,7 +1702,25 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
   // ==========================================
   if (!isLoggedIn) {
     return (
-      <div className="w-full min-h-screen bg-gradient-to-tr from-[#051424] via-[#0E3B66] to-[#124b82] flex items-center justify-center p-4 selection:bg-accent selection:text-white font-sans text-slate-800">
+      <div className="w-full min-h-screen bg-gradient-to-tr from-[#051424] via-[#0E3B66] to-[#124b82] flex items-center justify-center p-4 selection:bg-accent selection:text-white font-sans text-slate-800 relative">
+
+        {/* Toast Notification */}
+        {notification && (
+          <div
+            onClick={() => setNotification(null)}
+            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-red-50 border-red-200 text-red-800'
+              }`}
+          >
+            {notification.type === 'success' ? (
+              <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+            ) : (
+              <ShieldAlert className="w-5 h-5 text-red-600 shrink-0" />
+            )}
+            <span>{notification.message}</span>
+          </div>
+        )}
 
         {/* Decorative elements */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
@@ -1346,15 +1731,12 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
             <div className="flex justify-center mb-6">
               <Logo variant="dark" className="scale-110" />
             </div>
+            <p className="text-xs text-slate-200 leading-relaxed font-inter max-w-[280px] mx-auto">
+              Portal Keamanan Administrasi Dinas. Masukkan kredensial admin untuk mengakses panel kendali
+            </p>
           </div>
 
           <form onSubmit={handleLogin} className="mt-8 space-y-5 text-left font-inter text-slate-700">
-            {loginError && (
-              <div className="bg-red-500/25 border border-red-500/50 p-4 rounded-xl text-red-100 text-xs font-semibold flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 shrink-0 text-red-200" />
-                <span>{loginError}</span>
-              </div>
-            )}
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-slate-200 tracking-wider uppercase font-mono">Username</label>
@@ -1421,10 +1803,13 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
 
       {/* Toast Notification */}
       {notification && (
-        <div className={`fixed bottom-5 right-5 z-[100] px-5 py-4 rounded-xl shadow-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in ${notification.type === 'success'
-          ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-          : 'bg-red-50 border-red-200 text-red-800'
-          }`}>
+        <div
+          onClick={() => setNotification(null)}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+            : 'bg-red-50 border-red-200 text-red-800'
+            }`}
+        >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
           ) : (
@@ -1465,13 +1850,16 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
           <nav className="p-4 space-y-1 font-mono text-xs uppercase tracking-wider">
             {[
               { id: 'dashboard', name: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+              { id: 'kepemudaan', name: 'Kepemudaan', icon: <Users className="w-4 h-4" /> },
+              { id: 'olahraga', name: 'Olahraga', icon: <Trophy className="w-4 h-4" /> },
+              { id: 'pariwisata', name: 'Pariwisata', icon: <Compass className="w-4 h-4" /> },
               { id: 'beranda', name: 'Konten Beranda', icon: <Sliders className="w-4 h-4" /> },
               { id: 'sambutan', name: 'Sambutan', icon: <User className="w-4 h-4" /> },
               { id: 'agenda', name: 'Agenda Event', icon: <Calendar className="w-4 h-4" /> },
               { id: 'berita', name: 'Berita', icon: <Newspaper className="w-4 h-4" /> },
               { id: 'galeri', name: 'Galeri Foto', icon: <ImageIcon className="w-4 h-4" /> },
               { id: 'berkas', name: 'Berkas Layanan', icon: <FileText className="w-4 h-4" /> },
-              { id: 'kontak', name: 'Info Kontak', icon: <Phone className="w-4 h-4" /> }
+              { id: 'Kontak', name: 'Info Kontak', icon: <Phone className="w-4 h-4" /> }
             ].map((tab) => {
               const active = activeTab === tab.id;
               return (
@@ -1482,9 +1870,13 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                     setSearchQuery('');
                     setSelectedCategoryFilter('Semua');
                     setIsSidebarOpen(false); // Close sidebar on mobile after selecting tab
+                    
+                    // Reset edit states when switching tabs
+                    setIsEditingWelcome(false);
+                    handleCancelContact();
+
                     if (tab.id === 'sambutan') {
                       setUploadedImageBase64(welcomeMessage.imageUrl || '');
-                      setIsEditingWelcome(false);
                     }
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer font-bold text-left ${active
@@ -1529,7 +1921,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
             </button>
             <div className="min-w-0">
               <h2 className="text-base sm:text-lg font-extrabold text-[#0E3B66] uppercase tracking-tight flex items-center gap-1.5 sm:gap-2 leading-none truncate">
-                <span>Panel Kendali</span>
+                <span>Panel Admin</span>
                 <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                 <span className="text-slate-500 capitalize truncate">{activeTab === 'beranda' ? 'Konten Beranda' : activeTab}</span>
               </h2>
@@ -2168,7 +2560,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
             )}
 
             {/* B. CRUD TABVIEWS (BERITA, GALERI, AGENDA, BERKAS) */}
-            {['berita', 'galeri', 'agenda', 'berkas'].includes(activeTab) && (
+            {['berita', 'galeri', 'agenda', 'berkas', 'kepemudaan', 'olahraga', 'pariwisata'].includes(activeTab) && (
               <div className="space-y-6 animate-fade-in">
                 {/* Control Action bar - STICKY SEARCH & FILTERS */}
                 <div className="sticky top-0 z-20 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md transition-all duration-300">
@@ -2189,7 +2581,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                     </div>
 
                     {/* Category Filter Dropdown */}
-                    {activeTab !== 'agenda' && (
+                    {activeTab !== 'agenda' && activeTab !== 'kepemudaan' && activeTab !== 'olahraga' && activeTab !== 'pariwisata' && (
                       <div className="w-full sm:w-44 relative font-inter">
                         <button
                           type="button"
@@ -2244,7 +2636,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
 
                   {/* Actions Group */}
                   <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
-                    {activeTab !== 'agenda' && (
+                    {activeTab !== 'agenda' && activeTab !== 'kepemudaan' && activeTab !== 'olahraga' && activeTab !== 'pariwisata' && (
                       <button
                         type="button"
                         onClick={() => {
@@ -2267,17 +2659,27 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                       className="w-full sm:w-auto px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
                     >
                       <Plus className="w-4 h-4 text-white" />
-                      <span>Tambah {activeTab}</span>
+                      <span>Tambah {activeTab === 'kepemudaan' ? 'Layanan Sewa Pemuda' : activeTab === 'olahraga' ? 'Sarana Olahraga' : activeTab === 'pariwisata' ? 'Destinasi Wisata' : activeTab}</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Data Table / List */}
                 <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+
+                  {/* ── Data Table for all tabs ── */}
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
                       <thead>
                         <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
+                          {['kepemudaan', 'olahraga', 'pariwisata'].includes(activeTab) && (
+                            <>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6 w-24">Gambar</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6 w-1/4">Nama</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Deskripsi</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center w-28">Aksi</th>
+                            </>
+                          )}
                           {activeTab === 'berita' && (
                             <>
                               <th className="py-3 px-3 sm:py-4.5 sm:px-6">Berita</th>
@@ -2298,13 +2700,15 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                           {activeTab === 'agenda' && (
                             <>
                               <th className="py-3 px-3 sm:py-4.5 sm:px-6">Agenda</th>
-                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Waktu &amp; Tanggal</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Tanggal Waktu</th>
                               <th className="py-3 px-3 sm:py-4.5 sm:px-6">Lokasi</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">Status</th>
                               <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">Aksi</th>
                             </>
                           )}
                           {activeTab === 'berkas' && (
                             <>
+                              <th className="py-3 px-2 sm:py-4.5 sm:px-4 text-center w-16">Format</th>
                               <th className="py-3 px-3 sm:py-4.5 sm:px-6">Nama Berkas</th>
                               <th className="py-3 px-3 sm:py-4.5 sm:px-6">Kategori</th>
                               <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">Aksi</th>
@@ -2316,6 +2720,28 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                         {getFilteredData().length > 0 ? (
                           (getFilteredData() as any[]).map((item) => (
                             <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                              {['kepemudaan', 'olahraga', 'pariwisata'].includes(activeTab) && (
+                                <>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6">
+                                    <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-slate-100 shadow-xs border border-slate-100">
+                                      {item.imageUrl ? (
+                                        <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                                      ) : (
+                                        <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                          <Compass className="w-5 h-5" />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 font-bold text-[#0E3B66]">
+                                    {item.title}
+                                  </td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-550">
+                                    <p className="line-clamp-2 text-xs font-light">{item.description}</p>
+                                  </td>
+                                </>
+                              )}
+
                               {/* Berita Row rendering */}
                               {activeTab === 'berita' && (
                                 <>
@@ -2349,22 +2775,46 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                                 </>
                               )}
 
-                              {activeTab === 'agenda' && (
-                                <>
-                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 max-w-xs">
-                                    <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
-                                  </td>
-                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-550 whitespace-nowrap">
-                                    <div className="font-bold text-[11px]">{item.date}</div>
-                                    <div className="text-[10px] mt-0.5 font-mono text-slate-400">{item.time}</div>
-                                  </td>
-                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-600 font-inter">{item.location}</td>
-                                </>
-                              )}
+                              {activeTab === 'agenda' && (() => {
+                                let isPast = false;
+                                try {
+                                  const evDate = parseIndonesianDate(item.date);
+                                  isPast = evDate.getTime() < todayWIB.getTime();
+                                } catch { }
+                                return (
+                                  <>
+                                    <td className="py-3 px-3 sm:py-4.5 sm:px-6 max-w-xs">
+                                      <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
+                                    </td>
+                                    <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-550 whitespace-nowrap">
+                                      <div className="font-bold text-[11px]">{item.date}</div>
+                                      <div className="text-[10px] mt-0.5 font-mono text-slate-400">{item.time}</div>
+                                    </td>
+                                    <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-600 font-inter">{item.location}</td>
+                                    <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">
+                                      {isPast ? (
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
+
+                                          Selesai
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                                          Mendatang
+                                        </span>
+                                      )}
+                                    </td>
+                                  </>
+                                );
+                              })()}
 
                               {/* Berkas Row rendering */}
                               {activeTab === 'berkas' && (
                                 <>
+                                  <td className="py-3 px-2 sm:py-4.5 sm:px-4 text-center">
+                                    <div className="flex items-center justify-center">
+                                      <FileFormatIcon downloadUrl={item.downloadUrl} title={item.title} className="w-5 h-5" />
+                                    </div>
+                                  </td>
                                   <td className="py-3 px-3 sm:py-4.5 sm:px-6 max-w-xs">
                                     <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
                                   </td>
@@ -2375,6 +2825,60 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                               {/* Actions Column */}
                               <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-center whitespace-nowrap">
                                 <div className="flex items-center justify-center gap-2">
+                                  {['kepemudaan', 'olahraga', 'pariwisata'].includes(activeTab) && (() => {
+                                    const cardsList = activeTab === 'kepemudaan'
+                                      ? kepemudaanCards
+                                      : activeTab === 'olahraga'
+                                        ? olahragaCards
+                                        : pariwisataCards;
+                                    const setCardsList = activeTab === 'kepemudaan'
+                                      ? setKepemudaanCards
+                                      : activeTab === 'olahraga'
+                                        ? setOlahragaCards
+                                        : setPariwisataCards;
+                                    const origIndex = cardsList.findIndex((c) => c.id === item.id);
+                                    const isFirst = origIndex <= 0;
+                                    const isLast = origIndex < 0 || origIndex === cardsList.length - 1;
+
+                                    const handleMove = (direction: 'up' | 'down') => {
+                                      if (direction === 'up' && isFirst) return;
+                                      if (direction === 'down' && isLast) return;
+                                      const newList = [...cardsList];
+                                      const swapWith = direction === 'up' ? origIndex - 1 : origIndex + 1;
+                                      const temp = newList[origIndex];
+                                      newList[origIndex] = newList[swapWith];
+                                      newList[swapWith] = temp;
+                                      setCardsList(newList);
+                                      showNotification(`Urutan berhasil dipindahkan ke ${direction === 'up' ? 'atas' : 'bawah'}.`, 'success');
+                                    };
+
+                                    return (
+                                      <>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleMove('up')}
+                                          disabled={isFirst}
+                                          className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-[#0E3B66] disabled:opacity-30 disabled:hover:text-slate-500 cursor-pointer transition-colors"
+                                          title="Pindahkan ke atas"
+                                        >
+                                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                          </svg>
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleMove('down')}
+                                          disabled={isLast}
+                                          className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-[#0E3B66] disabled:opacity-30 disabled:hover:text-slate-500 cursor-pointer transition-colors"
+                                          title="Pindahkan ke bawah"
+                                        >
+                                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                          </svg>
+                                        </button>
+                                      </>
+                                    );
+                                  })()}
                                   <button
                                     onClick={() => openForm('edit', item)}
                                     className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
@@ -2405,32 +2909,199 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                       </tbody>
                     </table>
                   </div>
+
                 </div>
               </div>
             )}
 
-            {/* C. INFO KONTAK EDIT VIEW */}
-            {activeTab === 'kontak' && (
-              <div className="space-y-6 animate-fade-in text-left">
+            {/* Form Pengaturan Bottom Card */}
+            {['kepemudaan', 'olahraga', 'pariwisata'].includes(activeTab) && (() => {
+              const bottomCard = bidangBottomCards.find(c => c.id === activeTab) || {
+                tag: '',
+                title: '',
+                description: '',
+                buttonText: '',
+                buttonLink: '',
+                imageUrl: '',
+                sectionTag: '',
+                sectionTitle: ''
+              };
+              return (
+                <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6 text-left mt-6 animate-fade-in font-inter">
+                  <div className="border-b border-slate-100 pb-4">
+                    <h3 className="text-base sm:text-lg font-extrabold text-[#0E3B66]">Pengaturan Informasi Bidang</h3>
+                  </div>
+
+                  <form onSubmit={handleUpdateBottomCard} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-450 tracking-wider uppercase font-mono">Tag Section Halaman Utama (Daftar Card)</label>
+                        <input
+                          type="text"
+                          name="sectionTag"
+                          required
+                          key={`${activeTab}-sectag`}
+                          defaultValue={bottomCard.sectionTag || ''}
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                          placeholder="Contoh: Program Strategis & Layanan Pemuda"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-450 tracking-wider uppercase font-mono">Judul Section Halaman Utama (Daftar Card)</label>
+                        <input
+                          type="text"
+                          name="sectionTitle"
+                          required
+                          key={`${activeTab}-sectitle`}
+                          defaultValue={bottomCard.sectionTitle || ''}
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                          placeholder="Contoh: Fasilitas Pembinaan Pemuda Kota Tegal"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-450 tracking-wider uppercase font-mono">Tag / Label Kategori Banner Bawah</label>
+                        <input
+                          type="text"
+                          name="tag"
+                          required
+                          key={`${activeTab}-tag`}
+                          defaultValue={bottomCard.tag}
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                          placeholder="Contoh: Layanan & Kemitraan Pemuda"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-450 tracking-wider uppercase font-mono">Judul Banner Bawah</label>
+                        <input
+                          type="text"
+                          name="title"
+                          required
+                          key={`${activeTab}-title`}
+                          defaultValue={bottomCard.title}
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                          placeholder="Masukkan judul banner..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">Deskripsi Banner</label>
+                      <textarea
+                        name="description"
+                        required
+                        rows={3}
+                        key={`${activeTab}-desc`}
+                        defaultValue={bottomCard.description}
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium resize-none"
+                        placeholder="Masukkan deskripsi banner..."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">Teks Tombol (CTA)</label>
+                        <input
+                          type="text"
+                          name="buttonText"
+                          required
+                          key={`${activeTab}-btn`}
+                          defaultValue={bottomCard.buttonText}
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                          placeholder="Contoh: Hubungi Kemitraan"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">Tautan / Link Tombol (CTA)</label>
+                        <input
+                          type="text"
+                          name="buttonLink"
+                          required
+                          key={`${activeTab}-btnlink`}
+                          defaultValue={bottomCard.buttonLink || '/pelayanan'}
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                          placeholder="Contoh: /pelayanan atau https://wa.me/..."
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">URL / Tautan Foto Banner</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            name="imageUrl"
+                            key={`${activeTab}-img`}
+                            defaultValue={bottomCard.imageUrl}
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                            placeholder="Masukkan tautan gambar..."
+                          />
+                          <div className="relative shrink-0">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              id="bottom-card-image-upload"
+                              className="hidden"
+                              onChange={handleFileChange}
+                            />
+                            <label
+                              htmlFor="bottom-card-image-upload"
+                              className="h-10 px-4 flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl transition-all cursor-pointer text-xs select-none"
+                            >
+                              <Upload className="w-4 h-4 shrink-0" />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-2">
+                      <button
+                        type="submit"
+                        className="h-10 px-6 bg-[#0E3B66] hover:bg-[#0c3359] text-white font-extrabold rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer border border-transparent"
+                      >
+                        Simpan Perubahan Banner
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              );
+            })()}
+
+            {activeTab === 'Kontak' && (
+              <div className="max-w-4xl mx-auto animate-fade-in text-left space-y-6">
                 <form onSubmit={handleUpdateContact} className="space-y-6 font-inter">
 
-                  {/* Action Header Card */}
-                  <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  {/* Sticky Action Header Card */}
+                  <div className="sticky top-0 z-20 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md transition-all duration-300">
                     <div>
-                      <h3 className="text-base sm:text-lg font-extrabold text-[#0E3B66]">Informasi Kontak Dinas</h3>
+                      <h3 className="text-base sm:text-lg font-extrabold text-[#0E3B66]">Kelola Informasi Kontak Dinas</h3>
                     </div>
                     {isEditingContact ? (
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingSocials([...editingSocials, { platform: 'instagram', label: '', url: '' }]);
+                          }}
+                          className="h-10 px-4 flex items-center justify-center font-extrabold bg-accent hover:bg-orange-500 text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
+                        >
+                          + Tambah Medsos
+                        </button>
                         <button
                           type="button"
                           onClick={handleCancelContact}
-                          className="h-10 px-5 flex items-center justify-center font-extrabold border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none"
+                          className="h-10 px-5 flex items-center justify-center font-extrabold border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer select-none shrink-0"
                         >
                           Batal
                         </button>
                         <button
                           type="submit"
-                          className="h-10 px-5 flex items-center justify-center font-extrabold bg-accent hover:bg-orange-500 text-white rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent"
+                          className="h-10 px-5 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
                         >
                           Simpan
                         </button>
@@ -2439,17 +3110,16 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                       <button
                         type="button"
                         onClick={() => setIsEditingContact(true)}
-                        className="h-10 px-6 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
+                        className="h-10 px-6 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
                       >
                         Edit Kontak
                       </button>
                     )}
                   </div>
 
-                  {/* 1. Informasi Kontak Grid 2 Kolom */}
-                  <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
-                    <h4 className="text-sm font-extrabold text-[#0E3B66] border-b border-slate-100 pb-2.5">Data Kontak Utama</h4>
-
+                  {/* Main Form Fields Content Card */}
+                  <div className="bg-white rounded-[2rem] border border-slate-200/80 shadow-sm p-6 sm:p-10 space-y-6">
+                    {/* Alamat, Telepon, Email, Jam Kerja Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Left: Alamat */}
                       <div className="space-y-2">
@@ -2479,7 +3149,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                             />
                           </div>
 
-                          <div className="space-y-1.5">
+                          <div>
                             <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Alamat Email Resmi</label>
                             <input
                               type="email"
@@ -2505,146 +3175,134 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* 2. Tabel Media Sosial */}
-                  <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-                    <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
-                      <div>
-                        <h4 className="text-sm font-extrabold text-[#0E3B66]">Daftar Media Sosial Dinas</h4>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!isEditingContact) {
-                            setIsEditingContact(true);
-                          }
-                          setEditingSocials([...editingSocials, { platform: 'instagram', label: '', url: '' }]);
-                        }}
-                        className="w-full sm:w-auto px-4 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer border border-transparent"
-                      >
-                        <Plus className="w-4 h-4 text-white" />
-                        <span>Tambah Media Sosial</span>
-                      </button>
+                    {/* Google Maps Input */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Google Maps Embed URL</label>
+                      <input
+                        type="text"
+                        required
+                        name="gmapsEmbedUrl"
+                        defaultValue={officeInfo.gmapsEmbedUrl}
+                        disabled={!isEditingContact}
+                        placeholder="Masukkan URL embed google maps (https://www.google.com/maps/embed?...)"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50 font-mono"
+                      />
                     </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
-                        <thead>
-                          <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
-                            <th className="py-4 px-6 w-1/5">Platform</th>
-                            <th className="py-4 px-6 w-1/4">Nama Akun (Label)</th>
-                            <th className="py-4 px-6">URL Tautan</th>
-                            <th className="py-4 px-6 text-center w-1/6">Aksi</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                          {editingSocials.map((social, index) => {
-                            const moveUp = () => {
-                              if (index === 0) return;
-                              const newList = [...editingSocials];
-                              const temp = newList[index];
-                              newList[index] = newList[index - 1];
-                              newList[index - 1] = temp;
-                              setEditingSocials(newList);
-                            };
+                    {/* Divider */}
+                    <hr className="border-slate-100 my-6" />
 
-                            const moveDown = () => {
-                              if (index === editingSocials.length - 1) return;
-                              const newList = [...editingSocials];
-                              const temp = newList[index];
-                              newList[index] = newList[index + 1];
-                              newList[index + 1] = temp;
-                              setEditingSocials(newList);
-                            };
+                    {/* Social Media Table (No heading text) */}
+                    <div className="space-y-4">
+                      <div className="overflow-x-auto border border-slate-150 rounded-2xl">
+                        <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
+                          <thead>
+                            <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-250">
+                              <th className="py-3.5 px-6 w-1/4">Platform</th>
+                              <th className="py-3.5 px-6 w-1/4">Nama Akun</th>
+                              <th className="py-3.5 px-6">URL Tautan</th>
+                              <th className="py-3.5 px-6 text-center w-1/6">Aksi</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                            {editingSocials.map((social, index) => {
+                              const moveUp = () => {
+                                if (index === 0) return;
+                                const newList = [...editingSocials];
+                                const temp = newList[index];
+                                newList[index] = newList[index - 1];
+                                newList[index - 1] = temp;
+                                setEditingSocials(newList);
+                              };
 
-                            const updateField = (field: 'platform' | 'label' | 'url', value: string) => {
-                              const newList = [...editingSocials];
-                              newList[index] = { ...newList[index], [field]: value };
-                              setEditingSocials(newList);
-                            };
+                              const moveDown = () => {
+                                if (index === editingSocials.length - 1) return;
+                                const newList = [...editingSocials];
+                                const temp = newList[index];
+                                newList[index] = newList[index + 1];
+                                newList[index + 1] = temp;
+                                setEditingSocials(newList);
+                              };
 
-                            const removeRow = () => {
-                              const newList = editingSocials.filter((_, i) => i !== index);
-                              setEditingSocials(newList);
-                            };
+                              const updateField = (field: 'platform' | 'label' | 'url', value: string) => {
+                                const newList = [...editingSocials];
+                                newList[index] = { ...newList[index], [field]: value };
+                                setEditingSocials(newList);
+                              };
 
-                            const platformLabel = social.platform.charAt(0).toUpperCase() + social.platform.slice(1);
+                              const removeRow = () => {
+                                const newList = editingSocials.filter((_, i) => i !== index);
+                                setEditingSocials(newList);
+                              };
 
-                            return (
-                              <tr key={index} className="hover:bg-slate-50/50 transition-colors">
-                                {/* Platform Selector */}
-                                <td className="py-4 px-6">
-                                  {isEditingContact ? (
-                                    <select
-                                      value={social.platform}
-                                      onChange={(e) => updateField('platform', e.target.value as any)}
-                                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent text-slate-800 cursor-pointer"
-                                    >
-                                      <option value="instagram">Instagram</option>
-                                      <option value="youtube">YouTube</option>
-                                      <option value="facebook">Facebook</option>
-                                      <option value="x">X (Twitter)</option>
-                                      <option value="tiktok">TikTok</option>
-                                      <option value="whatsapp">WhatsApp</option>
-                                      <option value="telegram">Telegram</option>
-                                      <option value="linkedin">LinkedIn</option>
-                                    </select>
-                                  ) : (
-                                    <span className="text-slate-800 font-bold uppercase tracking-wider text-[10px] bg-slate-100 border border-slate-200/60 px-2.5 py-1 rounded-lg">
-                                      {platformLabel === 'X' ? 'X (Twitter)' : platformLabel}
-                                    </span>
-                                  )}
-                                </td>
+                              const platformLabel = social.platform.charAt(0).toUpperCase() + social.platform.slice(1);
 
-                                {/* Nama Akun (Label) */}
-                                <td className="py-4 px-6">
-                                  {isEditingContact ? (
-                                    <input
-                                      type="text"
-                                      value={social.label}
-                                      onChange={(e) => updateField('label', e.target.value)}
-                                      placeholder="Keterangan (misal: Resmi)"
-                                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent text-slate-800 placeholder-slate-400"
-                                    />
-                                  ) : (
-                                    <span className="text-slate-800 font-bold text-xs">{social.label}</span>
-                                  )}
-                                </td>
-
-                                {/* URL Tautan */}
-                                <td className="py-4 px-6">
-                                  {isEditingContact ? (
-                                    <input
-                                      type="text"
-                                      value={social.url}
-                                      onChange={(e) => updateField('url', e.target.value)}
-                                      placeholder="https://..."
-                                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent text-slate-800 placeholder-slate-400 font-mono"
-                                    />
-                                  ) : (
-                                    <a
-                                      href={social.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-accent hover:text-orange-500 font-mono text-xs flex items-center gap-1 hover:underline truncate max-w-xs sm:max-w-md"
-                                    >
-                                      <span className="truncate">{social.url}</span>
-                                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-                                    </a>
-                                  )}
-                                </td>
-
-                                {/* Aksi */}
-                                <td className="py-4 px-6">
-                                  <div className="flex items-center justify-center gap-1.5">
+                              return (
+                                <tr key={index} className="hover:bg-slate-50/50 transition-colors">
+                                  {/* Platform Selector */}
+                                  <td className="py-3.5 px-6">
                                     {isEditingContact ? (
-                                      <>
+                                      <select
+                                        value={social.platform}
+                                        onChange={(e) => updateField('platform', e.target.value as any)}
+                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent text-slate-800 cursor-pointer"
+                                      >
+                                        <option value="instagram">Instagram</option>
+                                        <option value="youtube">YouTube</option>
+                                        <option value="facebook">Facebook</option>
+                                        <option value="x">X (Twitter)</option>
+                                        <option value="tiktok">TikTok</option>
+                                        <option value="whatsapp">WhatsApp</option>
+                                        <option value="telegram">Telegram</option>
+                                        <option value="linkedin">LinkedIn</option>
+                                      </select>
+                                    ) : (
+                                      <span className="text-slate-800 font-bold uppercase tracking-wider text-[10px] bg-slate-100 border border-slate-200/60 px-2.5 py-1 rounded-lg">
+                                        {platformLabel === 'X' ? 'X (Twitter)' : platformLabel}
+                                      </span>
+                                    )}
+                                  </td>
+
+                                  {/* Nama Akun (Label) */}
+                                  <td className="py-3.5 px-6">
+                                    {isEditingContact ? (
+                                      <input
+                                        type="text"
+                                        value={social.label}
+                                        onChange={(e) => updateField('label', e.target.value)}
+                                        placeholder="Keterangan (misal: Resmi)"
+                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent text-slate-800 placeholder-slate-400"
+                                      />
+                                    ) : (
+                                      <span className="text-slate-800 font-bold text-xs">{social.label}</span>
+                                    )}
+                                  </td>
+
+                                  {/* URL Tautan */}
+                                  <td className="py-3.5 px-6 font-mono text-xs text-slate-500 truncate max-w-xs sm:max-w-md">
+                                    {isEditingContact ? (
+                                      <input
+                                        type="text"
+                                        value={social.url}
+                                        onChange={(e) => updateField('url', e.target.value)}
+                                        placeholder="https://..."
+                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent text-slate-800 placeholder-slate-400 font-mono"
+                                      />
+                                    ) : (
+                                      <span className="truncate block">{social.url}</span>
+                                    )}
+                                  </td>
+
+                                  {/* Aksi */}
+                                  <td className="py-3.5 px-6 text-center w-1/6">
+                                    {isEditingContact ? (
+                                      <div className="flex items-center justify-center gap-1.5">
                                         <button
                                           type="button"
                                           onClick={moveUp}
                                           disabled={index === 0}
-                                          className="p-1.5 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-[#0E3B66] disabled:opacity-30 disabled:hover:text-slate-500 cursor-pointer transition-colors"
+                                          className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-[#0E3B66] hover:bg-[#0E3B66] hover:text-white disabled:opacity-30 disabled:hover:bg-slate-50 disabled:hover:text-slate-500 cursor-pointer transition-colors"
                                           title="Pindahkan ke atas"
                                         >
                                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
@@ -2653,7 +3311,7 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                                           type="button"
                                           onClick={moveDown}
                                           disabled={index === editingSocials.length - 1}
-                                          className="p-1.5 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-[#0E3B66] disabled:opacity-30 disabled:hover:text-slate-500 cursor-pointer transition-colors"
+                                          className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-[#0E3B66] hover:bg-[#0E3B66] hover:text-white disabled:opacity-30 disabled:hover:bg-slate-50 disabled:hover:text-slate-500 cursor-pointer transition-colors"
                                           title="Pindahkan ke bawah"
                                         >
                                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
@@ -2661,78 +3319,37 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                                         <button
                                           type="button"
                                           onClick={removeRow}
-                                          className="p-1.5 bg-red-50 border border-red-100 hover:bg-red-650 hover:text-white rounded-lg text-red-650 shrink-0 cursor-pointer transition-colors flex items-center justify-center"
+                                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 shrink-0 cursor-pointer transition-colors flex items-center justify-center"
                                           title="Hapus"
                                         >
                                           <Trash2 className="w-3.5 h-3.5" />
                                         </button>
-                                      </>
+                                      </div>
                                     ) : (
-                                      <>
-                                        <button
-                                          type="button"
-                                          onClick={() => setIsEditingContact(true)}
-                                          className="p-1.5 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
-                                          title="Ubah data"
+                                      social.url ? (
+                                        <a
+                                          href={social.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-[12px] inline-flex items-center justify-center gap-1 text-[#0E3B66] hover:text-accent font-kwbold transition-colors py-1.5 px-3 rounded-lg hover:bg-slate-100"
                                         >
-                                          <Edit2 className="w-3.5 h-3.5" />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => handleDeleteSocialRow(index)}
-                                          className="p-1.5 bg-red-50 hover:bg-red-650 hover:text-white border border-red-100 rounded-lg text-red-650 shrink-0 cursor-pointer transition-colors flex items-center justify-center"
-                                          title="Hapus"
-                                        >
-                                          <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                      </>
+                                          <span>Buka</span>
+                                          <ExternalLink className="w-3.5 h-3.5" />
+                                        </a>
+                                      ) : (
+                                        <span className="text-slate-400 font-mono italic text-[10px]">Kosong</span>
+                                      )
                                     )}
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                    {editingSocials.length === 0 && (
-                      <div className="bg-slate-50 py-10 text-center border-t border-slate-200">
-                        <p className="text-xs text-slate-450 italic select-none font-inter">Belum ada media sosial terhubung.</p>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
-                    )}
-                  </div>
-
-                  {/* 3. Google Maps Card Tersendiri */}
-                  <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-4">
-                    <div>
-                      <h4 className="text-sm font-extrabold text-[#0E3B66]">Lokasi Google Maps</h4>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Google Maps Embed URL</label>
-                        <input
-                          type="text"
-                          required
-                          name="gmapsEmbedUrl"
-                          defaultValue={officeInfo.gmapsEmbedUrl}
-                          disabled={!isEditingContact}
-                          placeholder="Masukkan URL embed google maps (https://www.google.com/maps/embed?...)"
-                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 placeholder-slate-400 transition-all font-medium disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-slate-100/50 font-mono"
-                        />
-                      </div>
-
-                      {officeInfo.gmapsEmbedUrl && (
-                        <div className="relative w-full h-60 rounded-2xl overflow-hidden border border-slate-150 bg-slate-50 shadow-inner">
-                          <iframe
-                            title="Preview Peta Lokasi Kantor"
-                            src={officeInfo.gmapsEmbedUrl}
-                            width="100%"
-                            height="100%"
-                            style={{ border: 0 }}
-                            allowFullScreen
-                            loading="lazy"
-                            className="w-full h-full"
-                          />
+                      {editingSocials.length === 0 && (
+                        <div className="bg-slate-50 py-8 text-center border border-dashed border-slate-200 rounded-2xl">
+                          <p className="text-xs text-slate-450 italic select-none font-inter">Belum ada media sosial terhubung.</p>
                         </div>
                       )}
                     </div>
@@ -2898,14 +3515,27 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                           </thead>
                           <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                             {priorityPrograms.length > 0 ? (
-                              [...priorityPrograms]
-                                .sort((a, b) => a.id.localeCompare(b.id))
-                                .map((program) => {
+                              priorityPrograms
+                                .map((program, index) => {
+                                  const isFirst = index === 0;
+                                  const isLast = index === priorityPrograms.length - 1;
+
+                                  const handleMoveProgram = (direction: 'up' | 'down') => {
+                                    if (direction === 'up' && isFirst) return;
+                                    if (direction === 'down' && isLast) return;
+                                    const newList = [...priorityPrograms];
+                                    const swapWith = direction === 'up' ? index - 1 : index + 1;
+                                    const temp = newList[index];
+                                    newList[index] = newList[swapWith];
+                                    newList[swapWith] = temp;
+                                    setPriorityPrograms(newList);
+                                    showNotification(`Urutan berhasil dipindahkan ke ${direction === 'up' ? 'atas' : 'bawah'}.`, 'success');
+                                  };
+
                                   return (
                                     <tr key={program.id} className="hover:bg-slate-50/50 transition-colors">
                                       <td className="py-4 px-3 sm:py-5 sm:px-6 max-w-xs">
                                         <h4 className="font-extrabold text-[#0E3B66] leading-tight">{program.title}</h4>
-                                        <span className="text-[10px] font-mono text-slate-400 mt-1 block">ID: {program.id}</span>
                                       </td>
                                       <td className="py-4 px-3 sm:py-5 sm:px-6 max-w-md">
                                         <p className="text-slate-500 text-xs font-light leading-relaxed mb-3 line-clamp-2">{program.description}</p>
@@ -2920,6 +3550,28 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                                       </td>
                                       <td className="py-4 px-3 sm:py-5 sm:px-6 text-center whitespace-nowrap">
                                         <div className="flex items-center justify-center gap-2">
+                                          <button
+                                            type="button"
+                                            onClick={() => handleMoveProgram('up')}
+                                            disabled={isFirst}
+                                            className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-[#0E3B66] disabled:opacity-30 disabled:hover:text-slate-500 cursor-pointer transition-colors"
+                                            title="Pindahkan ke atas"
+                                          >
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                            </svg>
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleMoveProgram('down')}
+                                            disabled={isLast}
+                                            className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-[#0E3B66] disabled:opacity-30 disabled:hover:text-slate-500 cursor-pointer transition-colors"
+                                            title="Pindahkan ke bawah"
+                                          >
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                            </svg>
+                                          </button>
                                           <button
                                             onClick={() => openForm('edit', program)}
                                             className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
@@ -3113,8 +3765,8 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
           </div>
 
           {/* Footer info in workspace */}
-          <footer className="mt-8 border-t border-slate-200 pt-5 pb-2 text-center text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-            afz-mawardi © 2026 DISPORAPAR KOTA TEGAL - PANEL INTERNAL ADMINISTRATOR
+          <footer className="mt-8 border-t border-slate-300 pt-5 pb-0 text-center text-[11px] font-mono font-bold text-slate-400 tracking-wider">
+            Copyright © 2026 DISPORAPAR Kota Tegal • Developed by Afz-ysx
           </footer>
         </section>
       </main>
@@ -3329,26 +3981,31 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                             type="url"
                             name="imageUrl"
                             id="hero-imageUrl-input"
-                            defaultValue={editingItem?.image && !editingItem.image.startsWith('data:') ? editingItem.image : ''}
+                            value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.image || ''}
+                            onChange={(e) => setUploadedImageBase64(e.target.value)}
                             placeholder="https://images.unsplash.com/..."
                             className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                           />
                         </div>
                       </div>
 
-                      {uploadedImageBase64 && (
-                        <div className="relative w-full aspect-video rounded-xl overflow-hidden mt-3 border border-slate-100 shadow-xs">
-                          <Image src={uploadedImageBase64} alt="Pratinjau Background" fill className="object-cover" />
+                      {(uploadedImageBase64 || editingItem?.image) && (
+                        <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <ImageIcon className="w-4 h-4 text-accent shrink-0" />
+                            <span className="text-slate-800 font-bold truncate max-w-[200px]">
+                              {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.image}
+                            </span>
+                          </div>
                           <button
                             type="button"
                             onClick={() => {
                               setUploadedImageBase64('');
-                              const inp = document.getElementById('hero-imageUrl-input') as HTMLInputElement;
-                              if (inp) inp.value = '';
+                              if (editingItem) editingItem.image = '';
                             }}
-                            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600/90 text-white hover:bg-red-700 hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer hover:rotate-90"
+                            className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer font-sans"
                           >
-                            <X className="w-4 h-4" />
+                            Hapus
                           </button>
                         </div>
                       )}
@@ -3412,31 +4069,18 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Tanggal Publikasi</label>
-                      <input
-                        type="date"
-                        required
-                        name="date"
-                        defaultValue={editingItem ? parseIndonesianDateToYYYYMMDD(editingItem.date) : ''}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
-                      />
-                      {editingItem?.date && (
-                        <span className="text-[9px] text-slate-400 font-inter">Nilai saat ini: {editingItem.date}</span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2.5 pt-6 text-xs font-bold">
-                      <input
-                        type="checkbox"
-                        id="featured"
-                        name="featured"
-                        defaultChecked={editingItem?.featured || false}
-                        className="w-4 h-4 rounded text-accent border-slate-300 focus:ring-accent accent-accent"
-                      />
-                      <label htmlFor="featured" className="text-slate-600 select-none cursor-pointer">Sematkan sebagai Berita Utama</label>
-                    </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Tanggal Publikasi</label>
+                    <input
+                      type="date"
+                      required
+                      name="date"
+                      defaultValue={editingItem ? parseIndonesianDateToYYYYMMDD(editingItem.date) : ''}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                    />
+                    {editingItem?.date && (
+                      <span className="text-[9px] text-slate-400 font-inter">Nilai saat ini: {editingItem.date}</span>
+                    )}
                   </div>
 
                   {/* Image input: support local file and url link */}
@@ -3470,26 +4114,31 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                           type="url"
                           name="imageUrl"
                           id="news-imageUrl-input"
-                          defaultValue={editingItem?.imageUrl && !editingItem.imageUrl.startsWith('data:') ? editingItem.imageUrl : ''}
+                          value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.imageUrl || ''}
+                          onChange={(e) => setUploadedImageBase64(e.target.value)}
                           placeholder="https://images.unsplash.com/..."
                           className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                         />
                       </div>
                     </div>
 
-                    {uploadedImageBase64 && (
-                      <div className="relative w-full aspect-video rounded-xl overflow-hidden mt-3 border border-slate-100 shadow-xs">
-                        <Image src={uploadedImageBase64} alt="Pratinjau" fill className="object-cover" />
+                    {(uploadedImageBase64 || editingItem?.imageUrl) && (
+                      <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <ImageIcon className="w-4 h-4 text-accent shrink-0" />
+                          <span className="text-slate-800 font-bold truncate max-w-[200px]">
+                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.imageUrl}
+                          </span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
                             setUploadedImageBase64('');
-                            const inp = document.getElementById('news-imageUrl-input') as HTMLInputElement;
-                            if (inp) inp.value = '';
+                            if (editingItem) editingItem.imageUrl = '';
                           }}
-                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600/90 text-white hover:bg-red-700 hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer hover:rotate-90"
+                          className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer font-sans"
                         >
-                          <X className="w-4 h-4" />
+                          Hapus
                         </button>
                       </div>
                     )}
@@ -3556,26 +4205,31 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                           type="url"
                           name="imageUrl"
                           id="gallery-imageUrl-input"
-                          defaultValue={editingItem?.imageUrl && !editingItem.imageUrl.startsWith('data:') ? editingItem.imageUrl : ''}
+                          value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.imageUrl || ''}
+                          onChange={(e) => setUploadedImageBase64(e.target.value)}
                           placeholder="https://images.unsplash.com/..."
                           className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                         />
                       </div>
                     </div>
 
-                    {uploadedImageBase64 && (
-                      <div className="relative w-full aspect-square rounded-xl overflow-hidden mt-3 border border-slate-100 shadow-xs max-w-[200px] mx-auto">
-                        <Image src={uploadedImageBase64} alt="Pratinjau" fill className="object-cover" />
+                    {(uploadedImageBase64 || editingItem?.imageUrl) && (
+                      <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <ImageIcon className="w-4 h-4 text-accent shrink-0" />
+                          <span className="text-slate-800 font-bold truncate max-w-[200px]">
+                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.imageUrl}
+                          </span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
                             setUploadedImageBase64('');
-                            const inp = document.getElementById('gallery-imageUrl-input') as HTMLInputElement;
-                            if (inp) inp.value = '';
+                            if (editingItem) editingItem.imageUrl = '';
                           }}
-                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600/90 text-white hover:bg-red-700 hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer hover:rotate-90"
+                          className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer font-sans"
                         >
-                          <X className="w-4 h-4" />
+                          Hapus
                         </button>
                       </div>
                     )}
@@ -3679,26 +4333,31 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                           type="url"
                           name="imageUrl"
                           id="agenda-imageUrl-input"
-                          defaultValue={editingItem?.imageUrl && !editingItem.imageUrl.startsWith('data:') ? editingItem.imageUrl : ''}
+                          value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.imageUrl || ''}
+                          onChange={(e) => setUploadedImageBase64(e.target.value)}
                           placeholder="https://images.unsplash.com/..."
                           className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                         />
                       </div>
                     </div>
 
-                    {uploadedImageBase64 && (
-                      <div className="relative w-full aspect-video rounded-xl overflow-hidden mt-3 border border-slate-100 shadow-xs">
-                        <Image src={uploadedImageBase64} alt="Pratinjau" fill className="object-cover" />
+                    {(uploadedImageBase64 || editingItem?.imageUrl) && (
+                      <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <ImageIcon className="w-4 h-4 text-accent shrink-0" />
+                          <span className="text-slate-800 font-bold truncate max-w-[200px]">
+                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.imageUrl}
+                          </span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
                             setUploadedImageBase64('');
-                            const inp = document.getElementById('agenda-imageUrl-input') as HTMLInputElement;
-                            if (inp) inp.value = '';
+                            if (editingItem) editingItem.imageUrl = '';
                           }}
-                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600/90 text-white hover:bg-red-700 hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer hover:rotate-90"
+                          className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer font-sans"
                         >
-                          <X className="w-4 h-4" />
+                          Hapus
                         </button>
                       </div>
                     )}
@@ -3764,19 +4423,22 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                           type="url"
                           name="downloadUrl"
                           id="services-downloadUrl-input"
-                          defaultValue={editingItem?.downloadUrl && !editingItem.downloadUrl.startsWith('data:') ? editingItem.downloadUrl : ''}
+                          value={uploadedFileBase64.startsWith('data:') ? '' : uploadedFileBase64 || editingItem?.downloadUrl || ''}
+                          onChange={(e) => setUploadedFileBase64(e.target.value)}
                           placeholder="https://drive.google.com/..."
                           className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                         />
                       </div>
                     </div>
 
-                    {(uploadedFileBase64 || uploadedFileName) && (
-                      <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
+                    {(uploadedFileBase64 || editingItem?.downloadUrl) && (
+                      <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
                         <div className="flex items-center gap-2 min-w-0">
                           <FileText className="w-4 h-4 text-accent shrink-0" />
                           <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                            {uploadedFileName || 'Berkas Terunggah'}
+                            {uploadedFileBase64.startsWith('data:')
+                              ? (uploadedFileName || 'Berkas Terunggah (Local)')
+                              : uploadedFileBase64 || editingItem?.downloadUrl}
                           </span>
                         </div>
                         <button
@@ -3785,8 +4447,216 @@ export default function AdminClientPage({ initialIsLoggedIn, initialUsername }: 
                             setUploadedFileBase64('');
                             setUploadedFileName('');
                             setUploadedFileSize('');
-                            const inp = document.getElementById('services-downloadUrl-input') as HTMLInputElement;
-                            if (inp) inp.value = '';
+                            if (editingItem) editingItem.downloadUrl = '';
+                          }}
+                          className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer font-sans"
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {(activeTab === 'kepemudaan' || activeTab === 'olahraga' || activeTab === 'pariwisata') && modalType !== 'delete' && (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Nama / Judul Sarana</label>
+                    <input
+                      type="text"
+                      required
+                      name="title"
+                      defaultValue={editingItem?.title || ''}
+                      placeholder="Masukkan nama sarana..."
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Deskripsi Lengkap</label>
+                    <textarea
+                      required
+                      name="description"
+                      rows={3}
+                      defaultValue={editingItem?.description || ''}
+                      placeholder="Masukkan deskripsi sarana..."
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 resize-none"
+                    />
+                  </div>
+
+                  {/* Tabular Details List Config (Urutan Fleksibel & Reorderable) */}
+                  <div className="space-y-2.5 border-t border-b border-slate-150/60 py-4 font-inter text-left">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono block">
+                        Detail Keterangan &amp; Icon (Urutan Fleksibel)
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAddDetail}
+                        className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-600 hover:text-white border border-emerald-250 text-emerald-600 rounded-lg text-[10px] font-bold uppercase tracking-wider font-mono transition-colors cursor-pointer"
+                      >
+                        + Tambah Detail
+                      </button>
+                    </div>
+
+                    {modalDetails.length > 0 ? (
+                      <div className="overflow-x-auto w-full">
+                        <table className="w-full text-left border-collapse min-w-[400px]">
+                          <thead>
+                            <tr className="border-b border-slate-100 text-[9px] uppercase font-mono text-slate-400">
+                              <th className="pb-2 font-bold w-[15%] text-center">Urutan</th>
+                              <th className="pb-2 font-bold w-[50%]">Isi Nilai</th>
+                              <th className="pb-2 font-bold w-[25%]">Pilih Icon</th>
+                              <th className="pb-2 font-bold w-[10%] text-center">Aksi</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100/50">
+                            {modalDetails.map((item, idx) => (
+                              <tr key={idx} className="align-middle">
+                                <td className="py-2 px-1">
+                                  <div className="flex items-center justify-center gap-1">
+                                    <button
+                                      type="button"
+                                      disabled={idx === 0}
+                                      onClick={() => handleMoveDetail(idx, 'up')}
+                                      className="p-1 border border-slate-200 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer text-slate-500 font-bold text-xs"
+                                      title="Pindah Ke Atas"
+                                    >
+                                      ▲
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={idx === modalDetails.length - 1}
+                                      onClick={() => handleMoveDetail(idx, 'down')}
+                                      className="p-1 border border-slate-200 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer text-slate-500 font-bold text-xs"
+                                      title="Pindah Ke Bawah"
+                                    >
+                                      ▼
+                                    </button>
+                                  </div>
+                                </td>
+                                <td className="py-2 px-1">
+                                  <input
+                                    type="text"
+                                    required
+                                    value={item.value}
+                                    onChange={(e) => handleUpdateDetailField(idx, 'value', e.target.value)}
+                                    placeholder="Masukkan detail..."
+                                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent font-medium text-slate-800"
+                                  />
+                                </td>
+                                <td className="py-2 px-1">
+                                  <select
+                                    value={item.icon}
+                                    onChange={(e) => handleUpdateDetailField(idx, 'icon', e.target.value)}
+                                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent text-slate-700 font-medium"
+                                  >
+                                    <option value="MapPin">📍 MapPin</option>
+                                    <option value="Clock">🕒 Clock</option>
+                                    <option value="Users">👥 Users</option>
+                                    <option value="Ticket">🎫 Ticket</option>
+                                    <option value="Calendar">📅 Calendar</option>
+                                    <option value="Circle">⚫ Poin Titik</option>
+                                  </select>
+                                </td>
+                                <td className="py-2 px-1 text-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveDetail(idx)}
+                                    className="p-1.5 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                                    title="Hapus detail"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="py-6 text-center text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
+                        <span className="text-xs">Tidak ada detail keterangan. Silakan klik &quot;+ Tambah Detail&quot;</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Facilities (Editable Label & Values) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Teks Judul Fasilitas</label>
+                      <input
+                        type="text"
+                        name="facilitiesTitle"
+                        defaultValue={editingItem?.facilitiesTitle || 'Fasilitas Area'}
+                        placeholder="Contoh: Fasilitas Area"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Isi Fasilitas (Pisahkan Koma)</label>
+                      <input
+                        type="text"
+                        name="facilities"
+                        defaultValue={editingItem?.facilities ? editingItem.facilities.join(', ') : ''}
+                        placeholder="Contoh: Kios Teh Poci, Gazebo Pantai, Area Terapi Air"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Foto Sarana</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Local Upload */}
+                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal
+                        ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
+                        : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50'
+                        }`}>
+                        <Upload className="w-5 h-5 text-slate-400" />
+                        <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Foto</span>
+                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG)</span>
+                        <input
+                          type="file"
+                          accept="image/webp, image/png, image/jpeg, image/jpg"
+                          onChange={handleFileChange}
+                          onDragEnter={() => setIsDragOverModal(true)}
+                          onDragLeave={() => setIsDragOverModal(false)}
+                          onDrop={() => setIsDragOverModal(false)}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+
+                      {/* URL input */}
+                      <div className="space-y-1.5 flex flex-col justify-center">
+                        <span className="text-[8.5px] font-bold text-slate-400 font-mono">Atau Masukkan URL Link Foto:</span>
+                        <input
+                          type="text"
+                          name="imageUrl"
+                          id="sarana-imageUrl-input"
+                          value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.imageUrl || ''}
+                          onChange={(e) => setUploadedImageBase64(e.target.value)}
+                          placeholder="https://images.unsplash.com/..."
+                          className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                        />
+                      </div>
+                    </div>
+
+                    {(uploadedImageBase64 || editingItem?.imageUrl) && (
+                      <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <ImageIcon className="w-4 h-4 text-accent shrink-0" />
+                          <span className="text-slate-800 font-bold truncate max-w-[200px]">
+                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.imageUrl}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUploadedImageBase64('');
+                            if (editingItem) editingItem.imageUrl = '';
                           }}
                           className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
                         >

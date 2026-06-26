@@ -67,7 +67,7 @@ CREATE TABLE `berkas` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `kontak` (
+CREATE TABLE `Kontak` (
     `id` VARCHAR(191) NOT NULL DEFAULT 'default',
     `address` TEXT NOT NULL,
     `phone` VARCHAR(191) NOT NULL,

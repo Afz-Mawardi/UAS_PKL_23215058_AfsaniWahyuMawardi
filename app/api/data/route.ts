@@ -146,6 +146,31 @@ export async function GET() {
       { id: 'slide-admin-2', username: 'admin' }
     ];
 
+    // 12. Fetch Bidang Cards (Kepemudaan, Olahraga, Pariwisata)
+    const kepemudaanCards = (await prisma.kepemudaanCard.findMany({
+      orderBy: { createdAt: 'asc' }
+    })).map((c: any) => ({
+      ...c,
+      facilities: c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : []
+    }));
+
+    const olahragaCards = (await prisma.olahragaCard.findMany({
+      orderBy: { createdAt: 'asc' }
+    })).map((c: any) => ({
+      ...c,
+      facilities: c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : []
+    }));
+
+    const pariwisataCards = (await prisma.pariwisataCard.findMany({
+      orderBy: { createdAt: 'asc' }
+    })).map((c: any) => ({
+      ...c,
+      capacity: c.operationalHours || '',
+      facilities: c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : []
+    }));
+
+    const bidangBottomCards = await prisma.bidangBottomCard.findMany();
+
     return NextResponse.json({
       news,
       events,
@@ -157,7 +182,11 @@ export async function GET() {
       categories,
       homepageSettings,
       priorityPrograms,
-      users
+      users,
+      kepemudaanCards,
+      olahragaCards,
+      pariwisataCards,
+      bidangBottomCards
     });
   } catch (error) {
     console.error('Failed to read database', error);
@@ -372,6 +401,112 @@ export async function POST(request: Request) {
       await prisma.$transaction([
         prisma.priorityProgram.deleteMany(),
         prisma.priorityProgram.createMany({ data: programsArray })
+      ]);
+    } else if (type === 'kepemudaanCards') {
+      const now = new Date();
+      const cardsArray = data.map((item: any, index: number) => ({
+        id: item.id,
+        title: item.title || '',
+        description: item.description || '',
+        location: item.location || '',
+        capacity: item.capacity || '',
+        price: item.price || '',
+        facilities: Array.isArray(item.facilities) ? item.facilities.join(', ') : (item.facilities || ''),
+        imageUrl: item.imageUrl || '',
+        createdAt: new Date(now.getTime() + index * 1000)
+      }));
+
+      // Delete orphaned local files/images
+      const existingCards = await prisma.kepemudaanCard.findMany();
+      const newImageUrls = new Set(cardsArray.map((c: any) => c.imageUrl).filter(Boolean));
+      for (const item of existingCards) {
+        if (item.imageUrl && !newImageUrls.has(item.imageUrl)) {
+          deleteLocalFile(item.imageUrl);
+        }
+      }
+
+      await prisma.$transaction([
+        prisma.kepemudaanCard.deleteMany(),
+        prisma.kepemudaanCard.createMany({ data: cardsArray })
+      ]);
+    } else if (type === 'olahragaCards') {
+      const now = new Date();
+      const cardsArray = data.map((item: any, index: number) => ({
+        id: item.id,
+        title: item.title || '',
+        description: item.description || '',
+        location: item.location || '',
+        capacity: item.capacity || '',
+        price: item.price || '',
+        facilities: Array.isArray(item.facilities) ? item.facilities.join(', ') : (item.facilities || ''),
+        imageUrl: item.imageUrl || '',
+        createdAt: new Date(now.getTime() + index * 1000)
+      }));
+
+      // Delete orphaned local files/images
+      const existingCards = await prisma.olahragaCard.findMany();
+      const newImageUrls = new Set(cardsArray.map((c: any) => c.imageUrl).filter(Boolean));
+      for (const item of existingCards) {
+        if (item.imageUrl && !newImageUrls.has(item.imageUrl)) {
+          deleteLocalFile(item.imageUrl);
+        }
+      }
+
+      await prisma.$transaction([
+        prisma.olahragaCard.deleteMany(),
+        prisma.olahragaCard.createMany({ data: cardsArray })
+      ]);
+    } else if (type === 'pariwisataCards') {
+      const now = new Date();
+      const cardsArray = data.map((item: any, index: number) => ({
+        id: item.id,
+        title: item.title || '',
+        description: item.description || '',
+        location: item.location || '',
+        operationalHours: item.operationalHours || item.capacity || '',
+        price: item.price || '',
+        facilities: Array.isArray(item.facilities) ? item.facilities.join(', ') : (item.facilities || ''),
+        imageUrl: item.imageUrl || '',
+        createdAt: new Date(now.getTime() + index * 1000)
+      }));
+
+      // Delete orphaned local files/images
+      const existingCards = await prisma.pariwisataCard.findMany();
+      const newImageUrls = new Set(cardsArray.map((c: any) => c.imageUrl).filter(Boolean));
+      for (const item of existingCards) {
+        if (item.imageUrl && !newImageUrls.has(item.imageUrl)) {
+          deleteLocalFile(item.imageUrl);
+        }
+      }
+
+      await prisma.$transaction([
+        prisma.pariwisataCard.deleteMany(),
+        prisma.pariwisataCard.createMany({ data: cardsArray })
+      ]);
+    } else if (type === 'bidangBottomCards') {
+      const bottomCardsArray = data.map((item: any) => ({
+        id: item.id,
+        tag: item.tag || '',
+        title: item.title || '',
+        description: item.description || '',
+        buttonText: item.buttonText || '',
+        imageUrl: item.imageUrl || '',
+        sectionTag: item.sectionTag || '',
+        sectionTitle: item.sectionTitle || ''
+      }));
+
+      // Delete orphaned local files/images
+      const existingCards = await prisma.bidangBottomCard.findMany();
+      const newImageUrls = new Set(bottomCardsArray.map((c: any) => c.imageUrl).filter(Boolean));
+      for (const item of existingCards) {
+        if (item.imageUrl && !newImageUrls.has(item.imageUrl)) {
+          deleteLocalFile(item.imageUrl);
+        }
+      }
+
+      await prisma.$transaction([
+        prisma.bidangBottomCard.deleteMany(),
+        prisma.bidangBottomCard.createMany({ data: bottomCardsArray })
       ]);
     } else if (type === 'homepageSettings') {
       await prisma.homepageSetting.upsert({

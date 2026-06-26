@@ -48,7 +48,7 @@ export default function GaleriPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             Galeri Dokumentasi & Perspektif Suasana
           </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
             Dokumentasi Kegiatan Dinas
           </h1>
         </div>
@@ -110,7 +110,7 @@ export default function GaleriPage() {
                         src={photo.imageUrl}
                         alt={photo.title}
                         fill
-                        className="object-cover group-hover:scale-103 transition-transform duration-500"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
                         sizes="(max-w-711px) 100vw, (max-w-1023px) 50vw, 25vw"
                         referrerPolicy="no-referrer"
                       />

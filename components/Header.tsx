@@ -28,7 +28,7 @@ export default function Header() {
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
   const pathname = usePathname();
   const isHome = pathname === '/';
-  const isHubungiActive = pathname === '/hubungi-kami';
+  const isHubungiActive = pathname === '/kontak';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -143,7 +143,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-12">
 
           {/* Logo Brand Title */}
-          <Link href="/" className="flex items-center gap-3.5 group">
+          <Link href="/" className="flex items-center gap-3.5">
             <Logo isWhiteNav={isWhiteNav} />
           </Link>
 
@@ -276,12 +276,12 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right Action Hubungi Kami */}
+          {/* Right Action Kontak */}
           <div className="hidden lg:flex items-center gap-3">
             <Link
-              href="/hubungi-kami"
+              href="/kontak"
               onClick={() => {
-                if (pathname === '/hubungi-kami') {
+                if (pathname === '/kontak') {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
@@ -292,7 +292,7 @@ export default function Header() {
                   : 'border-accent text-accent hover:bg-accent hover:text-white drop-shadow-xs'
                 }`}
             >
-              HUBUNGI KAMI
+              Info Kontak
             </Link>
           </div>
 
@@ -434,9 +434,9 @@ export default function Header() {
 
                 {/* Direct Link to Kontak */}
                 <Link
-                  href="/hubungi-kami"
+                  href="/kontak"
                   onClick={() => {
-                    if (pathname === '/hubungi-kami') {
+                    if (pathname === '/kontak') {
                       setIsOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
@@ -446,7 +446,7 @@ export default function Header() {
                     : 'text-slate-200 hover:text-white hover:bg-white/5 border-white/10'
                     }`}
                 >
-                  <span>HUBUNGI KAMI</span>
+                  <span>Kontak</span>
                   <ChevronRight className={`w-3.5 h-3.5 ${isHubungiActive ? 'text-white' : 'text-slate-400'}`} />
                 </Link>
               </div>

@@ -58,7 +58,7 @@ export default function BeritaPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             Media Publikasi & Pers Rilis Resmi
           </span>
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
             Warta & Kabar Terbaru
           </h1>
         </div>
@@ -119,7 +119,7 @@ export default function BeritaPage() {
                       src={news.imageUrl}
                       alt={news.title}
                       fill
-                      className="object-cover group-hover:scale-103 transition-transform duration-500"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
                       sizes="(max-w-711px) 100vw, 33vw"
                       referrerPolicy="no-referrer"
                     />

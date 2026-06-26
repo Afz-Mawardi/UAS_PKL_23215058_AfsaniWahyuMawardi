@@ -19,6 +19,115 @@ import {
   HeartHandshake
 } from 'lucide-react';
 
+const getFileFormat = (downloadUrl?: string, title?: string): 'pdf' | 'zip' | 'word' | 'unknown' => {
+  if (!downloadUrl || downloadUrl === '#' || downloadUrl === '') return 'unknown';
+  const urlLower = downloadUrl.toLowerCase();
+  const titleLower = title ? title.toLowerCase() : '';
+  
+  if (urlLower.includes('.pdf') || titleLower.includes('pdf')) return 'pdf';
+  if (urlLower.includes('.zip') || urlLower.includes('.rar') || titleLower.includes('zip') || titleLower.includes('rar')) return 'zip';
+  if (urlLower.includes('.doc') || urlLower.includes('.docx') || titleLower.includes('word') || titleLower.includes('doc') || titleLower.includes('docx')) return 'word';
+  
+  if (urlLower.startsWith('data:application/pdf')) return 'pdf';
+  if (urlLower.startsWith('data:application/zip') || urlLower.startsWith('data:application/x-zip-compressed')) return 'zip';
+  if (urlLower.startsWith('data:application/msword') || urlLower.startsWith('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document')) return 'word';
+  
+  return 'unknown';
+};
+
+interface FileFormatIconProps {
+  className?: string;
+  downloadUrl?: string;
+  title?: string;
+  colorClasses?: string;
+}
+
+const FileFormatIcon: React.FC<FileFormatIconProps> = ({ className = "w-5 h-5", downloadUrl, title, colorClasses }) => {
+  const format = getFileFormat(downloadUrl, title);
+  const color = colorClasses !== undefined ? colorClasses : (
+    format === 'pdf' ? 'text-red-500' :
+    format === 'word' ? 'text-blue-650' :
+    format === 'zip' ? 'text-amber-500' :
+    'text-slate-400'
+  );
+
+  switch (format) {
+    case 'pdf':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M9 15H7v-4h2" />
+          <path d="M9 13H7" />
+          <path d="M12 11v4h1a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 13 11h-1z" />
+          <path d="M17 11h2" />
+          <path d="M17 13h1.5" />
+        </svg>
+      );
+    case 'zip':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M10 6v2" />
+          <path d="M10 10v2" />
+          <path d="M10 14v2" />
+          <path d="M10 18h2" />
+        </svg>
+      );
+    case 'word':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M9 11.5l1.5 4 1.5-4 1.5 4 1.5-4.5" />
+        </svg>
+      );
+    default:
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <line x1="10" y1="9" x2="8" y2="9" />
+        </svg>
+      );
+  }
+};
+
 export default function PelayananPublikPage() {
   const [publicServices] = usePublicServices();
   const [categoriesStore] = useCategories();
@@ -86,7 +195,7 @@ export default function PelayananPublikPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             PELAYANAN PUBLIK
           </span>
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
             Pelayanan Publik Terpadu
           </h1>
         </div>
@@ -201,7 +310,7 @@ export default function PelayananPublikPage() {
             {/* List Content inside its own card */}
             <div className="bg-white rounded-3xl border border-slate-100 p-8 sm:p-12 shadow-sm text-left space-y-8 w-full">
               <div className="space-y-2">
-                <span className="text-[10px] font-bold tracking-widest text-[#F2994A] font-mono uppercase bg-orange-50 border border-orange-100/50 px-3 py-1.5 rounded-full inline-block">SOP & BERKAS</span>
+                <span className="text-[10px] font-bold tracking-widest text-[#F2994A] font-mono uppercase bg-orange-50 border border-orange-100/50 px-3 py-1.5 rounded-full inline-block">UNDUH BERKAS</span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">Berkas Layanan & Dokumen Resmi</h3>
               </div>
 
@@ -214,38 +323,44 @@ export default function PelayananPublikPage() {
                         key={service.id}
                         className="bg-slate-50/40 rounded-xl p-4 sm:p-5 border border-slate-100 hover:border-emerald-500/45 hover:bg-white hover:shadow-xs transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                       >
-                        <div className="flex items-start gap-3.5 min-w-0 flex-1 text-left">
-                          <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100/60 flex items-center justify-center text-emerald-600 shrink-0 mt-0.5 animate-fade-in">
-                            <FileText className="w-5 h-5" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h4 className="font-bold text-[#0E3B66] text-sm sm:text-base leading-snug tracking-tight">
-                              {service.title}
-                            </h4>
-                          </div>
+                        <div className="flex items-center gap-3.5 min-w-0 flex-1 text-left">
+                          {(() => {
+                            const format = getFileFormat(service.downloadUrl, service.title);
+                            let bgBorderText = 'bg-slate-50 border border-slate-200/60 text-slate-400';
+                            if (format === 'pdf') bgBorderText = 'bg-red-50 border border-red-100/60 text-red-650';
+                            else if (format === 'word') bgBorderText = 'bg-blue-50 border border-blue-100/60 text-blue-600';
+                            else if (format === 'zip') bgBorderText = 'bg-amber-50 border border-amber-100/60 text-amber-600';
+
+                            return (
+                              <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${bgBorderText}`}>
+                                <FileFormatIcon downloadUrl={service.downloadUrl} title={service.title} className="w-5 h-5" colorClasses="text-current" />
+                              </div>
+                            );
+                          })()}
+                          <h4 className="font-bold text-[#0E3B66] text-sm sm:text-base leading-snug tracking-tight min-w-0 flex-1">
+                            {service.title}
+                          </h4>
                         </div>
 
-                        <div className="flex items-center justify-end shrink-0 w-full sm:w-auto">
-                          {!service.downloadUrl || service.downloadUrl === '#' || service.downloadUrl === '' ? (
-                            <button
-                              disabled
-                              className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-mono uppercase tracking-wider cursor-not-allowed border border-slate-200"
-                            >
-                              <span>Tidak Tersedia</span>
-                              <Download className="w-3.5 h-3.5 shrink-0" />
-                            </button>
-                          ) : (
-                            <a
-                              href={service.downloadUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-xs font-bold text-white bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] px-4 py-2 rounded-lg transition-colors font-mono uppercase tracking-wider shadow-xs"
-                            >
-                              <span>Unduh</span>
-                              <Download className="w-3.5 h-3.5 shrink-0" />
-                            </a>
-                          )}
-                        </div>
+                        {!service.downloadUrl || service.downloadUrl === '#' || service.downloadUrl === '' ? (
+                          <button
+                            disabled
+                            className="inline-flex items-center justify-center gap-2 text-xs font-bold text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-mono uppercase tracking-wider cursor-not-allowed border border-slate-200 shrink-0 w-full sm:w-auto"
+                          >
+                            <span>Tidak Tersedia</span>
+                            <Download className="w-3.5 h-3.5 shrink-0" />
+                          </button>
+                        ) : (
+                          <a
+                            href={service.downloadUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 text-xs font-bold text-white bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] px-4 py-2 rounded-lg transition-colors font-mono uppercase tracking-wider shadow-xs shrink-0 w-full sm:w-auto"
+                          >
+                            <span>Unduh</span>
+                            <Download className="w-3.5 h-3.5 shrink-0" />
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>

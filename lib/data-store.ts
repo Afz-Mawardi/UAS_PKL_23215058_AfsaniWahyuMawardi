@@ -18,8 +18,60 @@ import {
   PriorityProgram,
   HomepageSection,
   HomepageSettings,
-  INITIAL_HOMEPAGE_SETTINGS as initialHomepageSettings
+  INITIAL_HOMEPAGE_SETTINGS as initialHomepageSettings,
+  DEFAULT_KEPEMUDAAN_CARDS as initialKepemudaanCards,
+  DEFAULT_OLAHRAGA_CARDS as initialOlahragaCards,
+  DEFAULT_PARIWISATA_CARDS as initialPariwisataCards,
+  BidangCard
 } from './data';
+
+export interface BidangBottomCard {
+  id: 'kepemudaan' | 'olahraga' | 'pariwisata';
+  tag: string;
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonLink?: string;
+  imageUrl: string;
+  sectionTag?: string;
+  sectionTitle?: string;
+}
+
+export const initialBidangBottomCards: BidangBottomCard[] = [
+  {
+    id: 'kepemudaan',
+    tag: 'Layanan & Kemitraan Pemuda',
+    title: 'Kemitraan Organisasi & Legalitas Kepemudaan',
+    description: 'DISPORAPAR memandu, membina legalitas organisasi kepemudaan, serta memfasilitasi gerakan KNPI, Karang Taruna, dan Forum Anak Tegal (FAT) dalam upaya mewujudkan sinergi dan pemberdayaan potensi pemuda Kota Tegal secara berkelanjutan.',
+    buttonText: 'Hubungi Kemitraan Pemuda',
+    buttonLink: '/pelayanan',
+    imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
+    sectionTag: 'Program Strategis & Layanan Pemuda',
+    sectionTitle: 'Fasilitas Pembinaan Pemuda Kota Tegal'
+  },
+  {
+    id: 'olahraga',
+    tag: 'Pemberdayaan Atlet Daerah',
+    title: 'Pemusatan Latihan & Pembinaan Olahraga Berkelanjutan',
+    description: 'DISPORAPAR bersinergi erat bersama KONI (Komite Olahraga Nasional Indonesia) Kota Tegal secara terpadu mengelola pemusatan latihan atlet usia dini berkala, peningkatan kualifikasi lisensi pelatih nasional, serta penyelenggaraan bonus apresiasi kejuaraan PORPROV & PON.',
+    buttonText: 'Hubungi Layanan Atlet & KONI',
+    buttonLink: '/pelayanan',
+    imageUrl: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=800',
+    sectionTag: 'Sarana & Fasilitas Olahraga',
+    sectionTitle: 'Pusat Kegiatan Keolahragaan Kota Tegal'
+  },
+  {
+    id: 'pariwisata',
+    tag: 'Mitra Pelaku Usaha Wisata',
+    title: 'Kembangkan Usaha Pariwisata & Kuliner Kreatif Anda Bersama Kami',
+    description: 'DISPORAPAR mendukung penuh pelaku industri penginapan, restoran Sate Tegal legendaris, agen perjalanan, serta pemandu wisata bahari untuk mengajukan data usaha resmi agar terdaftar secara luas di bawah rekomendasi katalog pariwisata terpadu.',
+    buttonText: 'Urus Izin Usaha & TDUP',
+    buttonLink: '/pelayanan',
+    imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
+    sectionTag: 'Destinasi Wisata',
+    sectionTitle: 'Destinasi Wisata Terpopuler & Unggulan'
+  }
+];
 
 // Helper to check if running in client-side
 const isClient = typeof window !== 'undefined';
@@ -328,31 +380,43 @@ export const saveStoredCategories = (data: CategoryStore) => {
   }
 };
 
-// Global synchronization flag to avoid duplicate calls on initial render
-let hasSynced = false;
+// Shared Promise reference to deduplicate parallel API calls on mount
+let activeSyncPromise: Promise<void> | null = null;
 
 const syncWithServer = async () => {
-  try {
-    const res = await fetch('/api/data', { cache: 'no-store' });
-    if (res.ok) {
-      const db = await res.json();
-      if (db.news) localStorage.setItem('disporapar_news', JSON.stringify(db.news));
-      if (db.events) localStorage.setItem('disporapar_events', JSON.stringify(db.events));
-      if (db.gallery) localStorage.setItem('disporapar_gallery', JSON.stringify(db.gallery));
-      if (db.services) localStorage.setItem('disporapar_services', JSON.stringify(db.services));
-      if (db.officeInfo) localStorage.setItem('disporapar_office_info', JSON.stringify(db.officeInfo));
-      if (db.categories) localStorage.setItem('disporapar_categories', JSON.stringify(db.categories));
-      if (db.welcomeMessage) localStorage.setItem('disporapar_welcome_message', JSON.stringify(db.welcomeMessage));
-      if (db.heroSlides) localStorage.setItem('disporapar_hero_slides', JSON.stringify(db.heroSlides));
-      if (db.priorityPrograms) localStorage.setItem('disporapar_priority_programs', JSON.stringify(db.priorityPrograms));
-      if (db.homepageSettings) localStorage.setItem('disporapar_homepage_settings', JSON.stringify(db.homepageSettings));
-      
-      // Dispatch update to sync all states
-      window.dispatchEvent(new Event('disporapar_data_update'));
+  if (activeSyncPromise) return activeSyncPromise;
+
+  activeSyncPromise = (async () => {
+    try {
+      const res = await fetch('/api/data', { cache: 'no-store' });
+      if (res.ok) {
+        const db = await res.json();
+        if (db.news) localStorage.setItem('disporapar_news', JSON.stringify(db.news));
+        if (db.events) localStorage.setItem('disporapar_events', JSON.stringify(db.events));
+        if (db.gallery) localStorage.setItem('disporapar_gallery', JSON.stringify(db.gallery));
+        if (db.services) localStorage.setItem('disporapar_services', JSON.stringify(db.services));
+        if (db.officeInfo) localStorage.setItem('disporapar_office_info', JSON.stringify(db.officeInfo));
+        if (db.categories) localStorage.setItem('disporapar_categories', JSON.stringify(db.categories));
+        if (db.welcomeMessage) localStorage.setItem('disporapar_welcome_message', JSON.stringify(db.welcomeMessage));
+        if (db.heroSlides) localStorage.setItem('disporapar_hero_slides', JSON.stringify(db.heroSlides));
+        if (db.priorityPrograms) localStorage.setItem('disporapar_priority_programs', JSON.stringify(db.priorityPrograms));
+        if (db.homepageSettings) localStorage.setItem('disporapar_homepage_settings', JSON.stringify(db.homepageSettings));
+        if (db.kepemudaanCards) localStorage.setItem('disporapar_kepemudaan_cards', JSON.stringify(db.kepemudaanCards));
+        if (db.olahragaCards) localStorage.setItem('disporapar_olahraga_cards', JSON.stringify(db.olahragaCards));
+        if (db.pariwisataCards) localStorage.setItem('disporapar_pariwisata_cards', JSON.stringify(db.pariwisataCards));
+        if (db.bidangBottomCards) localStorage.setItem('disporapar_bidang_bottom_cards', JSON.stringify(db.bidangBottomCards));
+        
+        // Dispatch update to sync all states
+        window.dispatchEvent(new Event('disporapar_data_update'));
+      }
+    } catch (e) {
+      console.error('Failed to sync data with server database', e);
+    } finally {
+      activeSyncPromise = null;
     }
-  } catch (e) {
-    console.error('Failed to sync data with server database', e);
-  }
+  })();
+
+  return activeSyncPromise;
 };
 
 // Reactive custom hooks that listen to changes
@@ -363,8 +427,7 @@ export function useNews() {
   useEffect(() => {
     setData(getStoredNews());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -392,8 +455,7 @@ export function useEvents() {
   useEffect(() => {
     setData(getStoredEvents());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -421,8 +483,7 @@ export function useGallery() {
   useEffect(() => {
     setData(getStoredGallery());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -450,8 +511,7 @@ export function usePublicServices() {
   useEffect(() => {
     setData(getStoredServices());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -479,8 +539,7 @@ export function useOfficeInfo() {
   useEffect(() => {
     setData(getStoredOfficeInfo());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -508,8 +567,7 @@ export function useCategories() {
   useEffect(() => {
     setData(getStoredCategories());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -537,8 +595,7 @@ export function useWelcomeMessage() {
   useEffect(() => {
     setData(getStoredWelcomeMessage());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -566,8 +623,7 @@ export function useHeroSlides() {
   useEffect(() => {
     setData(getStoredHeroSlides());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -626,8 +682,7 @@ export function useHomepageSettings() {
   useEffect(() => {
     setData(getStoredHomepageSettings());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -655,8 +710,7 @@ export function usePriorityPrograms() {
   useEffect(() => {
     setData(getStoredPriorityPrograms());
     
-    if (!hasSynced && isClient) {
-      hasSynced = true;
+    if (isClient) {
       syncWithServer();
     }
     
@@ -672,6 +726,246 @@ export function usePriorityPrograms() {
 
   const updateData = (newData: PriorityProgram[]) => {
     saveStoredPriorityPrograms(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+
+// ==========================================
+// Kepemudaan Cards Store
+// ==========================================
+export const getStoredKepemudaanCards = (): BidangCard[] => {
+  if (!isClient) return initialKepemudaanCards;
+  try {
+    const stored = localStorage.getItem('disporapar_kepemudaan_cards');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialKepemudaanCards;
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : initialKepemudaanCards;
+  } catch (e) {
+    console.error('Error reading disporapar_kepemudaan_cards', e);
+    return initialKepemudaanCards;
+  }
+};
+
+export const saveStoredKepemudaanCards = (data: BidangCard[]) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_kepemudaan_cards', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'kepemudaanCards', data })
+      }).catch(err => console.error('Failed to save kepemudaan cards to server database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
+export function useKepemudaanCards() {
+  const [data, setData] = useState<BidangCard[]>(initialKepemudaanCards);
+
+  useEffect(() => {
+    setData(getStoredKepemudaanCards());
+    
+    if (isClient) {
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredKepemudaanCards());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: BidangCard[]) => {
+    saveStoredKepemudaanCards(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+
+// ==========================================
+// Olahraga Cards Store
+// ==========================================
+export const getStoredOlahragaCards = (): BidangCard[] => {
+  if (!isClient) return initialOlahragaCards;
+  try {
+    const stored = localStorage.getItem('disporapar_olahraga_cards');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialOlahragaCards;
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : initialOlahragaCards;
+  } catch (e) {
+    console.error('Error reading disporapar_olahraga_cards', e);
+    return initialOlahragaCards;
+  }
+};
+
+export const saveStoredOlahragaCards = (data: BidangCard[]) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_olahraga_cards', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'olahragaCards', data })
+      }).catch(err => console.error('Failed to save olahraga cards to server database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
+export function useOlahragaCards() {
+  const [data, setData] = useState<BidangCard[]>(initialOlahragaCards);
+
+  useEffect(() => {
+    setData(getStoredOlahragaCards());
+    
+    if (isClient) {
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredOlahragaCards());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: BidangCard[]) => {
+    saveStoredOlahragaCards(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+
+// ==========================================
+// Pariwisata Cards Store
+// ==========================================
+export const getStoredPariwisataCards = (): BidangCard[] => {
+  if (!isClient) return initialPariwisataCards;
+  try {
+    const stored = localStorage.getItem('disporapar_pariwisata_cards');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialPariwisataCards;
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : initialPariwisataCards;
+  } catch (e) {
+    console.error('Error reading disporapar_pariwisata_cards', e);
+    return initialPariwisataCards;
+  }
+};
+
+export const saveStoredPariwisataCards = (data: BidangCard[]) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_pariwisata_cards', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'pariwisataCards', data })
+      }).catch(err => console.error('Failed to save pariwisata cards to server database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
+export function usePariwisataCards() {
+  const [data, setData] = useState<BidangCard[]>(initialPariwisataCards);
+
+  useEffect(() => {
+    setData(getStoredPariwisataCards());
+    
+    if (isClient) {
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredPariwisataCards());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: BidangCard[]) => {
+    saveStoredPariwisataCards(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+
+// ==========================================
+// Bidang Bottom Cards Store
+// ==========================================
+export const getStoredBidangBottomCards = (): BidangBottomCard[] => {
+  if (!isClient) return initialBidangBottomCards;
+  try {
+    const stored = localStorage.getItem('disporapar_bidang_bottom_cards');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialBidangBottomCards;
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : initialBidangBottomCards;
+  } catch (e) {
+    console.error('Error reading disporapar_bidang_bottom_cards', e);
+    return initialBidangBottomCards;
+  }
+};
+
+export const saveStoredBidangBottomCards = (data: BidangBottomCard[]) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_bidang_bottom_cards', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'bidangBottomCards', data })
+      }).catch(err => console.error('Failed to save bidang bottom cards to server database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
+export function useBidangBottomCards() {
+  const [data, setData] = useState<BidangBottomCard[]>(initialBidangBottomCards);
+
+  useEffect(() => {
+    setData(getStoredBidangBottomCards());
+    
+    if (isClient) {
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredBidangBottomCards());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: BidangBottomCard[]) => {
+    saveStoredBidangBottomCards(newData);
     setData(newData);
   };
 

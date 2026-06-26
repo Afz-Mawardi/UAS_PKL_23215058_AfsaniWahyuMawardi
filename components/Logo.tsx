@@ -36,7 +36,7 @@ export default function Logo({ isWhiteNav, variant, className = '', showEmblem =
   return (
     <div className={`flex items-center gap-3 ${quicksand.variable} ${outfit.variable} ${className}`}>
       {showEmblem && (
-        <div className="relative shrink-0 transition-transform duration-300 group-hover:scale-105">
+        <div className="relative shrink-0">
           <Image
             src="/aset/tegal-emblem.svg"
             alt="Kota Tegal Shield Emblem"

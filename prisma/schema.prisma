@@ -81,7 +81,7 @@ model OfficeInfo {
   youtube          String
   gmapsEmbedUrl    String @db.Text
 
-  @@map("kontak")
+  @@map("Kontak")
 }
 
 model WelcomeMessage {
@@ -131,4 +131,62 @@ model PriorityProgram {
 
   @@map("pilar_program")
 }
+
+model KepemudaanCard {
+  id          String   @id
+  title       String   @db.Text
+  description String   @db.Text
+  location    String   @db.Text
+  capacity    String   @db.Text
+  price       String   @db.Text
+  facilities  String   @db.Text // Comma-separated list
+  imageUrl    String   @db.Text
+  createdAt   DateTime @default(now())
+
+  @@map("kepemudaan_card")
+}
+
+model OlahragaCard {
+  id          String   @id
+  title       String   @db.Text
+  description String   @db.Text
+  location    String   @db.Text
+  capacity    String   @db.Text
+  price       String   @db.Text
+  facilities  String   @db.Text // Comma-separated list
+  imageUrl    String   @db.Text
+  createdAt   DateTime @default(now())
+
+  @@map("olahraga_card")
+}
+
+model PariwisataCard {
+  id               String   @id
+  title            String   @db.Text
+  description      String   @db.Text
+  location         String   @db.Text
+  operationalHours String   @db.Text
+  price            String   @db.Text
+  facilities       String   @db.Text // Comma-separated list
+  imageUrl         String   @db.Text
+  createdAt        DateTime @default(now())
+
+  @@map("pariwisata_card")
+}
+
+model BidangBottomCard {
+  id           String   @id // 'kepemudaan', 'olahraga', 'pariwisata'
+  tag          String   @db.Text
+  title        String   @db.Text
+  description  String   @db.Text
+  buttonText   String   @db.Text
+  imageUrl     String   @db.Text
+  sectionTag   String?  @db.Text
+  sectionTitle String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  @@map("bidang_bottom_card")
+}
+
+
 
