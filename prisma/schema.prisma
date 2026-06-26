@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+
+  @@map("user")
+}
+
+model News {
+  id             String   @id
+  title          String   @db.Text
+  excerpt        String   @db.Text
+  content        String   @db.Text
+  category       String
+  date           String
+  imageUrl       String   @db.Text
+  author         String
+  featured       Boolean  @default(false)
+  showOnHomepage Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@map("berita")
+}
+
+model Event {
+  id             String   @id
+  title          String   @db.Text
+  date           String
+  time           String
+  location       String   @db.Text
+  description    String   @db.Text
+  imageUrl       String   @db.Text
+  showOnHomepage Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@map("agenda")
+}
+
+model GalleryPhoto {
+  id             String   @id
+  title          String   @db.Text
+  category       String
+  imageUrl       String   @db.Text
+  showOnHomepage Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@map("galeri")
+}
+
+model PublicService {
+  id             String   @id
+  title          String   @db.Text
+  description    String   @db.Text
+  category       String
+  downloadUrl    String   @db.Text
+  fileSize       String
+  showOnHomepage Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@map("berkas")
+}
+
+model OfficeInfo {
+  id               String @id @default("default")
+  address          String @db.Text
+  phone            String
+  email            String
+  operationalHours String
+  instagramResmi   String @db.Text
+  instagramTourism String
+  instagramPemuda  String
+  youtube          String
+  gmapsEmbedUrl    String @db.Text
+
+  @@map("kontak")
+}
+
+model WelcomeMessage {
+  id       String @id @default("default")
+  name     String
+  nip      String
+  content  String @db.Text
+  imageUrl String @db.Text
+
+  @@map("sambutan")
+}
+
+model HeroSlide {
+  id        String   @id
+  image     String   @db.Text
+  tagline   String
+  title     String   @db.Text
+  cta       String
+  href      String
+  createdAt DateTime @default(now())
+
+  @@map("beranda")
+}
+
+model Category {
+  id     String @id @default(uuid())
+  module String
+  name   String
+
+  @@unique([module, name])
+  @@map("kategori")
+}
+
+model HomepageSetting {
+  id   String @id @default("default")
+  data Json
+
+  @@map("pengaturan_beranda")
+}
+
+model PriorityProgram {
+  id          String   @id
+  title       String   @db.Text
+  description String   @db.Text
+  points      Json     // JSON array of strings: string[]
+  createdAt   DateTime @default(now())
+
+  @@map("pilar_program")
+}
+
