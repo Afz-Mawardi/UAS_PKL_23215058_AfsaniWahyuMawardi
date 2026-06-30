@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { usePublicServices, useCategories, useRetribusi } from '@/lib/data-store';
+import { usePublicServices, useCategories, useRetribusi, useHomepageSettings } from '@/lib/data-store';
 
 import {
   FileText,
@@ -141,6 +141,8 @@ export default function PelayananPageClient({
   const [publicServices] = usePublicServices(initialServices);
   const [categoriesStore] = useCategories(initialCategories);
   const [retribusi] = useRetribusi(initialRetribusi);
+  const sortedRetribusi = [...retribusi].sort((a, b) => a.name.localeCompare(b.name, 'id', { sensitivity: 'base' }));
+  const [homepageSettings] = useHomepageSettings();
 
   const pathname = usePathname();
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
@@ -323,7 +325,7 @@ export default function PelayananPageClient({
             {/* List Content inside its own card */}
             <div className="bg-white rounded-3xl border border-slate-100 p-8 sm:p-12 shadow-sm text-left space-y-8 w-full">
               <div className="space-y-2">
-                <span className="text-[10px] font-bold tracking-widest text-[#F2994A] font-mono uppercase bg-orange-50 border border-orange-100/50 px-3 py-1.5 rounded-full inline-block">UNDUH BERKAS</span>
+                <span className="text-[10px] font-bold tracking-widest text-[#F2994A] font-mono uppercase bg-orange-50 border border-orange-100/50 px-3 py-1.5 rounded-full inline-block">BERKAS LAYANAN</span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">Berkas Layanan & Dokumen Resmi</h3>
               </div>
 
@@ -439,8 +441,7 @@ export default function PelayananPageClient({
                   {/* RIGHT: TIGA JANJI PELAYANAN (PLEDGE CARDS GRID) */}
                   <div className="lg:col-span-7 flex flex-col gap-6 justify-between">
                     <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl">
-                      <span className="text-[9px] font-black uppercase text-[#F3702A] bg-[#FFF7ED] border border-[#FEE8DD] px-2.5 py-1 rounded-md tracking-wider font-mono">Janji Pelayanan</span>
-                      <h4 className="text-base font-extrabold text-[#0E3B66] mt-2 tracking-tight">Janji Pelayanan Publik</h4>
+                      <h4 className="text-base font-extrabold text-[#0E3B66] mt-0 tracking-tight">Janji Pelayanan Publik</h4>
                       <p className="text-xs sm:text-sm text-slate-700 font-semibold font-inter mt-3 leading-relaxed border-l-2 border-[#F3702A] pl-3">
                         Kami DISPORAPAR Kota Tegal berjanji:
                       </p>
@@ -556,7 +557,7 @@ export default function PelayananPageClient({
             {activeTab === 'retribusi' && (
               <div className="space-y-8 w-full text-left animate-fade-in">
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold tracking-widest text-[#0F5A9E] font-mono uppercase bg-indigo-50 border border-indigo-100/50 px-3 py-1.5 rounded-full inline-block">TARIF RETRIBUSI RESMI</span>
+                  <span className="text-[10px] font-bold tracking-widest text-[#0F5A9E] font-mono uppercase bg-indigo-50 border border-indigo-100/50 px-3 py-1.5 rounded-full inline-block">RETRIBUSI RESMI</span>
                   <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">Legalitas Tarif & Biaya Administrasi</h3>
                 </div>
 
@@ -567,9 +568,11 @@ export default function PelayananPageClient({
                       <Shield className="h-6 w-6" />
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-slate-950 text-base leading-none mb-2">Peraturan Daerah Tentang Retribusi</h4>
+                      <h4 className="font-extrabold text-slate-950 text-base leading-none mb-2">
+                        {homepageSettings.retribusiLegal?.title || 'Peraturan Daerah Tentang Retribusi'}
+                      </h4>
                       <p className="text-slate-500 text-sm leading-relaxed font-inter font-light">
-                        Penetapan tarif penggunaan retribusi pemanfaatan sewa fasilitas gedung olahraga daerah serta retribusi tanda masuk tempat rekreasi pariwisata bahari didasarkan pada draf regulasi <span className="font-bold text-slate-900">Peraturan Daerah Kota Tegal No. 5 Tahun 2021</span>. Biaya retribusi disetor langsung menuju kas daerah secara sah.
+                        {homepageSettings.retribusiLegal?.content || 'Penetapan tarif penggunaan retribusi pemanfaatan sewa fasilitas gedung olahraga daerah serta retribusi tanda masuk tempat rekreasi pariwisata bahari didasarkan pada draf regulasi Peraturan Daerah Kota Tegal No. 5 Tahun 2021. Biaya retribusi disetor langsung menuju kas daerah secara sah.'}
                       </p>
                     </div>
                   </div>
@@ -579,57 +582,39 @@ export default function PelayananPageClient({
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
                         <thead>
-                          <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
-                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-16 text-center">No</th>
-                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6">Fasilitas / Layanan</th>
-                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-36">Kategori</th>
-                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-56 text-right">Tarif / Biaya</th>
+                          <tr className="bg-[#0E3B66] text-white uppercase tracking-wider">
+                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-16 text-center font-mono font-bold text-xs">No</th>
+                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 font-sans font-bold text-xs">Fasilitas / Layanan</th>
+                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-44 text-center font-sans font-bold text-xs">Kategori</th>
+                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-96 text-right font-mono font-bold text-xs">Tarif / Biaya</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                          {retribusi && retribusi.length > 0 ? (
-                            retribusi.map((item, idx) => (
+                        <tbody className="divide-y divide-slate-100 text-slate-700">
+                          {sortedRetribusi && sortedRetribusi.length > 0 ? (
+                            sortedRetribusi.map((item, idx) => (
                               <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                                <td className="py-3 px-4 sm:py-4 sm:px-6 text-center font-mono text-slate-400">{idx + 1}</td>
-                                <td className="py-3 px-4 sm:py-4 sm:px-6 font-bold text-[#0E3B66]">{item.name}</td>
-                                <td className="py-3 px-4 sm:py-4 sm:px-6">
-                                  <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase font-mono tracking-wider ${item.category === 'Olahraga' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                                <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 text-center font-mono text-slate-900 font-normal text-xs sm:text-sm">{idx + 1}</td>
+                                <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 font-sans text-slate-900 font-normal text-xs sm:text-sm">{item.name}</td>
+                                <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 text-center">
+                                  <span className={`px-2.5 py-1 text-xs font-bold rounded-md uppercase font-mono tracking-wider inline-block ${item.category === 'Olahraga' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
                                     item.category === 'Kepemudaan' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
                                       'bg-amber-50 text-amber-700 border border-amber-100'
                                     }`}>
                                     {item.category}
                                   </span>
                                 </td>
-                                <td className="py-3 px-4 sm:py-4 sm:px-6 text-right font-mono text-slate-900 font-bold">{item.fee}</td>
+                                <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 text-right font-mono text-slate-900 font-normal text-xs sm:text-sm">{item.fee}</td>
                               </tr>
                             ))
                           ) : (
                             <tr>
-                              <td colSpan={4} className="py-8 text-center text-slate-400 italic">
+                              <td colSpan={4} className="py-8 text-center text-slate-400 italic font-sans text-xs sm:text-sm">
                                 Belum ada data tarif retribusi terdaftar.
                               </td>
                             </tr>
                           )}
                         </tbody>
                       </table>
-                    </div>
-                  </div>
-
-                  {/* General info cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex items-start gap-3">
-                      <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                      <div>
-                        <h5 className="font-extrabold text-slate-900 text-sm leading-tight">Biaya SOP Administrasi/Rekomendasi</h5>
-                        <p className="text-xs text-slate-500 mt-1 font-inter">Seluruh pendaftaran komunitas pemuda atau rekomendasi dinas berbiaya Rp 0 (GRATIS).</p>
-                      </div>
-                    </div>
-                    <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex items-start gap-3">
-                      <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                      <div>
-                        <h5 className="font-extrabold text-slate-900 text-sm leading-tight">Penyetoran Kas Daerah Langsung</h5>
-                        <p className="text-xs text-slate-500 mt-1 font-inter">Segala sewa prasarana lapangan wajib terlampir kuintansi billing resmi perbankan daerah (Bank Jateng).</p>
-                      </div>
                     </div>
                   </div>
                 </div>

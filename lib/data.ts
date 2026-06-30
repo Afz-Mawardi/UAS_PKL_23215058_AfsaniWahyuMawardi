@@ -825,6 +825,10 @@ export interface HomepageSettings {
   news: HomepageSection;
   gallery: HomepageSection;
   documents: HomepageSection;
+  retribusiLegal?: {
+    title: string;
+    content: string;
+  };
 }
 
 export const INITIAL_HOMEPAGE_SETTINGS: HomepageSettings = {
@@ -866,7 +870,11 @@ export const INITIAL_HOMEPAGE_SETTINGS: HomepageSettings = {
   },
   news: { title: 'Kabar Kegiatan Terkini', subtitle: 'BERITA TERBARU & PENGUMUMAN', desc: 'Informasi berita resmi, liputan pers, pengumuman regulasi, pembangunan fasilitas di lingkungan DISPORAPAR Kota Tegal.', show: true },
   gallery: { title: 'Suasana & Dokumentasi Nyata', subtitle: 'GALERI VISUAL KEGIATAN', desc: 'Dokumentasi visual dari berbagai program, festival, dan aktivitas kedinasan di lingkungan DISPORAPAR Kota Tegal.', show: true },
-  documents: { title: 'Berkas & Formulir Layanan', subtitle: 'DOKUMEN RESMI DINAS', desc: 'Silakan cari dan unduh berkas standar operasional prosedur (SOP) secara mandiri di bawah ini secara cuma-cuma, bebas biaya, transparan dan berlandaskan kepatuhan bebas pungutan liar.', show: true }
+  documents: { title: 'Berkas & Formulir Layanan', subtitle: 'DOKUMEN RESMI DINAS', desc: 'Silakan cari dan unduh berkas standar operasional prosedur (SOP) secara mandiri di bawah ini secara cuma-cuma, bebas biaya, transparan dan berlandaskan kepatuhan bebas pungutan liar.', show: true },
+  retribusiLegal: {
+    title: 'Peraturan Daerah Tentang Retribusi',
+    content: 'Penetapan tarif penggunaan retribusi pemanfaatan sewa fasilitas gedung olahraga daerah serta retribusi tanda masuk tempat rekreasi pariwisata bahari didasarkan pada draf regulasi Peraturan Daerah Kota Tegal No. 5 Tahun 2021. Biaya retribusi disetor langsung menuju kas daerah secara sah.'
+  }
 };
 
 export const DEFAULT_RETRIBUSI: Retribusi[] = [

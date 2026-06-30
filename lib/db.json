@@ -378,58 +378,62 @@
   ],
   "homepageSettings": {
     "about": {
-      "title": "Membangun Tegal Bersama DISPORAPAR",
-      "subtitle": "TENTANG KAMI",
       "desc": "DISPORAPAR Kota Tegal berkomitmen mengembangkan pemuda, meningkatkan prestasi olahraga, dan memajukan pariwisata untuk mendukung kesejahteraan masyarakat.",
       "show": true,
       "stats": [
         {
-          "value": "15+",
-          "label": "Destinasi Wisata"
+          "label": "Destinasi Wisata",
+          "value": "15+"
         },
         {
-          "value": "40+",
-          "label": "Event Tahunan"
+          "label": "Event Tahunan",
+          "value": "40+"
         },
         {
-          "value": "25+",
-          "label": "Komunitas Pemuda"
+          "label": "Komunitas Pemuda",
+          "value": "25+"
         },
         {
-          "value": "10+",
-          "label": "Cabang Olahraga Binaan"
+          "label": "Cabang Olahraga Binaan",
+          "value": "10+"
         }
-      ]
+      ],
+      "title": "Membangun Tegal Bersama DISPORAPAR",
+      "subtitle": "TENTANG KAMI"
     },
     "agenda": {
-      "title": "Event & Agenda Mendatang",
-      "subtitle": "AGENDA UTAMA DINAS",
       "desc": "Agenda resmi, festival tahunan pemuda kreatif, kompetisi olahraga, serta forum rapat terbuka DISPORAPAR Kota Tegal.",
-      "show": true
+      "show": true,
+      "title": "Event & Agenda Mendatang",
+      "subtitle": "AGENDA UTAMA DINAS"
     },
     "programs": {
-      "title": "Pilar Program Prioritas",
-      "subtitle": "PROGRAM UNGGULAN DINAS",
       "desc": "Fokus strategis pembangunan yang diimplementasikan secara akuntabel, transparan, dan berkelanjutan untuk Kota Tegal.",
-      "show": true
+      "show": true,
+      "title": "Pilar Program Prioritas",
+      "subtitle": "PROGRAM UNGGULAN DINAS"
     },
     "news": {
-      "title": "Kabar Kegiatan Terkini",
-      "subtitle": "BERITA TERBARU & PENGUMUMAN",
       "desc": "Informasi berita resmi, liputan pers, pengumuman regulasi, pembangunan fasilitas di lingkungan DISPORAPAR Kota Tegal.",
-      "show": true
+      "show": true,
+      "title": "Kabar Kegiatan Terkini",
+      "subtitle": "BERITA TERBARU & PENGUMUMAN"
     },
     "gallery": {
-      "title": "Suasana & Dokumentasi Nyata",
-      "subtitle": "GALERI VISUAL KEGIATAN",
       "desc": "Dokumentasi visual dari berbagai program, festival, dan aktivitas kedinasan di lingkungan DISPORAPAR Kota Tegal.",
-      "show": true
+      "show": true,
+      "title": "Suasana & Dokumentasi Nyata",
+      "subtitle": "GALERI VISUAL KEGIATAN"
     },
     "documents": {
-      "title": "Berkas & Formulir Layanan",
-      "subtitle": "DOKUMEN RESMI DINAS",
       "desc": "Silakan cari dan unduh berkas standar operasional prosedur (SOP) secara mandiri di bawah ini secara cuma-cuma, bebas biaya, transparan dan berlandaskan kepatuhan bebas pungutan liar.",
-      "show": true
+      "show": true,
+      "title": "Berkas & Formulir Layanan",
+      "subtitle": "DOKUMEN RESMI DINAS"
+    },
+    "retribusiLegal": {
+      "title": "Peraturan Daerah Tentang Retribusi",
+      "content": "Penetapan tarif penggunaan retribusi pemanfaatan sewa fasilitas gedung olahraga daerah serta retribusi tanda masuk tempat rekreasi pariwisata bahari didasarkan pada draf regulasi Peraturan Daerah Kota Tegal No. 5 Tahun 2025. Biaya retribusi disetor langsung menuju kas daerah secara sah."
     }
   },
   "retribusi": [

@@ -11,11 +11,37 @@ import {
   Search,
   Landmark
 } from 'lucide-react';
-import { useRetribusi, useCategories } from '@/lib/data-store';
+import { useRetribusi, useCategories, useHomepageSettings } from '@/lib/data-store';
 
 export default function RetribusiAdminPage() {
   const [retribusi, setRetribusi] = useRetribusi();
   const [categoriesStore, setCategoriesStore] = useCategories();
+  const [homepageSettings, setHomepageSettings] = useHomepageSettings();
+
+  // Legal base states
+  const [legalTitle, setLegalTitle] = useState<string>('');
+  const [legalContent, setLegalContent] = useState<string>('');
+  const [isEditingLegal, setIsEditingLegal] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (homepageSettings.retribusiLegal) {
+      setLegalTitle(homepageSettings.retribusiLegal.title);
+      setLegalContent(homepageSettings.retribusiLegal.content);
+    }
+  }, [homepageSettings]);
+
+  // Clean up on component unmount
+  React.useEffect(() => {
+    return () => {
+      setIsEditingLegal(false);
+    };
+  }, []);
+
+  const getRetribusiCategories = (): string[] => {
+    return (categoriesStore.retribusi && categoriesStore.retribusi.length > 0)
+      ? categoriesStore.retribusi
+      : ['Olahraga', 'Pariwisata', 'Kepemudaan'];
+  };
 
   // Local CRUD states
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -57,7 +83,7 @@ export default function RetribusiAdminPage() {
   const handleCreateCategory = () => {
     if (!newCategoryName.trim()) return;
     const name = newCategoryName.trim();
-    const currentList = categoriesStore.retribusi || [];
+    const currentList = getRetribusiCategories();
     if (currentList.includes(name)) {
       showNotification('Kategori sudah ada.', 'error');
       return;
@@ -78,7 +104,7 @@ export default function RetribusiAdminPage() {
       setEditingCategoryIndex(null);
       return;
     }
-    const currentList = categoriesStore.retribusi || [];
+    const currentList = getRetribusiCategories();
     if (currentList.includes(newName)) {
       showNotification('Nama kategori sudah digunakan.', 'error');
       return;
@@ -96,7 +122,7 @@ export default function RetribusiAdminPage() {
   };
 
   const handleDeleteCategory = (catName: string) => {
-    const currentList = categoriesStore.retribusi || [];
+    const currentList = getRetribusiCategories();
     if (currentList.length <= 1) {
       showNotification('Minimal harus ada 1 kategori tersisa.', 'error');
       return;
@@ -110,6 +136,27 @@ export default function RetribusiAdminPage() {
     // Cascade items to the first remaining category
     setRetribusi(retribusi.map(item => item.category === catName ? { ...item, category: updatedList[0] } : item));
     showNotification('Kategori berhasil dihapus.', 'success');
+  };
+
+  const handleCancelLegal = () => {
+    if (homepageSettings.retribusiLegal) {
+      setLegalTitle(homepageSettings.retribusiLegal.title);
+      setLegalContent(homepageSettings.retribusiLegal.content);
+    }
+    setIsEditingLegal(false);
+  };
+
+  const handleSaveLegal = () => {
+    const updated = {
+      ...homepageSettings,
+      retribusiLegal: {
+        title: legalTitle,
+        content: legalContent
+      }
+    };
+    setHomepageSettings(updated);
+    setIsEditingLegal(false);
+    showNotification('Legalitas Retribusi berhasil diperbarui.', 'success');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -163,12 +210,14 @@ export default function RetribusiAdminPage() {
     setEditingItem(null);
   };
 
-  const filteredRetribusi = retribusi.filter(item => {
-    const q = searchQuery.toLowerCase().trim();
-    const matchQuery = !q || item.name.toLowerCase().includes(q) || item.fee.toLowerCase().includes(q);
-    const matchCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
-    return matchQuery && matchCategory;
-  });
+  const filteredRetribusi = retribusi
+    .filter(item => {
+      const q = searchQuery.toLowerCase().trim();
+      const matchQuery = !q || item.name.toLowerCase().includes(q) || item.fee.toLowerCase().includes(q);
+      const matchCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
+      return matchQuery && matchCategory;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, 'id', { sensitivity: 'base' }));
 
   return (
     <div className="space-y-8 text-left animate-fade-in relative font-inter">
@@ -176,9 +225,8 @@ export default function RetribusiAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -211,7 +259,7 @@ export default function RetribusiAdminPage() {
             className="w-full sm:w-auto px-3.5 py-2 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold focus:outline-none focus:ring-2 focus:ring-[#0E3B66] cursor-pointer bg-white"
           >
             <option value="Semua">Semua Kategori</option>
-            {(categoriesStore.retribusi || ['Olahraga', 'Pariwisata', 'Kepemudaan']).map((c) => (
+            {getRetribusiCategories().map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
@@ -234,6 +282,69 @@ export default function RetribusiAdminPage() {
         </button>
       </div>
 
+      {/* Pengaturan Legalitas Retribusi */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4 text-left">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-0">
+          <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">
+            Pengaturan Legalitas Retribusi (Perda)
+          </h3>
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Judul Regulasi</label>
+            <input
+              type="text"
+              value={legalTitle}
+              onChange={(e) => setLegalTitle(e.target.value)}
+              disabled={!isEditingLegal}
+              className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 ${isEditingLegal ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
+                }`}
+              placeholder="Contoh: Peraturan Daerah Tentang Retribusi"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Deskripsi / Landasan Hukum</label>
+            <textarea
+              value={legalContent}
+              onChange={(e) => setLegalContent(e.target.value)}
+              disabled={!isEditingLegal}
+              rows={3}
+              className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 font-inter ${isEditingLegal ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
+                }`}
+              placeholder="Penjelasan draf regulasi landasan hukum retribusi..."
+            />
+          </div>
+          <div className="flex justify-end gap-3 pt-2">
+            {!isEditingLegal ? (
+              <button
+                type="button"
+                onClick={() => setIsEditingLegal(true)}
+                className="px-5 py-2.5 bg-[#0E3B66] hover:bg-sky-900 text-white font-extrabold rounded-xl transition-all shadow-md cursor-pointer font-mono text-xs uppercase tracking-wider"
+              >
+                Edit Legalitas
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleCancelLegal}
+                  className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer font-bold text-xs uppercase tracking-wider font-mono"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveLegal}
+                  className="px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md cursor-pointer font-mono text-xs uppercase tracking-wider"
+                >
+                  Simpan Legalitas
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Retribusi Table */}
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
@@ -251,12 +362,7 @@ export default function RetribusiAdminPage() {
                 filteredRetribusi.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-4 px-3 sm:py-5 sm:px-6 max-w-xs sm:max-w-md">
-                      <div className="flex items-center gap-3">
-                        <Landmark className="w-5 h-5 text-accent shrink-0" />
-                        <div>
-                          <h4 className="font-extrabold text-[#0E3B66] leading-snug">{item.name}</h4>
-                        </div>
-                      </div>
+                      <h4 className="font-extrabold text-[#0E3B66] leading-snug">{item.name}</h4>
                     </td>
                     <td className="py-4 px-3 sm:py-5 sm:px-6 uppercase font-mono text-[10px] tracking-wider text-slate-500">
                       {item.category}
@@ -354,10 +460,10 @@ export default function RetribusiAdminPage() {
                     <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Kategori Bidang</label>
                     <select
                       name="category"
-                      defaultValue={editingItem?.category || (categoriesStore.retribusi?.[0] || 'Olahraga')}
+                      defaultValue={editingItem?.category || (getRetribusiCategories()[0] || 'Olahraga')}
                       className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 cursor-pointer"
                     >
-                      {(categoriesStore.retribusi || ['Olahraga', 'Pariwisata', 'Kepemudaan']).map((c) => (
+                      {getRetribusiCategories().map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
@@ -423,7 +529,7 @@ export default function RetribusiAdminPage() {
               <div className="space-y-2">
                 <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest font-mono">Daftar Kategori</span>
                 <div className="space-y-1.5 max-h-[35vh] overflow-y-auto pr-1">
-                  {(categoriesStore.retribusi || ['Olahraga', 'Pariwisata', 'Kepemudaan']).map((cat, idx) => (
+                  {getRetribusiCategories().map((cat, idx) => (
                     <div key={idx} className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-xl hover:border-blue-100 transition-colors">
                       {editingCategoryIndex === idx ? (
                         <div className="flex items-center gap-2 w-full">

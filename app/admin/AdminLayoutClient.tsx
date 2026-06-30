@@ -456,7 +456,7 @@ export default function AdminLayoutClient({
         className={`fixed inset-y-0 left-0 z-45 w-64 bg-[#051424] text-white flex flex-col justify-between shrink-0 shadow-lg border-r border-white/5 transition-transform duration-300 md:translate-x-0 md:static md:h-full ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
-        <div className="overflow-y-auto max-h-[85vh] select-none pr-1">
+        <div className="overflow-y-auto max-h-[85vh] select-none pr-1 admin-sidebar-scrollbar">
           {/* Brand header */}
           <div className="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-[#051424] z-10">
             <div className="flex flex-col gap-2 w-full">
