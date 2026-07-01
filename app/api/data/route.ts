@@ -603,34 +603,6 @@ export async function POST(request: Request) {
         where: { id: user.id },
         data: updateData
       });
-    } else if (type === 'createAdmin') {
-      const { username, password } = data;
-      if (!username || !password) {
-        return NextResponse.json({ error: 'Username dan password wajib diisi' }, { status: 400 });
-      }
-      const existing = await prisma.user.findUnique({
-        where: { username }
-      });
-      if (existing) {
-        return NextResponse.json({ error: 'Username sudah digunakan' }, { status: 400 });
-      }
-      const crypto = require('crypto');
-      const md5Password = crypto.createHash('md5').update(password).digest('hex');
-      await prisma.user.create({
-        data: {
-          username,
-          password: md5Password
-        }
-      });
-    } else if (type === 'deleteAdmin') {
-      const { id } = data;
-      const count = await prisma.user.count();
-      if (count <= 1) {
-        return NextResponse.json({ error: 'Tidak dapat menghapus admin terakhir' }, { status: 400 });
-      }
-      await prisma.user.delete({
-        where: { id }
-      });
     } else {
       return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });
     }

@@ -166,7 +166,7 @@ export default function GaleriPageClient({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setActivePhotoModal(null)}
-            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-md cursor-pointer"
           >
             <div 
               onClick={(e) => e.stopPropagation()}

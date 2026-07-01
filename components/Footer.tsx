@@ -23,10 +23,10 @@ export default function Footer() {
       <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 pb-8">
-          {/* Brand Profile & Description - Col Span 5 */}
-          <div className="md:col-span-5 space-y-5">
+      <div className="max-w-[1200px] mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
+          {/* Brand Profile & Description - Col Span 7 */}
+          <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center gap-4">
               <Logo variant="dark" />
               <div className="w-[1px] h-7 sm:h-8 bg-white/15 shrink-0" />
@@ -40,13 +40,13 @@ export default function Footer() {
               />
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              Portal pelayanan informasi publik resmi Dinas Pemuda, Olahraga, dan Pariwisata Kota Tegal. Mewujudkan pelayanan prima yang sinergis, transparan, dan akuntabel.
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Portal resmi Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal.<br />Mewujudkan pelayanan publik prima, transparan, dan akuntabel.
             </p>
 
             {/* Social Media Links with minimalist badges */}
             <div className="flex flex-col gap-2.5 pt-2">
-              <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase font-mono">Media Sosial</span>
+              <span className="text-[10px] font-bold text-slate-300 tracking-wider uppercase font-mono">Media Sosial</span>
               <div className="flex flex-wrap gap-2">
                 {((officeInfo.socialMediaList || []) as any[]).map((social, idx) => {
                   let colorClass = 'text-slate-400 group-hover:text-white';
@@ -133,72 +133,35 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links Navigation - Col Span 3 */}
-          <div className="md:col-span-3 space-y-4">
-            <h3 className="text-xs font-bold text-white tracking-widest uppercase font-mono">
-              Navigasi Cepat
+          {/* Contact Details - Col Span 5 */}
+          <div className="lg:col-span-5 space-y-3.5">
+            <h3 className="text-[10px] font-bold text-slate-300 tracking-wider uppercase font-mono">
+              Info Kontak Resmi
             </h3>
-            <ul className="space-y-2.5 text-xs">
-              <li>
-                <Link href="/profil" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group">
-                  <span className="w-1 h-1 rounded-full bg-secondary/50 group-hover:bg-secondary transition-colors" />
-                  <span>Profil Dinas</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/kepemudaan" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group">
-                  <span className="w-1 h-1 rounded-full bg-secondary/50 group-hover:bg-secondary transition-colors" />
-                  <span>Bidang Kepemudaan</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/olahraga" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group">
-                  <span className="w-1 h-1 rounded-full bg-secondary/50 group-hover:bg-secondary transition-colors" />
-                  <span>Bidang Olahraga</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/pariwisata" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group">
-                  <span className="w-1 h-1 rounded-full bg-secondary/50 group-hover:bg-secondary transition-colors" />
-                  <span>Bidang Pariwisata</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/berita" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group">
-                  <span className="w-1 h-1 rounded-full bg-secondary/50 group-hover:bg-secondary transition-colors" />
-                  <span>Kabar & Berita</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/pelayanan" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group">
-                  <span className="w-1 h-1 rounded-full bg-secondary/50 group-hover:bg-secondary transition-colors" />
-                  <span>Informasi Layanan</span>
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact Details - Col Span 4 */}
-          <div className="md:col-span-4 space-y-4 text-xs">
-            <h3 className="text-xs font-bold text-white tracking-widest uppercase font-mono">
-              Kontak
-            </h3>
-            <div className="space-y-3.5">
-              <div className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+            <div className="space-y-4 text-xs">
+              <div className="flex items-start gap-3 overflow-hidden">
+                <div className="w-8 h-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-accent mt-[3px]">
+                  <MapPin className="h-4 w-4" />
+                </div>
                 <span className="leading-relaxed text-slate-400">{officeInfo.address}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-secondary shrink-0" />
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-8 h-8 rounded-lg bg-secondary/10 border border-secondary/20 flex items-center justify-center shrink-0 text-secondary">
+                  <Phone className="h-4 w-4" />
+                </div>
                 <span className="text-slate-400">{officeInfo.phone}</span>
               </div>
               <div className="flex items-center gap-3 overflow-hidden">
-                <Mail className="h-4 w-4 text-primary-200 shrink-0" />
+                <div className="w-8 h-8 rounded-lg bg-primary-200/10 border border-primary-200/20 flex items-center justify-center shrink-0 text-primary-200">
+                  <Mail className="h-4 w-4" />
+                </div>
                 <span className="text-slate-400 truncate">{officeInfo.email}</span>
               </div>
-              <div className="flex items-start gap-3 pt-3 border-t border-white/[0.04]">
-                <Clock className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-                <span className="leading-relaxed text-slate-400 font-medium">{officeInfo.operationalHours}</span>
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-8 h-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-accent mt-[3px]">
+                  <Clock className="h-4 w-4" />
+                </div>
+                <span className="leading-relaxed text-slate-400">{officeInfo.operationalHours}</span>
               </div>
             </div>
           </div>
@@ -206,18 +169,10 @@ export default function Footer() {
       </div>
 
       {/* Bottom copyright segment */}
-      <div className="w-full bg-black border-t border-white/15 py-6 mt-6 relative z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-[11px] font-medium text-slate-400 gap-4">
-          <p className="text-center sm:text-left">
-            © {new Date().getFullYear()} DISPORAPAR Kota Tegal. Seluruh Hak Cipta Dilindungi.
-          </p>
-          <div className="flex items-center gap-4">
-            <Link href="/kontak" className="hover:text-white transition-colors">
-              Kontak Kami
-            </Link>
-            <span className="text-white/20 font-light">|</span>
-            <span className="text-slate-500 font-mono text-[9px] uppercase tracking-widest">Official Portal</span>
-          </div>
+      <div className="font-mono w-full bg-black border-t border-white/10 py-6 mt-12 relative z-10">
+        <div className="text-center leading-relaxed max-w-[1200px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-center text-[12px] uppercase font-bold  text-slate-300 tracking-wider">
+          Copyright @ 2026 <br />
+          Dinas Kepemudaan dan Olahraga dan Pariwisata Kota Tegal
         </div>
       </div>
     </footer>

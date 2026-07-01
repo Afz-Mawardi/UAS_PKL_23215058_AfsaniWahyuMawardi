@@ -30,24 +30,14 @@ export default function InfoKontakAdminPage() {
   // Sync editingSocials when officeInfo loads
   useEffect(() => {
     if (officeInfo) {
-      setEditingSocials(officeInfo.socialMediaList || [
-        { platform: 'instagram', label: 'Resmi', url: officeInfo.socialMedia?.instagramResmi || '' },
-        { platform: 'instagram', label: 'Wisata', url: officeInfo.socialMedia?.instagramTourism || '' },
-        { platform: 'instagram', label: 'Pemuda', url: officeInfo.socialMedia?.instagramPemuda || '' },
-        { platform: 'youtube', label: 'YouTube', url: officeInfo.socialMedia?.youtube || '' }
-      ]);
+      setEditingSocials(officeInfo.socialMediaList || []);
     }
   }, [officeInfo]);
 
   const handleCancelContact = () => {
     setIsEditingContact(false);
     if (officeInfo) {
-      setEditingSocials(officeInfo.socialMediaList || [
-        { platform: 'instagram', label: 'Resmi', url: officeInfo.socialMedia?.instagramResmi || '' },
-        { platform: 'instagram', label: 'Wisata', url: officeInfo.socialMedia?.instagramTourism || '' },
-        { platform: 'instagram', label: 'Pemuda', url: officeInfo.socialMedia?.instagramPemuda || '' },
-        { platform: 'youtube', label: 'YouTube', url: officeInfo.socialMedia?.youtube || '' }
-      ]);
+      setEditingSocials(officeInfo.socialMediaList || []);
     }
   };
 

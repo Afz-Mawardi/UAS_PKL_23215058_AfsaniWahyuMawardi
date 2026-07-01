@@ -73,8 +73,8 @@ export default function AdminDashboard() {
   const selesaiCount = complaints.filter(c => c.status === 'Selesai').length;
   const ditolakCount = complaints.filter(c => c.status === 'Ditolak').length;
 
-  const resolutionRate = totalComplaints > 0 
-    ? Math.round((selesaiCount / totalComplaints) * 100) 
+  const resolutionRate = totalComplaints > 0
+    ? Math.round((selesaiCount / totalComplaints) * 100)
     : 0;
 
   // Circular progress calculations for resolution rate
@@ -270,12 +270,12 @@ export default function AdminDashboard() {
       {/* Stat summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
         {[
-          { title: 'Total Berita', count: news.length, icon: <Newspaper className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50/50 border-blue-100' },
-          { title: 'Dokumentasi Galeri', count: gallery.length, icon: <ImageIcon className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50/50 border-purple-100' },
-          { title: 'Agenda Terdaftar', count: events.length, icon: <Calendar className="w-5 h-5 text-amber-600" />, bg: 'bg-amber-50/50 border-amber-100' },
-          { title: 'Berkas Unduhan', count: services.length, icon: <FileText className="w-5 h-5 text-emerald-600" />, bg: 'bg-emerald-50/50 border-emerald-100' },
-          { title: 'Aduan Internal', count: totalComplaints, icon: <ShieldAlert className="w-5 h-5 text-rose-600" />, bg: 'bg-rose-50/50 border-rose-100' },
-          { title: 'Tautan Luar', count: externalLinks.length, icon: <ExternalLink className="w-5 h-5 text-cyan-600" />, bg: 'bg-cyan-50/50 border-cyan-100' }
+          { title: 'Berita', count: news.length, icon: <Newspaper className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50/50 border-blue-100' },
+          { title: 'Galeri', count: gallery.length, icon: <ImageIcon className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50/50 border-purple-100' },
+          { title: 'Agenda', count: events.length, icon: <Calendar className="w-5 h-5 text-amber-600" />, bg: 'bg-amber-50/50 border-amber-100' },
+          { title: 'Berkas', count: services.length, icon: <FileText className="w-5 h-5 text-emerald-600" />, bg: 'bg-emerald-50/50 border-emerald-100' },
+          { title: 'Aduan', count: totalComplaints, icon: <ShieldAlert className="w-5 h-5 text-rose-600" />, bg: 'bg-rose-50/50 border-rose-100' },
+          { title: 'Tautan', count: externalLinks.length, icon: <ExternalLink className="w-5 h-5 text-cyan-600" />, bg: 'bg-cyan-50/50 border-cyan-100' }
         ].map((stat, i) => (
           <div key={i} className={`p-4 rounded-2xl bg-white border shadow-xs flex items-center justify-between transition-all hover:scale-[1.02] hover:shadow-md ${stat.bg}`}>
             <div className="min-w-0 text-left">

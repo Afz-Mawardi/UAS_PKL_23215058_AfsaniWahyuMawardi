@@ -55,7 +55,7 @@ export default function KontakPageClient({
                   <div>
                     <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-widest font-mono leading-none">ALAMAT KANTOR</h4>
                     <span className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed block mt-1.5">
-                      {officeInfo.address || "Jl. Melati No.30a, Kejambon, Kec. Tegal Timur, Kota Tegal, Jawa Tengah 52124, Indonesia"}
+                      {officeInfo.address}
                     </span>
                   </div>
                 </div>
@@ -68,7 +68,7 @@ export default function KontakPageClient({
                   <div>
                     <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-widest font-mono leading-none">NOMOR TELEPON</h4>
                     <span className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed block mt-1.5">
-                      {officeInfo.phone || "(0283) 321253"}
+                      {officeInfo.phone}
                     </span>
                   </div>
                 </div>
@@ -81,7 +81,7 @@ export default function KontakPageClient({
                   <div>
                     <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-widest font-mono leading-none">ALAMAT EMAIL</h4>
                     <span className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed block mt-1.5 break-all">
-                      {officeInfo.email || "dinpora.tegalkota@gmail.com"}
+                      {officeInfo.email}
                     </span>
                   </div>
                 </div>
@@ -94,7 +94,7 @@ export default function KontakPageClient({
                   <div>
                     <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-widest font-mono leading-none">JAM OPERASIONAL</h4>
                     <span className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed block mt-1.5">
-                      {officeInfo.operationalHours || "Senin - Kamis: 07:30 - 16.00 WIB | Jumat: 07:30 - 11:00 WIB"}
+                      {officeInfo.operationalHours}
                     </span>
                   </div>
                 </div>
@@ -225,7 +225,7 @@ export default function KontakPageClient({
               <iframe
                 id="contact-map-interactive"
                 title="Peta Navigasi Google Maps Kantor DISPORAPAR Kota Tegal"
-                src={officeInfo.gmapsEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3961.2182512634426!2d109.1384074!3d-6.8644485!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fb9ded578d06b%3A0xc47f0d061fa03407!2sJl.%20Melati%20No.30a%2C%20Kejambon%2C%20Kec.%20Tegal%20Tim.%2C%20Kota%20Tegal%2C%20Jawa%20Tengah%2052124!5e0!3m2!1sid!2sid!4v1717838500000!5m2!1sid!2sid"}
+                src={officeInfo.gmapsEmbedUrl}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -239,7 +239,7 @@ export default function KontakPageClient({
             <div className="mt-6 grid grid-cols-2 gap-4">
               <a
                 id="map-route-btn"
-                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(officeInfo.address || "Jl. Melati No.30a, Kejambon, Kec. Tegal Timur, Kota Tegal, Jawa Tengah 52124")}`}
+                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(officeInfo.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 rounded-xl bg-[#0E3B66] hover:bg-[#0c355c] active:bg-[#0a2c4e] text-white font-bold text-xs uppercase tracking-widest text-center flex items-center justify-center gap-1.5 transition-all hover:shadow-md cursor-pointer"
@@ -250,7 +250,7 @@ export default function KontakPageClient({
 
               <a
                 id="map-open-btn"
-                href={`https://maps.google.com/?q=${encodeURIComponent(officeInfo.address || "Jl. Melati No.30a, Kejambon, Kec. Tegal Timur, Kota Tegal, Jawa Tengah 52124")}`}
+                href={`https://maps.google.com/?q=${encodeURIComponent(officeInfo.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-xs uppercase tracking-widest text-center flex items-center justify-center gap-1.5 transition-all hover:shadow-xs cursor-pointer"

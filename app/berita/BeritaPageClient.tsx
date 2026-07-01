@@ -191,7 +191,7 @@ export default function BeritaPageClient({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setActiveNewsDetail(null)}
-            className="fixed inset-0 z-50 bg-slate-950/60 flex items-center justify-center p-4 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 z-[100] bg-slate-950/60 flex items-center justify-center p-4 backdrop-blur-md cursor-pointer"
           >
             <motion.div
               initial={{ scale: 0.95, y: 15 }}

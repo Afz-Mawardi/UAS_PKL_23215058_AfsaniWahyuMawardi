@@ -42,7 +42,6 @@ import {
   useEvents,
   useGallery,
   usePublicServices,
-  useOfficeInfo,
   useHeroSlides,
   useHomepageSettings,
   usePriorityPrograms
@@ -171,7 +170,6 @@ export default function HomePageClient({
   initialEvents,
   initialGallery,
   initialServices,
-  initialOfficeInfo,
   initialHeroSlides,
   initialHomepageSettings,
   initialPriorityPrograms
@@ -180,7 +178,6 @@ export default function HomePageClient({
   initialEvents: any[];
   initialGallery: any[];
   initialServices: any[];
-  initialOfficeInfo: any;
   initialHeroSlides: any[];
   initialHomepageSettings: any;
   initialPriorityPrograms: any[];
@@ -189,7 +186,6 @@ export default function HomePageClient({
   const [eventsList] = useEvents(initialEvents);
   const [galleryPhotos] = useGallery(initialGallery);
   const [publicServices] = usePublicServices(initialServices);
-  const [officeInfo] = useOfficeInfo(initialOfficeInfo);
   const [heroSlides] = useHeroSlides(initialHeroSlides);
   const [homepageSettings] = useHomepageSettings(initialHomepageSettings);
   const [priorityPrograms] = usePriorityPrograms(initialPriorityPrograms);
@@ -260,7 +256,7 @@ export default function HomePageClient({
     <div className="w-full min-h-screen bg-[#F8FAFC] selection:bg-primary selection:text-white font-sans overflow-x-hidden">
 
       {/* 1. CINEMATIC HERO BANNER - DYNAMIC */}
-      <section className="relative h-[78vh] sm:h-[80vh] lg:h-[82vh] min-h-[500px] sm:min-h-[560px] lg:min-h-[620px] flex items-center justify-center bg-slate-950 overflow-hidden">
+      <section className="relative h-screen min-h-[600px] flex items-center justify-center bg-slate-950 overflow-hidden">
         {/* Slide backgrounds */}
         {heroSlides.length > 0 && heroSlides[currentSlide] && (
           <AnimatePresence>
@@ -353,16 +349,16 @@ export default function HomePageClient({
         )}
 
         {/* Playful Bottom Fade Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10 pointer-events-none" />
 
         {/* Slide Indicators */}
         {heroSlides.length > 1 && (
-          <div className="absolute bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-30 px-3.5 py-2 rounded-full bg-slate-950/35 border border-white/10 backdrop-blur-md shadow-lg">
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30">
             {heroSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${currentSlide === idx ? 'w-6 bg-accent' : 'w-1.5 bg-white/55 hover:bg-white/80'
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-350 cursor-pointer ${currentSlide === idx ? 'bg-accent scale-110 shadow-md' : 'bg-white/50 hover:bg-white/80'
                   }`}
                 aria-label={`Slide ${idx + 1}`}
               />
@@ -372,7 +368,7 @@ export default function HomePageClient({
       </section>
 
       {/* 2. QUICK ACCESS SERVICES */}
-      <section className="relative z-30 -mt-12 sm:-mt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative z-30 mt-8 sm:mt-12 lg:mt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-[2rem] p-8 sm:p-10 shadow-xl border border-slate-100">
           <div className="text-center md:text-left mb-8">
             <span className="text-[10px] font-bold tracking-widest text-[#F2994A] uppercase bg-orange-50 border border-orange-100/50 px-3 py-1 rounded-full inline-block font-mono mb-2">
@@ -1062,7 +1058,7 @@ export default function HomePageClient({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedPhoto(null)}
-            className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4 backdrop-blur-md cursor-pointer"
           >
             <div
               onClick={(e) => e.stopPropagation()}
@@ -1113,7 +1109,7 @@ export default function HomePageClient({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setActiveNewsDetail(null)}
-            className="fixed inset-0 z-50 bg-slate-950/60 flex items-center justify-center p-4 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 z-[100] bg-slate-950/60 flex items-center justify-center p-4 backdrop-blur-md cursor-pointer"
           >
             <motion.div
               initial={{ scale: 0.95, y: 15 }}

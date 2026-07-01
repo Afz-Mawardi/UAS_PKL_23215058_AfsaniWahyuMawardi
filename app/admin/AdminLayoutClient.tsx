@@ -62,13 +62,7 @@ export default function AdminLayoutClient({
   // Profile Dropdown & Password Modals
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState<boolean>(false);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState<boolean>(false);
-  const [accountModalTab, setAccountModalTab] = useState<'profile' | 'users'>('profile');
-  const [adminUsers, setAdminUsers] = useState<{ id: string; username: string }[]>([]);
-  const [showNewAdminPassword, setShowNewAdminPassword] = useState<boolean>(false);
-  const [newAdminUsername, setNewAdminUsername] = useState<string>('');
-  const [newAdminPassword, setNewAdminPassword] = useState<string>('');
-  const [newAdminError, setNewAdminError] = useState<string>('');
-  const [newAdminSuccess, setNewAdminSuccess] = useState<string>('');
+  const [showAccountConfirmPassword, setShowAccountConfirmPassword] = useState<boolean>(false);
 
   // Notification States
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -199,10 +193,22 @@ export default function AdminLayoutClient({
     const formData = new FormData(e.target as HTMLFormElement);
     const newUsername = formData.get('adminUsername') as string;
     const newPassword = formData.get('adminPassword') as string;
+    const confirmPassword = formData.get('adminConfirmPassword') as string;
 
     if (!newUsername.trim()) {
       setAccountError('Username tidak boleh kosong.');
       return;
+    }
+
+    if (newPassword) {
+      if (newPassword.trim().length < 6) {
+        setAccountError('Password baru harus minimal 6 karakter.');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setAccountError('Konfirmasi password tidak cocok.');
+        return;
+      }
     }
 
     try {
@@ -233,102 +239,10 @@ export default function AdminLayoutClient({
     }
   };
 
-  // Fetch all admin users
-  const fetchAdminUsers = async () => {
-    try {
-      const res = await fetch('/api/data', { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        setAdminUsers(data.users || []);
-      }
-    } catch (err) {
-      console.error('Failed to fetch admin users', err);
-    }
-  };
-
-  useEffect(() => {
-    if (isAccountModalOpen && accountModalTab === 'users') {
-      fetchAdminUsers();
-    }
-  }, [isAccountModalOpen, accountModalTab]);
-
-  // Handle Create Admin Account
-  const handleCreateAdmin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setNewAdminError('');
-    setNewAdminSuccess('');
-
-    if (!newAdminUsername.trim() || !newAdminPassword.trim()) {
-      setNewAdminError('Username dan password wajib diisi.');
-      return;
-    }
-
-    if (newAdminPassword.length < 6) {
-      setNewAdminError('Password harus minimal 6 karakter.');
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'createAdmin',
-          data: {
-            username: newAdminUsername.trim(),
-            password: newAdminPassword.trim()
-          }
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setNewAdminSuccess('Admin baru berhasil dibuat!');
-        setNewAdminUsername('');
-        setNewAdminPassword('');
-        fetchAdminUsers();
-      } else {
-        setNewAdminError(data.error || 'Gagal membuat admin baru.');
-      }
-    } catch (err) {
-      console.error(err);
-      setNewAdminError('Terjadi kesalahan koneksi.');
-    }
-  };
-
-  // Handle Delete Admin Account
-  const handleDeleteAdmin = async (adminId: string) => {
-    if (adminUsers.length <= 1) {
-      showNotification('Tidak dapat menghapus admin terakhir.', 'error');
-      return;
-    }
-    if (!confirm('Apakah Anda yakin ingin menghapus akun admin ini?')) return;
-
-    try {
-      const res = await fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'deleteAdmin',
-          data: { id: adminId }
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showNotification('Admin berhasil dihapus.', 'success');
-        fetchAdminUsers();
-      } else {
-        showNotification(data.error || 'Gagal menghapus admin.', 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      showNotification('Terjadi kesalahan koneksi.', 'error');
-    }
-  };
-
   // Render Login Panel if not logged in
   if (!isLoggedIn) {
     return (
-      <div className="w-full min-h-screen bg-gradient-to-tr from-[#051424] via-[#0E3B66] to-[#124b82] flex items-center justify-center p-4 selection:bg-accent selection:text-white font-sans text-slate-800 relative">
+      <div className="fixed inset-0 bg-gradient-to-tr from-[#051424] via-[#0E3B66] to-[#124b82] flex items-center justify-center p-4 selection:bg-accent selection:text-white font-sans text-slate-800 overflow-y-auto z-50">
         {notification && (
           <div
             onClick={() => setNotification(null)}
@@ -347,7 +261,7 @@ export default function AdminLayoutClient({
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/15 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-8 sm:p-10 rounded-[2rem] shadow-2xl relative z-10 text-white flex flex-col justify-between">
+        <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-6 sm:p-10 rounded-3xl shadow-2xl relative z-10 text-white flex flex-col justify-between">
           <div className="text-center space-y-3.5">
             <div className="flex justify-center mb-6">
               <Logo variant="dark" className="scale-110" />
@@ -365,7 +279,7 @@ export default function AdminLayoutClient({
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Masukkan username admin123"
+                placeholder="Masukkan username"
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-slate-400 transition-all font-medium"
               />
             </div>
@@ -378,7 +292,7 @@ export default function AdminLayoutClient({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password admin123"
+                  placeholder="Masukkan password"
                   className="w-full pl-4 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-slate-400 transition-all font-medium"
                 />
                 <button
@@ -433,7 +347,7 @@ export default function AdminLayoutClient({
   };
 
   return (
-    <div className="w-full min-h-screen md:h-screen md:overflow-hidden bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800 relative">
+    <div className="fixed inset-0 overflow-hidden bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800">
       {/* Toast Notification */}
       {notification && (
         <div
@@ -458,9 +372,9 @@ export default function AdminLayoutClient({
         className={`fixed inset-y-0 left-0 z-45 w-64 bg-[#051424] text-white flex flex-col justify-between shrink-0 shadow-lg border-r border-white/5 transition-transform duration-300 md:translate-x-0 md:static md:h-full ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
-        <div className="overflow-y-auto max-h-[85vh] select-none pr-1 admin-sidebar-scrollbar">
+        <div className="flex-grow h-full flex flex-col overflow-hidden">
           {/* Brand header */}
-          <div className="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-[#051424] z-10">
+          <div className="p-6 border-b border-white/5 flex items-center justify-between shrink-0 bg-[#051424] z-10">
             <div className="flex flex-col gap-2 w-full">
               <Logo variant="dark" className="scale-90 origin-left pointer-events-none" />
             </div>
@@ -474,102 +388,104 @@ export default function AdminLayoutClient({
           </div>
 
           {/* Nav links */}
-          <nav className="p-4 space-y-2.5">
-            {/* Dashboard Link */}
-            {renderSidebarLink('dashboard', 'Dashboard', '/admin/dashboard', <LayoutDashboard className="w-4 h-4" />)}
+          <div className="flex-grow overflow-y-auto select-none pr-1 admin-sidebar-scrollbar">
+            <nav className="p-4 space-y-2.5">
+              {/* Dashboard Link */}
+              {renderSidebarLink('dashboard', 'Dashboard', '/admin/dashboard', <LayoutDashboard className="w-4 h-4" />)}
 
-            {/* Beranda Category Accordion */}
-            <div className="space-y-1">
-              <button
-                onClick={() => toggleMenu('beranda')}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
-              >
-                <span>Beranda & PROFIL</span>
-                {expandedMenus.beranda ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </button>
-              {expandedMenus.beranda && (
-                <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
-                  {renderSidebarLink('hero-slider', 'Hero Slider', '/admin/beranda/hero-slider', <Sliders className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('publikasi-beranda', 'Publikasi Beranda', '/admin/beranda/publikasi-beranda', <FileText className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('pilar-program', 'Pilar Program', '/admin/beranda/pilar-program', <Sliders className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('sambutan', 'Sambutan', '/admin/beranda/sambutan', <User className="w-3.5 h-3.5" />)}
-                </div>
-              )}
-            </div>
+              {/* Beranda Category Accordion */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => toggleMenu('beranda')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
+                >
+                  <span>Beranda & PROFIL</span>
+                  {expandedMenus.beranda ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </button>
+                {expandedMenus.beranda && (
+                  <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
+                    {renderSidebarLink('hero-slider', 'Hero Slider', '/admin/beranda/hero-slider', <Sliders className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('publikasi-beranda', 'Publikasi Beranda', '/admin/beranda/publikasi-beranda', <FileText className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('pilar-program', 'Pilar Program', '/admin/beranda/pilar-program', <Sliders className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('sambutan', 'Sambutan', '/admin/beranda/sambutan', <User className="w-3.5 h-3.5" />)}
+                  </div>
+                )}
+              </div>
 
-            {/* Bidang Category Accordion */}
-            <div className="space-y-1">
-              <button
-                onClick={() => toggleMenu('bidang')}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
-              >
-                <span>Bidang</span>
-                {expandedMenus.bidang ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </button>
-              {expandedMenus.bidang && (
-                <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
-                  {renderSidebarLink('kepemudaan', 'Kepemudaan', '/admin/bidang/kepemudaan', <Users className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('olahraga', 'Olahraga', '/admin/bidang/olahraga', <Trophy className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('pariwisata', 'Pariwisata', '/admin/bidang/pariwisata', <Compass className="w-3.5 h-3.5" />)}
-                </div>
-              )}
-            </div>
+              {/* Bidang Category Accordion */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => toggleMenu('bidang')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
+                >
+                  <span>Bidang</span>
+                  {expandedMenus.bidang ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </button>
+                {expandedMenus.bidang && (
+                  <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
+                    {renderSidebarLink('kepemudaan', 'Kepemudaan', '/admin/bidang/kepemudaan', <Users className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('olahraga', 'Olahraga', '/admin/bidang/olahraga', <Trophy className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('pariwisata', 'Pariwisata', '/admin/bidang/pariwisata', <Compass className="w-3.5 h-3.5" />)}
+                  </div>
+                )}
+              </div>
 
-            {/* Publikasi Category Accordion */}
-            <div className="space-y-1">
-              <button
-                onClick={() => toggleMenu('publikasi')}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
-              >
-                <span>Publikasi</span>
-                {expandedMenus.publikasi ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </button>
-              {expandedMenus.publikasi && (
-                <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
-                  {renderSidebarLink('agenda-event', 'Agenda Event', '/admin/publikasi/agenda-event', <Calendar className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('berita', 'Berita', '/admin/publikasi/berita', <Newspaper className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('galeri-foto', 'Galeri Foto', '/admin/publikasi/galeri-foto', <ImageIcon className="w-3.5 h-3.5" />)}
-                </div>
-              )}
-            </div>
+              {/* Publikasi Category Accordion */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => toggleMenu('publikasi')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
+                >
+                  <span>Publikasi</span>
+                  {expandedMenus.publikasi ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </button>
+                {expandedMenus.publikasi && (
+                  <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
+                    {renderSidebarLink('agenda-event', 'Agenda Event', '/admin/publikasi/agenda-event', <Calendar className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('berita', 'Berita', '/admin/publikasi/berita', <Newspaper className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('galeri-foto', 'Galeri Foto', '/admin/publikasi/galeri-foto', <ImageIcon className="w-3.5 h-3.5" />)}
+                  </div>
+                )}
+              </div>
 
-            {/* Layanan Category Accordion */}
-            <div className="space-y-1">
-              <button
-                onClick={() => toggleMenu('layanan')}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
-              >
-                <span>Layanan</span>
-                {expandedMenus.layanan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </button>
-              {expandedMenus.layanan && (
-                <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
-                  {renderSidebarLink('retribusi', 'Retribusi', '/admin/layanan/retribusi', <Landmark className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('berkas-layanan', 'Berkas Layanan', '/admin/layanan/berkas-layanan', <FileText className="w-3.5 h-3.5" />)}
-                </div>
-              )}
-            </div>
+              {/* Layanan Category Accordion */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => toggleMenu('layanan')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
+                >
+                  <span>Layanan</span>
+                  {expandedMenus.layanan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </button>
+                {expandedMenus.layanan && (
+                  <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
+                    {renderSidebarLink('retribusi', 'Retribusi', '/admin/layanan/retribusi', <Landmark className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('berkas-layanan', 'Berkas Layanan', '/admin/layanan/berkas-layanan', <FileText className="w-3.5 h-3.5" />)}
+                  </div>
+                )}
+              </div>
 
-            {/* Pengaduan Category Accordion */}
-            <div className="space-y-1">
-              <button
-                onClick={() => toggleMenu('pengaduan')}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
-              >
-                <span>Pengaduan</span>
-                {expandedMenus.pengaduan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-              </button>
-              {expandedMenus.pengaduan && (
-                <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
-                  {renderSidebarLink('pengaduan-internal', 'Pengaduan Internal', '/admin/pengaduan/internal', <ShieldAlert className="w-3.5 h-3.5" />)}
-                  {renderSidebarLink('external-link', 'External Link', '/admin/pengaduan/external', <ExternalLink className="w-3.5 h-3.5" />)}
-                </div>
-              )}
-            </div>
+              {/* Pengaduan Category Accordion */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => toggleMenu('pengaduan')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
+                >
+                  <span>Pengaduan</span>
+                  {expandedMenus.pengaduan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                </button>
+                {expandedMenus.pengaduan && (
+                  <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
+                    {renderSidebarLink('pengaduan-internal', 'Pengaduan Internal', '/admin/pengaduan/internal', <ShieldAlert className="w-3.5 h-3.5" />)}
+                    {renderSidebarLink('external-link', 'External Link', '/admin/pengaduan/external', <ExternalLink className="w-3.5 h-3.5" />)}
+                  </div>
+                )}
+              </div>
 
-            {/* Info Kontak Link */}
-            {renderSidebarLink('info-kontak', 'Info Kontak', '/admin/info-kontak', <Phone className="w-4 h-4" />)}
-          </nav>
+              {/* Info Kontak Link */}
+              {renderSidebarLink('info-kontak', 'Info Kontak', '/admin/info-kontak', <Phone className="w-4 h-4" />)}
+            </nav>
+          </div>
         </div>
 
         {/* User logout section */}
@@ -593,7 +509,7 @@ export default function AdminLayoutClient({
       </aside>
 
       {/* 2. MAIN PANEL WORKSPACE */}
-      <main className="flex-grow md:h-full flex flex-col min-w-0 relative z-10 overflow-hidden">
+      <main className="flex-grow h-full flex flex-col min-w-0 relative z-10 overflow-hidden">
         {/* Top Header section - STICKY TOP ON MOBILE */}
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 sm:px-8 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3 min-w-0">
@@ -644,7 +560,6 @@ export default function AdminLayoutClient({
                     type="button"
                     onClick={() => {
                       setIsProfileDropdownOpen(false);
-                      setAccountModalTab('profile');
                       setIsAccountModalOpen(true);
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-slate-50 transition-colors text-xs font-bold text-slate-700 flex items-center gap-2 cursor-pointer"
@@ -671,7 +586,7 @@ export default function AdminLayoutClient({
         </header>
 
         {/* View Component Switch */}
-        <section className="flex-1 p-6 sm:p-8 overflow-y-auto flex flex-col justify-between relative">
+        <section className="flex-1 min-h-0 p-4 sm:p-8 overflow-y-auto flex flex-col justify-between relative">
           <div className="flex-grow">{children}</div>
 
           {/* Admin Footer */}
@@ -686,7 +601,7 @@ export default function AdminLayoutClient({
       {/* ACCOUNT SETTINGS MODAL */}
       {isAccountModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-inter">
-          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden flex flex-col">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-150 overflow-hidden flex flex-col">
             {/* Modal Header */}
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">Pengaturan Akun Admin</h3>
@@ -698,144 +613,70 @@ export default function AdminLayoutClient({
               </button>
             </div>
 
-            {/* Modal Tabs */}
-            <div className="flex border-b border-slate-100 bg-slate-50/50 p-1">
-              <button
-                type="button"
-                onClick={() => setAccountModalTab('profile')}
-                className={`flex-1 py-2 text-center text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors ${accountModalTab === 'profile' ? 'bg-[#0E3B66] text-white' : 'text-slate-500 hover:bg-slate-200/50'
-                  }`}
-              >
-                Ubah Profil
-              </button>
-              <button
-                type="button"
-                onClick={() => setAccountModalTab('users')}
-                className={`flex-1 py-2 text-center text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors ${accountModalTab === 'users' ? 'bg-[#0E3B66] text-white' : 'text-slate-500 hover:bg-slate-200/50'
-                  }`}
-              >
-                Daftar Admin ({adminUsers.length})
-              </button>
-            </div>
-
             {/* Modal Content */}
             <div className="p-6 overflow-y-auto max-h-[60vh]">
-              {accountModalTab === 'profile' ? (
-                <form onSubmit={handleUpdateAccount} className="space-y-4">
-                  {accountSuccess && <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-100">{accountSuccess}</div>}
-                  {accountError && <div className="p-3 bg-red-50 text-red-800 text-xs font-bold rounded-xl border border-red-100">{accountError}</div>}
+              <form onSubmit={handleUpdateAccount} className="space-y-4">
+                {accountSuccess && <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-100">{accountSuccess}</div>}
+                {accountError && <div className="p-3 bg-red-50 text-red-800 text-xs font-bold rounded-xl border border-red-100">{accountError}</div>}
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Username Admin</label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Username Admin</label>
+                  <input
+                    type="text"
+                    name="adminUsername"
+                    required
+                    defaultValue={currentAdminUsername}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Password Baru (Kosongkan jika tidak diubah)</label>
+                  <div className="relative">
                     <input
-                      type="text"
-                      name="adminUsername"
-                      required
-                      defaultValue={currentAdminUsername}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
+                      type={showAccountPassword ? 'text' : 'password'}
+                      name="adminPassword"
+                      //placeholder="masukkan pasword"
+                      className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
                     />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Password Baru (Kosongkan jika tidak diubah)</label>
-                    <div className="relative">
-                      <input
-                        type={showAccountPassword ? 'text' : 'password'}
-                        name="adminPassword"
-                        placeholder="••••••••"
-                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowAccountPassword(!showAccountPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors"
-                      >
-                        {showAccountPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="pt-4">
                     <button
-                      type="submit"
-                      className="w-full py-3 bg-[#0E3B66] hover:bg-[#0a2c4e] text-white font-extrabold rounded-xl transition-all shadow-md text-xs uppercase tracking-wider font-mono cursor-pointer"
+                      type="button"
+                      onClick={() => setShowAccountPassword(!showAccountPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors"
                     >
-                      SIMPAN PERUBAHAN
+                      {showAccountPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
                     </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="space-y-6">
-                  {/* Create New Admin Form */}
-                  <form onSubmit={handleCreateAdmin} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                    <span className="text-[10px] font-bold text-[#0E3B66] uppercase tracking-wider font-mono">Buat Akun Admin Baru</span>
-                    {newAdminSuccess && <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-100">{newAdminSuccess}</div>}
-                    {newAdminError && <div className="p-2.5 bg-red-50 text-red-800 text-xs font-bold rounded-lg border border-red-100">{newAdminError}</div>}
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        placeholder="Username Baru"
-                        value={newAdminUsername}
-                        onChange={(e) => setNewAdminUsername(e.target.value)}
-                        className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0E3B66]"
-                      />
-                      <div className="relative">
-                        <input
-                          type={showNewAdminPassword ? 'text' : 'password'}
-                          placeholder="Password Baru"
-                          value={newAdminPassword}
-                          onChange={(e) => setNewAdminPassword(e.target.value)}
-                          className="w-full pl-3.5 pr-9 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0E3B66]"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowNewAdminPassword(!showNewAdminPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
-                        >
-                          {showNewAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full py-2 bg-[#0E3B66] hover:bg-[#0a2c4e] text-white font-bold rounded-xl transition-all text-xs uppercase tracking-wider font-mono cursor-pointer"
-                    >
-                      TAMBAH ADMIN BARU
-                    </button>
-                  </form>
-
-                  {/* Admin list */}
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest font-mono">Daftar Admin Aktif</span>
-                    <div className="divide-y divide-slate-100 border border-slate-100 rounded-2xl overflow-hidden bg-white">
-                      {adminUsers.map((user) => (
-                        <div key={user.id} className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 transition-colors">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-[#0E3B66]/10 text-[#0E3B66] flex items-center justify-center font-bold text-xs">
-                              {user.username[0].toUpperCase()}
-                            </div>
-                            <div className="text-left">
-                              <p className="text-xs font-extrabold text-slate-900 leading-tight">{user.username}</p>
-                              <p className="text-[9px] text-slate-400 font-mono uppercase tracking-widest">ID: {user.id.substring(0, 8)}</p>
-                            </div>
-                          </div>
-                          {user.username !== currentAdminUsername ? (
-                            <button
-                              onClick={() => handleDeleteAdmin(user.id)}
-                              className="px-2.5 py-1 text-[10px] font-bold font-mono tracking-wide rounded-lg bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 text-red-600 transition-all cursor-pointer"
-                            >
-                              HAPUS
-                            </button>
-                          ) : (
-                            <span className="px-2.5 py-1 text-[9px] font-bold font-mono rounded-lg bg-slate-100 border border-slate-200 text-slate-450">ANDA</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </div>
-              )}
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Konfirmasi Password Baru</label>
+                  <div className="relative">
+                    <input
+                      type={showAccountConfirmPassword ? 'text' : 'password'}
+                      name="adminConfirmPassword"
+                      //placeholder="••••••••"
+                      className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowAccountConfirmPassword(!showAccountConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors"
+                    >
+                      {showAccountConfirmPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-[#0E3B66] hover:bg-[#0a2c4e] text-white font-extrabold rounded-xl transition-all shadow-md text-xs uppercase tracking-wider font-mono cursor-pointer"
+                  >
+                    SIMPAN PERUBAHAN
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

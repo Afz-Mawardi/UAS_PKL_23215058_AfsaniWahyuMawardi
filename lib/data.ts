@@ -699,22 +699,23 @@ export interface OfficeInfo {
 }
 
 export const OFFICE_INFO: OfficeInfo = {
-  address: 'Jl. Melati No.30a, Kejambon, Kec. Tegal Tim., Kota Tegal, Jawa Tengah 52124, Indonesia',
-  phone: '(0283) 351052',
+  address: 'Jl. Melati No.30a, Kejambon, Kec. Tegal Timur, Kota Tegal, Jawa Tengah 52124, Indonesia',
+  phone: '(0283) 321253',
   email: 'dinpora.tegalkota@gmail.com',
-  operationalHours: 'Senin - Kamis: 07:15 - 15:45 WIB | Jumat: 07:15 - 11:30 WIB',
+  operationalHours: 'Senin - Kamis: 07:15 - 16:30 WIB | Jumat: 07:15 - 14:30 WIB',
   socialMedia: {
-    instagramResmi: 'https://www.instagram.com/disporaparkotategal',
+    instagramResmi: 'https://www.instagram.com/disporapartegalkota',
     instagramTourism: 'https://www.instagram.com/tegal.tourism',
     instagramPemuda: 'https://www.instagram.com/bidpemuda_disporapartegal',
-    youtube: 'https://www.youtube.com/disporapartegal'
+    youtube: 'https://www.youtube.com/@disporapartegalkota'
   },
   gmapsEmbedUrl: 'https://maps.google.com/maps?q=Jl.+Melati+No.30a,+Kejambon,+Kec.+Tegal+Tim.,+Kota+Tegal,+Jawa+Tengah+52124&t=&z=17&hl=id&output=embed',
   socialMediaList: [
-    { platform: 'instagram', label: 'Dinas', url: 'https://www.instagram.com/disporaparkotategal' },
-    { platform: 'instagram', label: 'Wisata', url: 'https://www.instagram.com/tegal.tourism' },
+    { platform: 'instagram', label: 'Dinas', url: 'https://www.instagram.com/disporapartegalkota' },
     { platform: 'instagram', label: 'Pemuda', url: 'https://www.instagram.com/bidpemuda_disporapartegal' },
-    { platform: 'youtube', label: 'YouTube', url: 'https://www.youtube.com/disporapartegal' }
+    { platform: 'instagram', label: 'Olahraga', url: 'https://www.instagram.com/bidornews.kotategal' },
+    { platform: 'instagram', label: 'Wisata', url: 'https://www.instagram.com/tegal.tourism' },
+    { platform: 'youtube', label: 'YouTube', url: 'https://www.youtube.com/@disporapartegalkota' }
   ]
 };
 
