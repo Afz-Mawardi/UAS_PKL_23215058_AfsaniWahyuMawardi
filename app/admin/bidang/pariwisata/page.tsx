@@ -486,7 +486,7 @@ export default function PariwisataAdminPage() {
                           </button>
                           <button
                             onClick={() => openDeleteConfirm(item)}
-                            className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                            className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
                             title="Hapus data"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -673,7 +673,8 @@ export default function PariwisataAdminPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-red-650 hover:bg-red-750 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
                     >
                       Ya, Hapus
                     </button>
@@ -783,7 +784,7 @@ export default function PariwisataAdminPage() {
                                     <button
                                       type="button"
                                       onClick={() => handleRemoveDetail(idx)}
-                                      className="p-1.5 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                                      className="p-1.5 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
                                     >
                                       <Trash2 className="w-3.5 h-3.5" />
                                     </button>

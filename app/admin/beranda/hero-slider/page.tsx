@@ -265,7 +265,7 @@ export default function HeroSliderPage() {
                         </button>
                         <button
                           onClick={() => openDeleteConfirm(slide)}
-                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
                           title="Hapus slide"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -321,6 +321,7 @@ export default function HeroSliderPage() {
                     <button
                       type="submit"
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
                     >
                       Ya, Hapus
                     </button>

@@ -79,7 +79,8 @@ export default function AdminLayoutClient({
     beranda: pathname.includes('/admin/beranda'),
     bidang: pathname.includes('/admin/bidang'),
     publikasi: pathname.includes('/admin/publikasi'),
-    layanan: pathname.includes('/admin/layanan')
+    layanan: pathname.includes('/admin/layanan'),
+    pengaduan: pathname.includes('/admin/pengaduan')
   });
 
   const toggleMenu = (key: string) => {
@@ -92,6 +93,7 @@ export default function AdminLayoutClient({
     if (pathname.includes('/admin/bidang')) setExpandedMenus((prev) => ({ ...prev, bidang: true }));
     if (pathname.includes('/admin/publikasi')) setExpandedMenus((prev) => ({ ...prev, publikasi: true }));
     if (pathname.includes('/admin/layanan')) setExpandedMenus((prev) => ({ ...prev, layanan: true }));
+    if (pathname.includes('/admin/pengaduan')) setExpandedMenus((prev) => ({ ...prev, pengaduan: true }));
   }, [pathname]);
 
   // Global click listener to close notification when active
@@ -548,6 +550,23 @@ export default function AdminLayoutClient({
               )}
             </div>
 
+            {/* Pengaduan Category Accordion */}
+            <div className="space-y-1">
+              <button
+                onClick={() => toggleMenu('pengaduan')}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
+              >
+                <span>Pengaduan</span>
+                {expandedMenus.pengaduan ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+              </button>
+              {expandedMenus.pengaduan && (
+                <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
+                  {renderSidebarLink('pengaduan-internal', 'Pengaduan Internal', '/admin/pengaduan/internal', <ShieldAlert className="w-3.5 h-3.5" />)}
+                  {renderSidebarLink('external-link', 'External Link', '/admin/pengaduan/external', <ExternalLink className="w-3.5 h-3.5" />)}
+                </div>
+              )}
+            </div>
+
             {/* Info Kontak Link */}
             {renderSidebarLink('info-kontak', 'Info Kontak', '/admin/info-kontak', <Phone className="w-4 h-4" />)}
           </nav>
@@ -558,14 +577,14 @@ export default function AdminLayoutClient({
           <Link
             href="/"
             target="_blank"
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/20 bg-red-650 hover:bg-blue-700 text-white transition-all text-[10px] font-mono font-bold uppercase tracking-widest cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/20 bg-slate-700 hover:bg-slate-600 text-white transition-all text-[10px] font-mono font-bold uppercase tracking-widest cursor-pointer"
           >
             <span>Buka Website</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
           <button
             onClick={() => handleLogout(false)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/20 bg-red-650 hover:bg-red-700 text-white transition-all text-[10px] font-mono font-bold uppercase tracking-widest cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/20 bg-red-600 hover:bg-red-700 text-white transition-all text-[10px] font-mono font-bold uppercase tracking-widest cursor-pointer"
           >
             <span>Keluar Sesi</span>
             <LogOut className="w-3.5 h-3.5" />
@@ -640,7 +659,7 @@ export default function AdminLayoutClient({
                       setIsProfileDropdownOpen(false);
                       handleLogout();
                     }}
-                    className="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 transition-colors text-xs font-bold text-red-650 flex items-center gap-2 border-t border-slate-100 cursor-pointer"
+                    className="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 transition-colors text-xs font-bold text-red-600 flex items-center gap-2 border-t border-slate-100 cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Logout</span>
@@ -804,7 +823,7 @@ export default function AdminLayoutClient({
                           {user.username !== currentAdminUsername ? (
                             <button
                               onClick={() => handleDeleteAdmin(user.id)}
-                              className="px-2.5 py-1 text-[10px] font-bold font-mono tracking-wide rounded-lg bg-red-50 hover:bg-red-650 hover:text-white border border-red-200 text-red-650 transition-all cursor-pointer"
+                              className="px-2.5 py-1 text-[10px] font-bold font-mono tracking-wide rounded-lg bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 text-red-600 transition-all cursor-pointer"
                             >
                               HAPUS
                             </button>

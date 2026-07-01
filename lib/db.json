@@ -150,57 +150,21 @@
   ],
   "services": [
     {
-      "id": "s-1",
-      "title": "SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)",
-      "description": "Panduan tata cara penyewaan sarana prasarana olahraga milik daerah untuk kegiatan olahraga maupun luar olahraga.",
-      "category": "SOP",
-      "downloadUrl": "/uploads/dokumen/1781977938236_Strategi_responden_IPP.zip",
-      "fileSize": "16 KB",
-      "showOnHomepage": true
-    },
-    {
-      "id": "s-10",
-      "title": "Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)",
-      "description": "Pendaftaran berkas seleksi delegasi pemuda andalan Kota Tegal ke tingkat provinsi untuk dikirim ke kancah global.",
-      "category": "Formulir",
-      "downloadUrl": "/uploads/dokumen/1781977908230_wmp.docx",
-      "fileSize": "934 KB",
-      "showOnHomepage": true
-    },
-    {
-      "id": "s-2",
-      "title": "Formulir Permohonan Izin Keikutsertaan Pameran Pariwisata",
-      "description": "Formulir pengajuan pendaftaran pameran bagi asosiasi pariwisata, pengelola destinasi, dan perajin cinderamata binaan.",
-      "category": "Formulir",
-      "downloadUrl": "#",
-      "fileSize": "450 KB",
-      "showOnHomepage": false
-    },
-    {
-      "id": "s-3",
-      "title": "Berkas Layanan Rekomendasi Tanda Daftar Usaha Pariwisata (TDUP)",
-      "description": "Persyaratan lengkap, durasi penyelesaian, dan jaminan keamanan penerbitan rekomendasi teknis pariwisata.",
+      "id": "s-9",
+      "title": "Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan",
+      "description": "Formulir basis data sertifikasi kurasi produk kriya, batik Tegalan, logam, dan makanan khas untuk event pameran daerah.",
       "category": "Berkas Layanan",
-      "downloadUrl": "#",
-      "fileSize": "1.8 MB",
-      "showOnHomepage": false
+      "downloadUrl": "/uploads/dokumen/1781977188734_souvenir.pdf",
+      "fileSize": "190 KB",
+      "showOnHomepage": true
     },
     {
-      "id": "s-4",
-      "title": "Formulir Pendaftaran Sertifikasi Organisasi Kepemudaan (OK)",
-      "description": "Formulir verifikasi legalitas kelayakan organisasi kepemudaan dalam menerima bansos dan rekomendasi kegiatan.",
+      "id": "s-7",
+      "title": "Formulir Pengajuan Stimulus Sarana Prasarana Klub Olahraga Masyarakat",
+      "description": "Formulir administrasi usulan bantuan bola, net, rompi, dan perbaikan sarana olahraga tingkat RW binaan dinas.",
       "category": "Formulir",
       "downloadUrl": "#",
-      "fileSize": "320 KB",
-      "showOnHomepage": false
-    },
-    {
-      "id": "s-5",
-      "title": "SOP Pengajuan Rekomendasi Penyelenggaraan Event Olahraga",
-      "description": "Prosedur pengusulan event olahraga berskala daerah, nasional, maupun internasional agar terdata resmi di bawah naungan dinas.",
-      "category": "SOP",
-      "downloadUrl": "#",
-      "fileSize": "950 KB",
+      "fileSize": "380 KB",
       "showOnHomepage": false
     },
     {
@@ -213,30 +177,30 @@
       "showOnHomepage": false
     },
     {
-      "id": "s-7",
-      "title": "Formulir Pengajuan Stimulus Sarana Prasarana Klub Olahraga Masyarakat",
-      "description": "Formulir administrasi usulan bantuan bola, net, rompi, dan perbaikan sarana olahraga tingkat RW binaan dinas.",
-      "category": "Formulir",
-      "downloadUrl": "#",
-      "fileSize": "380 KB",
-      "showOnHomepage": false
-    },
-    {
-      "id": "s-8",
-      "title": "SOP Pelaksanaan Sertifikasi Kompetensi Pemandu Wisata Pesisir",
-      "description": "Tata laksana pengujian kredibilitas dan keahlian pemandu wisata bahari berkolaborasi dengan Himpunan Pramuwisata Indonesia.",
-      "category": "SOP",
-      "downloadUrl": "#",
-      "fileSize": "1.5 MB",
-      "showOnHomepage": false
-    },
-    {
-      "id": "s-9",
-      "title": "Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan",
-      "description": "Formulir basis data sertifikasi kurasi produk kriya, batik Tegalan, logam, dan makanan khas untuk event pameran daerah.",
+      "id": "s-3",
+      "title": "Berkas Layanan Rekomendasi Tanda Daftar Usaha Pariwisata (TDUP)",
+      "description": "Persyaratan lengkap, durasi penyelesaian, dan jaminan keamanan penerbitan rekomendasi teknis pariwisata.",
       "category": "Berkas Layanan",
-      "downloadUrl": "/uploads/dokumen/1781977188734_souvenir.pdf",
-      "fileSize": "190 KB",
+      "downloadUrl": "#",
+      "fileSize": "1.8 MB",
+      "showOnHomepage": false
+    },
+    {
+      "id": "s-10",
+      "title": "Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)",
+      "description": "Pendaftaran berkas seleksi delegasi pemuda andalan Kota Tegal ke tingkat provinsi untuk dikirim ke kancah global.",
+      "category": "Formulir",
+      "downloadUrl": "/uploads/dokumen/1781977908230_wmp.docx",
+      "fileSize": "934 KB",
+      "showOnHomepage": true
+    },
+    {
+      "id": "s-1",
+      "title": "SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)",
+      "description": "Panduan tata cara penyewaan sarana prasarana olahraga milik daerah untuk kegiatan olahraga maupun luar olahraga.",
+      "category": "SOP",
+      "downloadUrl": "/uploads/dokumen/1781977938236_Strategi_responden_IPP.zip",
+      "fileSize": "16 KB",
       "showOnHomepage": true
     }
   ],

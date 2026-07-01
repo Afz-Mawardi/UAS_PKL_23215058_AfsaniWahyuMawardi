@@ -8,8 +8,6 @@ import {
   ShieldAlert,
   X,
   CheckCircle,
-  Upload,
-  Image as ImageIcon,
   Search,
   Calendar,
   MapPin,
@@ -51,41 +49,7 @@ const parseTimeRange = (timeStr?: string) => {
   return { start, end };
 };
 
-// Helper to convert image to WebP format
-const convertImageToWebP = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const validTypes = ['image/webp', 'image/png', 'image/jpeg', 'image/jpg'];
-    if (!validTypes.includes(file.type) && !/\.(webp|png|jpe?g)$/i.test(file.name)) {
-      reject(new Error('Format gambar harus berupa WEBP, PNG, JPG, atau JPEG.'));
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Gagal memproses gambar.'));
-          return;
-        }
-        ctx.drawImage(img, 0, 0);
-        const webpBase64 = canvas.toDataURL('image/webp', 0.85);
-        resolve(webpBase64);
-      };
-      img.onerror = () => {
-        reject(new Error('Gagal memuat gambar untuk konversi.'));
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.onerror = () => {
-      reject(new Error('Gagal membaca berkas gambar.'));
-    };
-    reader.readAsDataURL(file);
-  });
-};
+
 
 export default function AgendaEventAdminPage() {
   const [events, setEvents] = useEvents();
@@ -97,8 +61,6 @@ export default function AgendaEventAdminPage() {
 
   // Form states
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [uploadedImageBase64, setUploadedImageBase64] = useState<string>('');
-  const [isDragOverModal, setIsDragOverModal] = useState<boolean>(false);
 
   // Notifications
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -113,10 +75,6 @@ export default function AgendaEventAdminPage() {
   const openForm = (type: 'add' | 'edit', item: any = null) => {
     setModalType(type);
     setEditingItem(item);
-    setUploadedImageBase64('');
-    if (type === 'edit' && item) {
-      setUploadedImageBase64(item.imageUrl || '');
-    }
     setIsModalOpen(true);
   };
 
@@ -126,45 +84,7 @@ export default function AgendaEventAdminPage() {
     setIsModalOpen(true);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        showNotification('Ukuran gambar maksimal 2MB.', 'error');
-        e.target.value = '';
-        return;
-      }
-      showNotification('Sedang memproses gambar...', 'success');
-      convertImageToWebP(file)
-        .then(async (webpBase64) => {
-          try {
-            const res = await fetch('/api/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                fileBase64: webpBase64,
-                fileName: file.name.substring(0, file.name.lastIndexOf('.')) + '.webp',
-                menu: 'agenda'
-              })
-            });
-            const result = await res.json();
-            if (result.success) {
-              setUploadedImageBase64(result.url);
-              showNotification('Gambar berhasil diunggah.', 'success');
-            } else {
-              throw new Error(result.error || 'Gagal menyimpan gambar di server.');
-            }
-          } catch (err: any) {
-            showNotification(err.message || 'Gagal mengunggah gambar ke server.', 'error');
-            e.target.value = '';
-          }
-        })
-        .catch((err) => {
-          showNotification(err.message || 'Gagal memproses gambar.', 'error');
-          e.target.value = '';
-        });
-    }
-  };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,7 +106,6 @@ export default function AgendaEventAdminPage() {
     const endTime = formData.get('endTime') as string || '12:00';
     const time = `${startTime} - ${endTime} WIB`;
     const location = formData.get('location') as string;
-    const imageUrl = uploadedImageBase64 || formData.get('imageUrl') as string || '';
 
     if (!title.trim()) {
       showNotification('Judul agenda wajib diisi.', 'error');
@@ -212,7 +131,7 @@ export default function AgendaEventAdminPage() {
         time,
         location,
         description: '',
-        imageUrl
+        imageUrl: ''
       };
       setEvents([newItem, ...events]);
       showNotification('Agenda berhasil ditambahkan.', 'success');
@@ -223,7 +142,7 @@ export default function AgendaEventAdminPage() {
         date: dateString,
         time,
         location,
-        imageUrl
+        imageUrl: ''
       };
       setEvents(events.map(ev => ev.id === editingItem.id ? updatedItem : ev));
       showNotification('Agenda berhasil diubah.', 'success');
@@ -300,11 +219,6 @@ export default function AgendaEventAdminPage() {
                   <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-4 px-3 sm:py-5 sm:px-6 max-w-xs">
                       <div className="flex items-center gap-3">
-                        {item.imageUrl && (
-                          <div className="w-12 h-12 rounded-lg overflow-hidden border border-slate-150 shrink-0">
-                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
-                          </div>
-                        )}
                         <div>
                           <h4 className="font-extrabold text-[#0E3B66] leading-tight">{item.title}</h4>
                         </div>
@@ -337,7 +251,7 @@ export default function AgendaEventAdminPage() {
                         </button>
                         <button
                           onClick={() => openDeleteConfirm(item)}
-                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
                           title="Hapus agenda"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -392,7 +306,8 @@ export default function AgendaEventAdminPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-red-650 hover:bg-red-750 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
                     >
                       Ya, Hapus
                     </button>
@@ -458,68 +373,12 @@ export default function AgendaEventAdminPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2 pt-2 border-t border-slate-100">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Foto Banner Event</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Local Upload */}
-                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal
-                        ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
-                        : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50'
-                        }`}>
-                        <Upload className="w-5 h-5 text-slate-400" />
-                        <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Foto</span>
-                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG)</span>
-                        <input
-                          type="file"
-                          accept="image/webp, image/png, image/jpeg, image/jpg"
-                          onChange={handleFileChange}
-                          onDragEnter={() => setIsDragOverModal(true)}
-                          onDragLeave={() => setIsDragOverModal(false)}
-                          onDrop={() => setIsDragOverModal(false)}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                      </div>
-
-                      {/* URL input */}
-                      <div className="space-y-1.5 flex flex-col justify-center">
-                        <span className="text-[8.5px] font-bold text-slate-440 font-mono">Atau Masukkan URL Link Foto:</span>
-                        <input
-                          type="text"
-                          name="imageUrl"
-                          value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.imageUrl || ''}
-                          onChange={(e) => setUploadedImageBase64(e.target.value)}
-                          placeholder="https://images.unsplash.com/..."
-                          className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
-                        />
-                      </div>
-                    </div>
-
-                    {(uploadedImageBase64 || editingItem?.imageUrl) && (
-                      <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <ImageIcon className="w-4 h-4 text-accent shrink-0" />
-                          <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.imageUrl}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setUploadedImageBase64('')}
-                          className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
-                        >
-                          Hapus
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
                   <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 shrink-0">
                     <button
                       type="button"
                       onClick={() => {
                         setIsModalOpen(false);
                         setEditingItem(null);
-                        setUploadedImageBase64('');
                       }}
                       className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer font-bold text-xs uppercase tracking-wider font-mono"
                     >

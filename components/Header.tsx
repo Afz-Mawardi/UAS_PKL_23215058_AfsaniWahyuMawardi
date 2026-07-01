@@ -120,6 +120,9 @@ const getItemIcon = (name: string) => {
   if (normalized.includes('lapor!')) {
     return <ShieldAlert className="w-3.5 h-3.5 shrink-0" />;
   }
+  if (normalized.includes('internal') || normalized.includes('pengaduan internal')) {
+    return <ShieldAlert className="w-3.5 h-3.5 shrink-0" />;
+  }
   return <HelpCircle className="w-3.5 h-3.5 shrink-0" />;
 };
 
@@ -129,40 +132,25 @@ export default function Header() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
   const pathname = usePathname();
-  const isHome = pathname === '/';
-  const isHubungiActive = pathname === '/kontak';
+  
+  // Dynamic external links state
+  const [externalLinks, setExternalLinks] = useState<any[]>([]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 40) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    fetch('/api/external-links')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setExternalLinks(data);
+        }
+      })
+      .catch(err => console.error('Failed to load external links:', err));
   }, []);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+  const ppidLink = externalLinks.find(l => l.id === 'ppid') || { title: 'PPID', url: 'https://ppid.tegalkota.go.id/' };
+  const laporGubLink = externalLinks.find(l => l.id === 'laporgub') || { title: 'LaporGub!', url: 'https://laporgub.jatengprov.go.id/' };
+  const laporLink = externalLinks.find(l => l.id === 'lapor') || { title: 'SP4N-LAPOR!', url: 'https://lapor.go.id/' };
 
-  useEffect(() => {
-    setOpenDropdown(null);
-    setIsOpen(false);
-  }, [pathname]);
-
-  // Structural groupings requested to make navbar compact
   const navigationMenu: MenuGroup[] = [
     {
       name: 'BERANDA',
@@ -205,16 +193,52 @@ export default function Header() {
     {
       name: 'PENGADUAN',
       items: [
-        { name: 'LaporGub!', href: 'https://laporgub.jatengprov.go.id/', isExternal: true },
-        { name: 'SP4N-LAPOR!', href: 'https://lapor.go.id/', isExternal: true },
+        { name: laporGubLink.title, href: laporGubLink.url, isExternal: true },
+        { name: laporLink.title, href: laporLink.url, isExternal: true },
+        { name: 'Pengaduan Internal', href: '/pengaduan/internal' }
       ],
     },
     {
-      name: 'PPID',
-      href: 'https://ppid.tegalkota.go.id/',
+      name: ppidLink.title.toUpperCase(),
+      href: ppidLink.url,
       isExternal: true,
     },
   ];
+
+  const isHome = pathname === '/';
+  const isHubungiActive = pathname === '/kontak';
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    setOpenDropdown(null);
+    setIsOpen(false);
+  }, [pathname]);
+
+
 
   const isWhiteNav = scrolled || !isHome;
 

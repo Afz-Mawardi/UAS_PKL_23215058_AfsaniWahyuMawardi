@@ -198,3 +198,24 @@ model Retribusi {
 
   @@map("retribusi")
 }
+
+model Complaint {
+  id        String   @id @default(uuid())
+  title     String   @db.Text
+  content   String   @db.Text
+  imageUrl  String   @db.Text
+  contact   String   @db.Text
+  status    String   @default("Baru") // Baru, Diproses, Selesai, Ditolak
+  notes     String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("pengaduan_internal")
+}
+
+model ExternalLink {
+  id    String @id // 'laporgub', 'lapor', 'ppid'
+  title String
+  url   String @db.Text
+
+  @@map("link_eksternal")
+}

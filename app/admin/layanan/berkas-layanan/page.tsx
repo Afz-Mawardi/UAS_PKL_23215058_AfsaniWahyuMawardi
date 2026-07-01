@@ -459,7 +459,7 @@ export default function BerkasLayananAdminPage() {
                         </button>
                         <button
                           onClick={() => openDeleteConfirm(item)}
-                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
                           title="Hapus berkas"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -514,7 +514,8 @@ export default function BerkasLayananAdminPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-red-650 hover:bg-red-750 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
                     >
                       Ya, Hapus
                     </button>
@@ -647,7 +648,7 @@ export default function BerkasLayananAdminPage() {
                   setEditingCategoryIndex(null);
                   setEditingCategoryName('');
                 }}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-650 text-white/80 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-600 text-white/80 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -699,7 +700,7 @@ export default function BerkasLayananAdminPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteCategory(cat)}
-                              className="p-1.5 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                              className="p-1.5 text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
