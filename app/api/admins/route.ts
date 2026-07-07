@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import crypto from 'crypto';
+<<<<<<< HEAD
 import fs from 'fs';
 import path from 'path';
 
@@ -23,6 +24,10 @@ function saveToLocalDbJson(key: string, data: any) {
     console.error(`Failed to sync key "${key}" to local db.json`, error);
   }
 }
+=======
+
+export const dynamic = 'force-dynamic';
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
 // Helper to check if the session is SUPER_ADMIN
 async function checkSuperAdmin() {
@@ -50,6 +55,7 @@ export async function GET() {
       }
     });
 
+<<<<<<< HEAD
     // Auto-update JSON file on successful database read
     try {
       const allUsers = await prisma.user.findMany();
@@ -79,6 +85,11 @@ export async function GET() {
     } catch (e) {
       console.error('Failed to read fallback users:', e);
     }
+=======
+    return NextResponse.json({ success: true, admins });
+  } catch (error: any) {
+    console.error('Failed to get admins:', error);
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ error: 'Gagal memuat data administrator.' }, { status: 500 });
   }
 }
@@ -130,6 +141,7 @@ export async function POST(request: Request) {
       }
     });
 
+<<<<<<< HEAD
     // Sync users and logs to db.json
     try {
       const allUsers = await prisma.user.findMany();
@@ -140,6 +152,8 @@ export async function POST(request: Request) {
       console.error('Failed to sync users/logs to db.json after POST:', e);
     }
 
+=======
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ success: true, admin: { id: newAdmin.id, username: newAdmin.username, role: newAdmin.role, createdAt: (newAdmin as any).createdAt } });
   } catch (error: any) {
     console.error('Failed to create admin:', error);
@@ -218,6 +232,7 @@ export async function PATCH(request: Request) {
       }
     });
 
+<<<<<<< HEAD
     // Sync users and logs to db.json
     try {
       const allUsers = await prisma.user.findMany();
@@ -228,6 +243,8 @@ export async function PATCH(request: Request) {
       console.error('Failed to sync users/logs to db.json after PATCH:', e);
     }
 
+=======
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({
       success: true,
       admin: { id: updatedAdmin.id, username: updatedAdmin.username, role: updatedAdmin.role }
@@ -278,6 +295,7 @@ export async function DELETE(request: Request) {
       }
     });
 
+<<<<<<< HEAD
     // Sync users and logs to db.json
     try {
       const allUsers = await prisma.user.findMany();
@@ -288,6 +306,8 @@ export async function DELETE(request: Request) {
       console.error('Failed to sync users/logs to db.json after DELETE:', e);
     }
 
+=======
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Failed to delete admin:', error);

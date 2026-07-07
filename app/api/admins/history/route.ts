@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+<<<<<<< HEAD
 import fs from 'fs';
 import path from 'path';
 
@@ -22,6 +23,10 @@ function saveToLocalDbJson(key: string, data: any) {
     console.error(`Failed to sync key "${key}" to local db.json`, error);
   }
 }
+=======
+
+export const dynamic = 'force-dynamic';
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
 // Helper to check if the session is SUPER_ADMIN
 async function checkSuperAdmin() {
@@ -46,6 +51,7 @@ export async function GET() {
       }
     });
 
+<<<<<<< HEAD
     // Auto-update JSON file on successful database read
     saveToLocalDbJson('adminLogs', logs);
 
@@ -64,6 +70,11 @@ export async function GET() {
     } catch (e) {
       console.error('Failed to read fallback adminLogs:', e);
     }
+=======
+    return NextResponse.json({ success: true, logs });
+  } catch (error: any) {
+    console.error('Failed to get admin logs:', error);
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ error: 'Gagal memuat riwayat aktivitas.' }, { status: 500 });
   }
 }
@@ -103,6 +114,7 @@ export async function DELETE(request: Request) {
       }
     });
 
+<<<<<<< HEAD
     // Sync all remaining logs to db.json
     try {
       const remainingLogs = await prisma.adminLog.findMany({
@@ -114,6 +126,15 @@ export async function DELETE(request: Request) {
     } catch (e) {
       console.error('Failed to sync admin logs to db.json after deletion:', e);
     }
+=======
+    // Log the logs deletion action itself (meta log)
+    const currentUsername = session.user?.name || 'Super Admin';
+    await prisma.adminLog.create({
+      data: {
+        action: `Super Admin "${currentUsername}" menghapus ${result.count} data riwayat aktivitas admin.`
+      }
+    });
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
     return NextResponse.json({ success: true, count: result.count });
   } catch (error: any) {

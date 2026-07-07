@@ -35,6 +35,10 @@
     "@types/react-dom": "^19",
     "eslint": "9.39.1",
     "eslint-config-next": "16.0.8",
+<<<<<<< HEAD
+=======
+    "potrace": "^2.1.8",
+>>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     "prisma": "^5.22.0",
     "sharp": "^0.35.1",
     "tailwindcss": "4.1.11",
