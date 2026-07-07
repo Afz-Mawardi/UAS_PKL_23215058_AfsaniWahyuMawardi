@@ -18,7 +18,7 @@ import {
   useGallery,
   usePublicServices
 } from '@/lib/data-store';
-import { parseIndonesianDate } from '@/lib/utils';
+import { parseIndonesianDate, sortItemsByDateTime } from '@/lib/utils';
 
 const getFileFormat = (downloadUrl?: string, title?: string): 'pdf' | 'zip' | 'word' | 'unknown' => {
   if (!downloadUrl || downloadUrl === '#' || downloadUrl === '') return 'unknown';
@@ -233,9 +233,7 @@ export default function PublikasiBerandaPage() {
         <div className="space-y-6 max-h-[450px] overflow-y-auto pr-1">
           {/* 1. Berita Tab */}
           {dashboardTab === 'berita' && (() => {
-            const sortedNews = [...news].sort((a, b) => {
-              return getItemTimestamp(b) - getItemTimestamp(a);
-            });
+            const sortedNews = [...news].sort(sortItemsByDateTime);
             const activeItems = sortedNews.filter(item => item.showOnHomepage !== false);
             const inactiveItems = sortedNews.filter(item => item.showOnHomepage === false);
             return (
@@ -314,8 +312,9 @@ export default function PublikasiBerandaPage() {
 
           {/* 2. Galeri Tab */}
           {dashboardTab === 'galeri' && (() => {
-            const activeItems = gallery.filter(item => item.showOnHomepage !== false);
-            const inactiveItems = gallery.filter(item => item.showOnHomepage === false);
+            const sortedGallery = [...gallery].sort(sortItemsByDateTime);
+            const activeItems = sortedGallery.filter(item => item.showOnHomepage !== false);
+            const inactiveItems = sortedGallery.filter(item => item.showOnHomepage === false);
             return (
               <div className="space-y-5">
                 <div className="space-y-2">
@@ -392,9 +391,7 @@ export default function PublikasiBerandaPage() {
 
           {/* 3. Agenda Tab */}
           {dashboardTab === 'agenda' && (() => {
-            const sortedEvents = [...events].sort((a, b) => {
-              return getItemTimestamp(b) - getItemTimestamp(a);
-            });
+            const sortedEvents = [...events].sort(sortItemsByDateTime);
             const activeItems = sortedEvents.filter(item => item.showOnHomepage !== false);
             const inactiveItems = sortedEvents.filter(item => item.showOnHomepage === false);
             return (

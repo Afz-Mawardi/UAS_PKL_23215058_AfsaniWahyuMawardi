@@ -132,7 +132,7 @@ export default function Header() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
   const pathname = usePathname();
-  
+
   // Dynamic external links state
   const [externalLinks, setExternalLinks] = useState<any[]>([]);
 

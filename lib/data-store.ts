@@ -26,9 +26,38 @@ const initialWelcomeMessage = dbData.welcomeMessage as WelcomeMessage;
 const initialHeroSlides = dbData.heroSlides as HeroSlide[];
 const initialPriorityPrograms = dbData.priorityPrograms as PriorityProgram[];
 const initialHomepageSettings = dbData.homepageSettings as unknown as HomepageSettings;
-const initialKepemudaanCards = dbData.kepemudaanCards as BidangCard[];
-const initialOlahragaCards = dbData.olahragaCards as BidangCard[];
-const initialPariwisataCards = dbData.pariwisataCards as BidangCard[];
+// Helper to normalize BidangCard data structures (facilities and details)
+const normalizeBidangCards = (cards: any[]): BidangCard[] => {
+  return (cards || []).map((c: any) => {
+    // 1. Ensure facilities is always a string array
+    let normalizedFacilities: string[] = [];
+    if (Array.isArray(c.facilities)) {
+      normalizedFacilities = c.facilities;
+    } else if (typeof c.facilities === 'string') {
+      normalizedFacilities = c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [];
+    }
+
+    // 2. Reconstruct details array dynamically if it's missing/empty
+    let normalizedDetails = c.details;
+    if (!normalizedDetails || !Array.isArray(normalizedDetails) || normalizedDetails.length === 0) {
+      normalizedDetails = [
+        { value: c.location || '', icon: c.locationIcon || 'MapPin' },
+        { value: c.capacity || c.operationalHours || '', icon: c.capacityIcon || 'Users' },
+        { value: c.price || '', icon: c.priceIcon || 'Ticket' }
+      ].filter(d => d.value.trim() !== '');
+    }
+
+    return {
+      ...c,
+      facilities: normalizedFacilities,
+      details: normalizedDetails
+    };
+  });
+};
+
+const initialKepemudaanCards = normalizeBidangCards(dbData.kepemudaanCards);
+const initialOlahragaCards = normalizeBidangCards(dbData.olahragaCards);
+const initialPariwisataCards = normalizeBidangCards(dbData.pariwisataCards);
 const initialRetribusi = dbData.retribusi as Retribusi[];
 
 export interface BidangBottomCard {
@@ -386,17 +415,9 @@ const syncWithServer = async (force = false) => {
       const res = await fetch('/api/data', { cache: 'no-store' });
       if (res.ok) {
         const db = await res.json();
-        
+
         // Check if database connection failed and fell back to db.json
-        if (db.isFallback) {
-          const isAdmin = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
-          if (isAdmin) {
-            localStorage.removeItem('disporapar_admin_login_time');
-            localStorage.removeItem('disporapar_admin_last_activity');
-            signOut({ callbackUrl: '/login.admin?reason=db_error' });
-            return;
-          }
-        }
+
 
         if (db.news) localStorage.setItem('disporapar_news', JSON.stringify(db.news));
         if (db.events) localStorage.setItem('disporapar_events', JSON.stringify(db.events));
@@ -415,7 +436,7 @@ const syncWithServer = async (force = false) => {
         if (db.retribusi) localStorage.setItem('disporapar_retribusi', JSON.stringify(db.retribusi));
 
         isSyncedGlobal = true;
-        
+
         // Dispatch update to sync all states
         window.dispatchEvent(new Event('disporapar_data_update'));
 
@@ -442,9 +463,9 @@ function useDataStore<T>(
 
   useEffect(() => {
     setData(getStored());
-    
+
     if (isClient) {
-      const isAdmin = window.location.pathname.startsWith('/admin');
+      const isAdmin = window.location.pathname.startsWith('/login.admin');
       if (isAdmin && !adminSyncedGlobal) {
         adminSyncedGlobal = true;
         syncWithServer(true);
@@ -452,7 +473,7 @@ function useDataStore<T>(
         syncWithServer();
       }
     }
-    
+
     const handleUpdate = () => {
       setData(getStored());
     };
@@ -562,7 +583,7 @@ export const getStoredKepemudaanCards = (): BidangCard[] => {
     const stored = localStorage.getItem('disporapar_kepemudaan_cards');
     if (!stored || stored === 'null' || stored === 'undefined') return initialKepemudaanCards;
     const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : initialKepemudaanCards;
+    return Array.isArray(parsed) ? normalizeBidangCards(parsed) : initialKepemudaanCards;
   } catch (e) {
     console.error('Error reading disporapar_kepemudaan_cards', e);
     return initialKepemudaanCards;
@@ -602,7 +623,7 @@ export const getStoredOlahragaCards = (): BidangCard[] => {
     const stored = localStorage.getItem('disporapar_olahraga_cards');
     if (!stored || stored === 'null' || stored === 'undefined') return initialOlahragaCards;
     const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : initialOlahragaCards;
+    return Array.isArray(parsed) ? normalizeBidangCards(parsed) : initialOlahragaCards;
   } catch (e) {
     console.error('Error reading disporapar_olahraga_cards', e);
     return initialOlahragaCards;
@@ -642,7 +663,7 @@ export const getStoredPariwisataCards = (): BidangCard[] => {
     const stored = localStorage.getItem('disporapar_pariwisata_cards');
     if (!stored || stored === 'null' || stored === 'undefined') return initialPariwisataCards;
     const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : initialPariwisataCards;
+    return Array.isArray(parsed) ? normalizeBidangCards(parsed) : initialPariwisataCards;
   } catch (e) {
     console.error('Error reading disporapar_pariwisata_cards', e);
     return initialPariwisataCards;

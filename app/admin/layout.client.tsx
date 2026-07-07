@@ -469,7 +469,7 @@ export default function AdminLayoutClient({
             <div className="flex-grow">{children}</div>
 
             {/* Admin Footer */}
-            <footer className="mt-8 pt-2 border-t border-slate-200 text-center shrink-0">
+            <footer className="mt-8 pt-4 border-t border-slate-300 text-center shrink-0">
               <p className="text-[10px] font-mono text-slate-400">
                 Copyright &copy; {new Date().getFullYear()} DISPORAPAR Kota Tegal &bull; Developed by Afz-ysx
               </p>

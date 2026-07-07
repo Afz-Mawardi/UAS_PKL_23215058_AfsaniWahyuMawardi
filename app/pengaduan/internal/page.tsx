@@ -31,8 +31,8 @@ const convertImageToWebP = (file: File): Promise<string> => {
           return;
         }
         ctx.drawImage(img, 0, 0);
-        // Convert to WebP base64 with 0.82 quality
-        const webpBase64 = canvas.toDataURL('image/webp', 0.82);
+        // Convert to WebP base64 with 0.80 quality
+        const webpBase64 = canvas.toDataURL('image/webp', 0.80);
         resolve(webpBase64);
       };
       img.onerror = () => {
@@ -91,9 +91,9 @@ export default function PengaduanInternalPage() {
   const processFile = (file: File | undefined) => {
     if (!file) return;
 
-    // Check size limit: 1MB
-    if (file.size > 1 * 1024 * 1024) {
-      showNotification('Ukuran berkas melebihi batas maksimal 1MB.', 'error');
+    // Check size limit: 3MB
+    if (file.size > 3 * 1024 * 1024) {
+      showNotification('Ukuran berkas melebihi batas maksimal 3MB.', 'error');
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -249,26 +249,23 @@ export default function PengaduanInternalPage() {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center cursor-default"
+              className="bg-white rounded-3xl p-8 max-w-md w-full border border-slate-100 shadow-2xl text-center space-y-5 animate-scale-in"
             >
-              <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mb-5">
-                <CheckCircle className="w-10 h-10" />
+              <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
+                <CheckCircle className="w-8 h-8 text-emerald-600 animate-bounce" />
               </div>
-
-              <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                Terima Kasih!
-              </h3>
-
-              <p className="text-sm text-slate-500 font-inter font-light mt-3 leading-relaxed">
-                Pengaduan Anda berhasil dikirim dan akan segera ditindaklanjuti.
-              </p>
-
+              <div className="space-y-1.5">
+                <h3 className="text-lg font-black text-slate-800 uppercase tracking-wider font-mono">Pengaduan Terkirim</h3>
+                <p className="text-slate-500 text-xs leading-relaxed font-medium">
+                  Terima kasih atas laporan Anda. Pengaduan Anda telah berhasil kami terima untuk segera diproses lebih lanjut.
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowSuccessModal(false)}
-                className="mt-6 w-full py-2.5 bg-[#0E3B66] hover:bg-[#0c355c] active:bg-[#0a2c4e] text-white font-bold rounded-xl transition-colors cursor-pointer text-xs uppercase tracking-wider font-mono shadow-md"
+                className="w-full py-3 bg-accent hover:bg-orange-500 text-white text-xs font-mono font-extrabold uppercase tracking-widest rounded-xl transition-all shadow-md"
               >
-                Tutup
+                Tutup Halaman
               </button>
             </div>
           </div>
@@ -277,7 +274,6 @@ export default function PengaduanInternalPage() {
         {/* Form Card */}
         <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-10 lg:p-12 shadow-sm mb-6 transition-all duration-300">
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
-
             {/* Judul Pengaduan */}
             <div className="space-y-2">
               <label htmlFor="title" className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono flex items-center gap-1.5">
@@ -332,12 +328,12 @@ export default function PengaduanInternalPage() {
                   <Upload className="w-8 h-8 text-slate-400 animate-pulse" />
                   <div className="space-y-1">
                     <p className="text-xs font-bold text-slate-700">Tarik gambar ke sini, atau klik untuk memilih</p>
-                    <p className="text-[10px] text-slate-400 font-mono">Format: JPG, JPEG, PNG • Maksimal 1MB</p>
+                    <p className="text-[10px] text-slate-400 font-mono">Format: WEBP, PNG, JPG, JPEG • Maksimal 3MB</p>
                   </div>
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/png, image/jpeg, image/jpg"
+                    accept="image/png, image/jpeg, image/jpg, image/webp"
                     onChange={handleFileChange}
                     disabled={isSubmitting}
                     className="hidden"

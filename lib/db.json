@@ -52,12 +52,12 @@
   "events": [
     {
       "id": "e-1",
-      "title": "Tegal Pesisir Fun Run 10K",
+      "title": "Tegal Pesisir Fun Run 5K",
       "date": "14 Juni 2026",
       "time": "06:00 - 09:30 WIB",
       "location": "Start-Finish di Pantai Alam Indah (PAI)",
       "description": "Lari santai menyusuri indahnya garis pantai utara Kota Tegal dengan target 2.000 pelari dari seluruh Jawa Tengah. Berhadiah total Rp 50 Juta dan hiburan musik lokal.",
-      "imageUrl": "https://picsum.photos/seed/fun_run/800/600",
+      "imageUrl": "",
       "showOnHomepage": true
     },
     {
@@ -159,21 +159,30 @@
   ],
   "services": [
     {
-      "id": "s-9",
-      "title": "Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan",
-      "description": "Formulir basis data sertifikasi kurasi produk kriya, batik Tegalan, logam, dan makanan khas untuk event pameran daerah.",
-      "category": "Berkas Layanan",
-      "downloadUrl": "/uploads/dokumen/1781977188734_souvenir.pdf",
-      "fileSize": "190 KB",
+      "id": "s-1",
+      "title": "SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)",
+      "description": "Panduan tata cara penyewaan sarana prasarana olahraga milik daerah untuk kegiatan olahraga maupun luar olahraga.",
+      "category": "SOP",
+      "downloadUrl": "/uploads/dokumen/1781977938236_Strategi_responden_IPP.zip",
+      "fileSize": "16 KB",
       "showOnHomepage": true
     },
     {
-      "id": "s-7",
-      "title": "Formulir Pengajuan Stimulus Sarana Prasarana Klub Olahraga Masyarakat",
-      "description": "Formulir administrasi usulan bantuan bola, net, rompi, dan perbaikan sarana olahraga tingkat RW binaan dinas.",
+      "id": "s-10",
+      "title": "Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)",
+      "description": "Pendaftaran berkas seleksi delegasi pemuda andalan Kota Tegal ke tingkat provinsi untuk dikirim ke kancah global.",
       "category": "Formulir",
+      "downloadUrl": "/uploads/dokumen/1781977908230_wmp.docx",
+      "fileSize": "934 KB",
+      "showOnHomepage": true
+    },
+    {
+      "id": "s-3",
+      "title": "Berkas Layanan Rekomendasi Tanda Daftar Usaha Pariwisata (TDUP)",
+      "description": "Persyaratan lengkap, durasi penyelesaian, dan jaminan keamanan penerbitan rekomendasi teknis pariwisata.",
+      "category": "Berkas Layanan",
       "downloadUrl": "#",
-      "fileSize": "380 KB",
+      "fileSize": "1.8 MB",
       "showOnHomepage": false
     },
     {
@@ -186,30 +195,21 @@
       "showOnHomepage": false
     },
     {
-      "id": "s-3",
-      "title": "Berkas Layanan Rekomendasi Tanda Daftar Usaha Pariwisata (TDUP)",
-      "description": "Persyaratan lengkap, durasi penyelesaian, dan jaminan keamanan penerbitan rekomendasi teknis pariwisata.",
-      "category": "Berkas Layanan",
+      "id": "s-7",
+      "title": "Formulir Pengajuan Stimulus Sarana Prasarana Klub Olahraga Masyarakat",
+      "description": "Formulir administrasi usulan bantuan bola, net, rompi, dan perbaikan sarana olahraga tingkat RW binaan dinas.",
+      "category": "Formulir",
       "downloadUrl": "#",
-      "fileSize": "1.8 MB",
+      "fileSize": "380 KB",
       "showOnHomepage": false
     },
     {
-      "id": "s-10",
-      "title": "Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)",
-      "description": "Pendaftaran berkas seleksi delegasi pemuda andalan Kota Tegal ke tingkat provinsi untuk dikirim ke kancah global.",
-      "category": "Formulir",
-      "downloadUrl": "/uploads/dokumen/1781977908230_wmp.docx",
-      "fileSize": "934 KB",
-      "showOnHomepage": true
-    },
-    {
-      "id": "s-1",
-      "title": "SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)",
-      "description": "Panduan tata cara penyewaan sarana prasarana olahraga milik daerah untuk kegiatan olahraga maupun luar olahraga.",
-      "category": "SOP",
-      "downloadUrl": "/uploads/dokumen/1781977938236_Strategi_responden_IPP.zip",
-      "fileSize": "16 KB",
+      "id": "s-9",
+      "title": "Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan",
+      "description": "Formulir basis data sertifikasi kurasi produk kriya, batik Tegalan, logam, dan makanan khas untuk event pameran daerah.",
+      "category": "Berkas Layanan",
+      "downloadUrl": "/uploads/dokumen/1781977188734_souvenir.pdf",
+      "fileSize": "190 KB",
       "showOnHomepage": true
     }
   ],
@@ -356,19 +356,19 @@
       "stats": [
         {
           "label": "Destinasi Wisata",
-          "value": "15+"
+          "value": "4+"
         },
         {
           "label": "Event Tahunan",
-          "value": "40+"
+          "value": "5+"
         },
         {
           "label": "Komunitas Pemuda",
           "value": "25+"
         },
         {
-          "label": "Cabang Olahraga Binaan",
-          "value": "10+"
+          "label": "Cabang Olahraga",
+          "value": "6+"
         }
       ],
       "title": "Membangun Tegal Bersama DISPORAPAR",
@@ -502,40 +502,6 @@
   ],
   "kepemudaanCards": [
     {
-      "id": "kc-1",
-      "title": "Bumi Perkemahan Pramuka Martoloyo",
-      "description": "Area perkemahan yang representatif dan asri untuk kegiatan luar ruangan gerakan pramuka, latihan kepemimpinan pemuda, serta outbound umum dengan fasilitas air bersih dan keamanan terjaga.",
-      "location": "Mintaragen, Tegal Timur, Kota Tegal",
-      "capacity": "1.500 Peserta",
-      "price": "Rp 150.000 / Hari",
-      "facilities": [
-        "Area Tenda Luas",
-        "MCK Bersih",
-        "Pendopo Utama",
-        "Akses Air Bersih",
-        "Pos Keamanan"
-      ],
-      "imageUrl": "https://picsum.photos/seed/bumi_perkemahan/800/600",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Users",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Mintaragen, Tegal Timur, Kota Tegal",
-          "icon": "MapPin"
-        },
-        {
-          "value": "1.500 Peserta",
-          "icon": "Users"
-        },
-        {
-          "value": "Rp 150.000 / Hari",
-          "icon": "Ticket"
-        }
-      ]
-    },
-    {
       "id": "kc-2",
       "title": "Gedung Serbaguna Kepemudaan (GSG)",
       "description": "Gedung pertemuan indoor untuk kegiatan organisasi kepemudaan, pentas seni, seminar, rapat pleno, dan pameran kreativitas wirausaha muda Kota Tegal.",
@@ -550,24 +516,24 @@
         "Area Parkir"
       ],
       "imageUrl": "https://picsum.photos/seed/gedung_pemuda/800/600",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Users",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Kejambon, Tegal Timur, Kota Tegal",
-          "icon": "MapPin"
-        },
-        {
-          "value": "500 Kursi",
-          "icon": "Users"
-        },
-        {
-          "value": "Rp 100.000 / Jam",
-          "icon": "Ticket"
-        }
-      ]
+      "createdAt": "2026-06-25T07:05:57.092Z"
+    },
+    {
+      "id": "kc-1",
+      "title": "Bumi Perkemahan Pramuka Martoloyo",
+      "description": "Area perkemahan yang representatif dan asri untuk kegiatan luar ruangan gerakan pramuka, latihan kepemimpinan pemuda, serta outbound umum dengan fasilitas air bersih dan keamanan terjaga.",
+      "location": "Mintaragen, Tegal Timur, Kota Tegal",
+      "capacity": "1.500 Peserta",
+      "price": "Rp 150.000 / Hari",
+      "facilities": [
+        "Area Tenda Luas",
+        "MCK Bersih",
+        "Pendopo Utama",
+        "Akses Air Bersih",
+        "Pos Keamanan"
+      ],
+      "imageUrl": "https://picsum.photos/seed/bumi_perkemahan/800/600",
+      "createdAt": "2026-06-25T07:05:58.092Z"
     },
     {
       "id": "kc-3",
@@ -584,24 +550,7 @@
         "Whiteboard"
       ],
       "imageUrl": "https://picsum.photos/seed/creative_hub_room/800/600",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Users",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Slerok, Tegal Timur, Kota Tegal",
-          "icon": "MapPin"
-        },
-        {
-          "value": "50 Orang",
-          "icon": "Users"
-        },
-        {
-          "value": "Gratis (Bagi Organisasi Binaan)",
-          "icon": "Ticket"
-        }
-      ]
+      "createdAt": "2026-06-25T07:05:59.092Z"
     }
   ],
   "olahragaCards": [
@@ -612,32 +561,9 @@
       "location": "Jl. Melati, Kejambon, Tegal Timur",
       "capacity": "15.000 Penonton",
       "price": "Rp 250.000 / Jam",
-      "facilities": [
-        "Lap. Rumput Alami",
-        "Lintasan Atletik",
-        "Tribun Penonton",
-        "Lampu Penerangan",
-        "Area Parkir Luas"
-      ],
+      "facilities": "Lap. Rumput Alami, Lintasan Atletik, Tribun Penonton, Lampu Penerangan, Area Parkir Luas",
       "imageUrl": "https://picsum.photos/seed/stadion_yos_sudarso/800/600",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Users",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Jl. Melati, Kejambon, Tegal Timur",
-          "icon": "MapPin"
-        },
-        {
-          "value": "15.000 Penonton",
-          "icon": "Users"
-        },
-        {
-          "value": "Rp 250.000 / Jam",
-          "icon": "Ticket"
-        }
-      ]
+      "createdAt": "2026-06-25T08:02:15.098Z"
     },
     {
       "id": "oc-2",
@@ -646,32 +572,9 @@
       "location": "Slerok, Tegal Timur, Kota Tegal",
       "capacity": "2.500 Penonton",
       "price": "Rp 75.000 / Jam",
-      "facilities": [
-        "Lapangan Futsal",
-        "Lapangan Badminton",
-        "Ring Basket",
-        "Tribun Indoor",
-        "Toilet & Ruang Ganti"
-      ],
+      "facilities": "Lapangan Futsal, Lapangan Badminton, Ring Basket, Tribun Indoor, Toilet & Ruang Ganti",
       "imageUrl": "https://picsum.photos/seed/gor_wisanggeni/800/600",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Users",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Slerok, Tegal Timur, Kota Tegal",
-          "icon": "MapPin"
-        },
-        {
-          "value": "2.500 Penonton",
-          "icon": "Users"
-        },
-        {
-          "value": "Rp 75.000 / Jam",
-          "icon": "Ticket"
-        }
-      ]
+      "createdAt": "2026-06-25T08:02:16.098Z"
     },
     {
       "id": "oc-3",
@@ -680,32 +583,9 @@
       "location": "Kawasan Wisata PAI, Mintaragen",
       "capacity": "1.000 Pengunjung",
       "price": "Rp 15.000 / Orang",
-      "facilities": [
-        "Kolam Olympic Standard",
-        "Kolam Anak",
-        "Area Bilas Modern",
-        "Tribun Penonton",
-        "Kios Makanan"
-      ],
+      "facilities": "Kolam Olympic Standard, Kolam Anak, Area Bilas Modern, Tribun Penonton, Kios Makanan",
       "imageUrl": "https://picsum.photos/seed/kolam_renang_bahari/800/600",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Users",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Kawasan Wisata PAI, Mintaragen",
-          "icon": "MapPin"
-        },
-        {
-          "value": "1.000 Pengunjung",
-          "icon": "Users"
-        },
-        {
-          "value": "Rp 15.000 / Orang",
-          "icon": "Ticket"
-        }
-      ]
+      "createdAt": "2026-06-25T08:02:17.098Z"
     }
   ],
   "pariwisataCards": [
@@ -714,110 +594,40 @@
       "title": "Pantai Alam Indah (PAI)",
       "description": "Icon pariwisata bahari Kota Tegal dengan pasir putih, hutan mangrove yang asri, dermaga apung yang modern, sunset menawan, serta Monumen Bahari TNI AL yang memajang kendaraan tempur bersejarah asli.",
       "location": "Mintaragen, Tegal Timur, Kota Tegal",
-      "capacity": "05:00 - 21:00 WIB",
+      "operationalHours": "05:00 - 21:00 WIB",
       "price": "Rp 5.000 (Anak) / Rp 10.000 (Dewasa)",
-      "facilities": [
-        "Area Bermain",
-        "Hutan Mangrove",
-        "Dermaga Apung",
-        "Monumen Alutsista",
-        "Food Court Kuliner Khas",
-        "Mushola & Toilet"
-      ],
+      "facilities": "Area Bermain, Hutan Mangrove, Dermaga Apung, Monumen Alutsista, Food Court Kuliner Khas, Mushola & Toilet",
       "imageUrl": "https://picsum.photos/seed/pantai_alam_indah/1200/800",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Clock",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Mintaragen, Tegal Timur, Kota Tegal",
-          "icon": "MapPin"
-        },
-        {
-          "value": "05:00 - 21:00 WIB",
-          "icon": "Clock"
-        },
-        {
-          "value": "Rp 5.000 (Anak) / Rp 10.000 (Dewasa)",
-          "icon": "Ticket"
-        }
-      ]
+      "createdAt": "2026-06-25T08:06:32.673Z"
     },
     {
       "id": "pc-2",
       "title": "Pantai Pulau Kodok",
       "description": "Pantai yang terkenal dengan suasana sejuk berkat rindangnya cemara laut dan memiliki terapi air laut alami bagi wisatawan. Destinasi favorit keluarga dan komunitas di pesisir Tegal.",
       "location": "Panggung, Tegal Timur, Kota Tegal",
-      "capacity": "05:00 - 18:00 WIB",
+      "operationalHours": "05:00 - 18:00 WIB",
       "price": "Rp 3.000",
-      "facilities": [
-        "Kios Teh Poci",
-        "Gazebo Pantai",
-        "Area Terapi Air",
-        "Panggung Hiburan",
-        "Spot Foto Instagramable"
-      ],
+      "facilities": "Kios Teh Poci, Gazebo Pantai, Area Terapi Air, Panggung Hiburan, Spot Foto Instagramable",
       "imageUrl": "https://picsum.photos/seed/pulau_kodok/1200/800",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Clock",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Panggung, Tegal Timur, Kota Tegal",
-          "icon": "MapPin"
-        },
-        {
-          "value": "05:00 - 18:00 WIB",
-          "icon": "Clock"
-        },
-        {
-          "value": "Rp 3.000",
-          "icon": "Ticket"
-        }
-      ]
+      "createdAt": "2026-06-25T08:06:33.673Z"
     },
     {
       "id": "pc-3",
       "title": "Alun-Alun Kota Tegal & Taman Pancasila",
       "description": "Kawasan pusat kota yang terintegrasi indah dengan Masjid Agung Tegal, Gedung Birao (SCS) peninggalan kolonial bersejarah, dan Menara Air peninggalan Belanda. Dilengkapi dancing fountain dan pedestrian ramah pejalan kaki.",
       "location": "Mangkukusuman, Tegal Timur, Kota Tegal",
-      "capacity": "Buka 24 Jam",
+      "operationalHours": "Buka 24 Jam",
       "price": "Gratis",
-      "facilities": [
-        "Pedestrian Edukatif",
-        "Taman Pancasila",
-        "Lokomotif Antik Kereta Api",
-        "Kawasan Kuliner",
-        "Gedung SCS Kolonial"
-      ],
+      "facilities": "Pedestrian Edukatif, Taman Pancasila, Lokomotif Antik Kereta Api, Kawasan Kuliner, Gedung SCS Kolonial",
       "imageUrl": "https://picsum.photos/seed/alun_alun_tegal/1200/800",
-      "locationIcon": "MapPin",
-      "capacityIcon": "Clock",
-      "priceIcon": "Ticket",
-      "facilitiesTitle": "Fasilitas Area",
-      "details": [
-        {
-          "value": "Mangkukusuman, Tegal Timur, Kota Tegal",
-          "icon": "MapPin"
-        },
-        {
-          "value": "Buka 24 Jam",
-          "icon": "Clock"
-        },
-        {
-          "value": "Gratis",
-          "icon": "Ticket"
-        }
-      ]
+      "createdAt": "2026-06-25T08:06:34.673Z"
     }
   ],
   "externalLinks": [
     {
       "id": "lapor",
       "title": "SP4N-LAPOR!",
-      "url": "https://lapor.go.id/"
+      "url": "https://lapor.go.id"
     },
     {
       "id": "laporgub",
@@ -831,6 +641,56 @@
     }
   ],
   "complaints": [
+    {
+      "id": "6d41548c-d0f4-45e8-8ba7-0cc04ca04793",
+      "title": "ddddsg",
+      "content": "gdrgdgfdxg",
+      "imageUrl": "/uploads/pengaduan/1782370940204_a3cd877a-15df-4cd8-84da-79ea552b598b.webp",
+      "contact": "123456",
+      "status": "Baru",
+      "notes": "",
+      "createdAt": "2026-06-25T07:02:20.338Z"
+    },
+    {
+      "id": "37fa0cd5-3039-4118-8ff0-2145da7a9757",
+      "title": "as",
+      "content": "ad",
+      "imageUrl": "/uploads/pengaduan/1782370854989_0af446e7-1050-4c5c-991b-015bfcb09f34.webp",
+      "contact": "124",
+      "status": "Baru",
+      "notes": "",
+      "createdAt": "2026-06-25T07:00:55.150Z"
+    },
+    {
+      "id": "e0404293-7d64-419c-b1df-0b9e83df331c",
+      "title": "jpg",
+      "content": "jpgg",
+      "imageUrl": "/uploads/pengaduan/1782370834889_ce10bfa8-2acc-4198-87bb-e44db8055677.webp",
+      "contact": "asa",
+      "status": "Baru",
+      "notes": "",
+      "createdAt": "2026-06-25T07:00:35.037Z"
+    },
+    {
+      "id": "cc8dbce9-e012-4859-aba8-d596f14e5ac6",
+      "title": "wdfuic",
+      "content": "ascvkajc",
+      "imageUrl": "/uploads/pengaduan/1782370811763_e40d70f4-b777-44d6-a173-da577027ca56.webp",
+      "contact": "90987654",
+      "status": "Baru",
+      "notes": "",
+      "createdAt": "2026-06-25T07:00:11.894Z"
+    },
+    {
+      "id": "658d7bd1-6e80-4db0-9ce4-222305ec2770",
+      "title": "PAI Bayarnya mahal",
+      "content": "pak kenapa sih sekarang PAI bayarnya mahal??",
+      "imageUrl": "",
+      "contact": "089897",
+      "status": "Baru",
+      "notes": "",
+      "createdAt": "2026-06-25T06:58:23.761Z"
+    },
     {
       "id": "314b9e3f-6691-49cf-bd19-3dafbaabc5dd",
       "title": "as",
@@ -852,5 +712,447 @@
       "createdAt": "2026-06-24T15:30:37.455Z"
     }
   ],
-  "adminLogs": []
+  "adminLogs": [
+    {
+      "id": "1d102b95-ec68-4478-8078-93bd1e4e2934",
+      "action": "{\"waktu\":\"2026-06-25T12:26:11.065Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/admins\",\"aksi\":\"Update Admin: admin (password diperbarui (Argon2))\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T12:26:11.066Z"
+    },
+    {
+      "id": "452a5f91-624f-49f9-8127-5cfb4a4909d4",
+      "action": "{\"waktu\":\"2026-06-25T12:25:51.323Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T12:25:51.324Z"
+    },
+    {
+      "id": "e9cb6a57-1431-4760-903b-eef836258237",
+      "action": "{\"waktu\":\"2026-06-25T12:25:38.323Z\",\"user\":\"admin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T12:25:38.324Z"
+    },
+    {
+      "id": "0f8b0f17-5ee9-41a0-90c4-94cc00b4df83",
+      "action": "{\"waktu\":\"2026-06-25T12:25:25.565Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T12:25:25.566Z"
+    },
+    {
+      "id": "534c40ed-c875-4449-a350-a94d93bbaaa2",
+      "action": "{\"waktu\":\"2026-06-25T12:25:25.557Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Password Migration to Argon2\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T12:25:25.559Z"
+    },
+    {
+      "id": "94b65cd5-487a-42df-9c4a-296091326b54",
+      "action": "{\"waktu\":\"2026-06-25T12:24:47.590Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
+      "createdAt": "2026-06-25T12:24:47.593Z"
+    },
+    {
+      "id": "5c3f3bfe-1949-4257-bfad-eb5b2feabd89",
+      "action": "{\"waktu\":\"2026-06-25T12:24:39.998Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
+      "createdAt": "2026-06-25T12:24:40.001Z"
+    },
+    {
+      "id": "5370e4a7-255b-4b8b-a1e7-1980d83fa8b9",
+      "action": "{\"waktu\":\"2026-06-25T12:24:27.709Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
+      "createdAt": "2026-06-25T12:24:27.712Z"
+    },
+    {
+      "id": "606c6271-02f5-4593-9b82-75a89ec7ceb8",
+      "action": "{\"waktu\":\"2026-06-25T09:12:08.341Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T09:12:08.351Z"
+    },
+    {
+      "id": "685f89a9-7782-46da-8965-c1e1b3361caf",
+      "action": "{\"waktu\":\"2026-06-25T09:11:38.478Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T09:11:38.481Z"
+    },
+    {
+      "id": "3525efb0-f4d6-4c99-969b-7138a4cbca43",
+      "action": "{\"waktu\":\"2026-06-25T09:11:04.744Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782378664730_cdd0aba1-0935-4a59-ba55-9c2b5804a184.webp\",\"size\":58460}",
+      "createdAt": "2026-06-25T09:11:04.751Z"
+    },
+    {
+      "id": "781c6d8e-3c6a-426d-9b23-8cbac30c6726",
+      "action": "{\"waktu\":\"2026-06-25T09:07:47.114Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782378467111_605d2e86-9ac1-467e-8148-2752b123be84.webp\",\"size\":58460}",
+      "createdAt": "2026-06-25T09:07:47.118Z"
+    },
+    {
+      "id": "31297d53-f8f3-463f-a55f-6c54c89be0e8",
+      "action": "{\"waktu\":\"2026-06-25T09:05:53.754Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782378353750_0fbb179f-72b6-494d-ab5f-d363ec14632e.webp\",\"size\":147570}",
+      "createdAt": "2026-06-25T09:05:53.759Z"
+    },
+    {
+      "id": "8a53fdf9-87cc-45a0-8591-aeae7f1a91f7",
+      "action": "{\"waktu\":\"2026-06-25T09:05:29.571Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782378329566_94a501da-9e99-41a1-a4f5-1c7d254717a6.webp\",\"size\":58460}",
+      "createdAt": "2026-06-25T09:05:29.584Z"
+    },
+    {
+      "id": "4f9eb584-f44e-43f3-83ea-977000fdc6fa",
+      "action": "{\"waktu\":\"2026-06-25T08:52:17.839Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:52:17.842Z"
+    },
+    {
+      "id": "7117f715-209e-45a5-aa93-540f6716cd92",
+      "action": "{\"waktu\":\"2026-06-25T08:44:56.694Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:44:56.697Z"
+    },
+    {
+      "id": "2cfdf7cd-9b5f-4a91-8c5c-f5f3805702be",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)\" (ditampilkan di beranda).",
+      "createdAt": "2026-06-25T08:44:56.627Z"
+    },
+    {
+      "id": "edb25d67-fdfe-4144-9c72-51ac2e702253",
+      "action": "{\"waktu\":\"2026-06-25T08:44:51.519Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:44:51.522Z"
+    },
+    {
+      "id": "353ba1b0-6a93-499f-bffc-c34e70e10309",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan\" (ditampilkan di beranda).",
+      "createdAt": "2026-06-25T08:44:51.477Z"
+    },
+    {
+      "id": "e13ba9ae-ddfc-4036-9c6f-8b04980c702b",
+      "action": "{\"waktu\":\"2026-06-25T08:44:46.452Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:44:46.455Z"
+    },
+    {
+      "id": "eb76b112-1455-45bc-adc4-90452da37405",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (ditampilkan di beranda).",
+      "createdAt": "2026-06-25T08:44:46.410Z"
+    },
+    {
+      "id": "a00cc65e-7cd9-41fd-949d-59148a02ab00",
+      "action": "{\"waktu\":\"2026-06-25T08:44:37.452Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:44:37.456Z"
+    },
+    {
+      "id": "1d9ce97c-a930-42a8-9a80-dcfecedd0e82",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (disembunyikan dari beranda).",
+      "createdAt": "2026-06-25T08:44:37.255Z"
+    },
+    {
+      "id": "bbe69a3d-1c5d-4237-ad2c-4de0e7179abf",
+      "action": "{\"waktu\":\"2026-06-25T08:44:33.158Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:44:33.161Z"
+    },
+    {
+      "id": "95841a0c-cf1e-4013-a56d-ce697ec45d16",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)\" (disembunyikan dari beranda).",
+      "createdAt": "2026-06-25T08:44:33.084Z"
+    },
+    {
+      "id": "cf6f8fc2-8803-4020-8c1f-db5512fa2121",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (ditampilkan di beranda).",
+      "createdAt": "2026-06-25T08:44:32.946Z"
+    },
+    {
+      "id": "cc001b8d-b76c-43f0-b6b8-751f787193ed",
+      "action": "{\"waktu\":\"2026-06-25T08:44:28.914Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:44:28.917Z"
+    },
+    {
+      "id": "8308e55e-2fa4-46b3-931c-3d6f7d7a8f04",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (disembunyikan dari beranda).",
+      "createdAt": "2026-06-25T08:44:28.836Z"
+    },
+    {
+      "id": "d89a8fb0-f8ee-4954-afd5-6b285e23fad4",
+      "action": "{\"waktu\":\"2026-06-25T08:44:24.164Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:44:24.167Z"
+    },
+    {
+      "id": "0541b8ff-2a99-4fbe-a02c-b4bf932f4d41",
+      "action": "{\"waktu\":\"2026-06-25T08:44:24.122Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:44:24.126Z"
+    },
+    {
+      "id": "098b89f5-37e4-4be3-9591-58623db2940a",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan\" (disembunyikan dari beranda).",
+      "createdAt": "2026-06-25T08:44:24.064Z"
+    },
+    {
+      "id": "63aae7a8-fdb6-4c99-93bc-8aec2db196a8",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan\" (disembunyikan dari beranda).",
+      "createdAt": "2026-06-25T08:44:24.062Z"
+    },
+    {
+      "id": "262ce025-00d1-476d-92ef-156a5c456356",
+      "action": "{\"waktu\":\"2026-06-25T08:36:05.597Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:36:05.602Z"
+    },
+    {
+      "id": "ed87d18f-893c-4342-9e49-c5a6c53d0468",
+      "action": "Super Admin \"superadmin\" menghapus berkas dokumen \"zca,\".",
+      "createdAt": "2026-06-25T08:36:05.545Z"
+    },
+    {
+      "id": "97ef95b5-2bba-4a1d-bb59-363c5cc69126",
+      "action": "{\"waktu\":\"2026-06-25T08:36:00.156Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:36:00.160Z"
+    },
+    {
+      "id": "91590e52-f043-47b7-a03a-a172bfb6b719",
+      "action": "Super Admin \"superadmin\" menghapus berkas dokumen \"jkas\".",
+      "createdAt": "2026-06-25T08:36:00.109Z"
+    },
+    {
+      "id": "3d66c8ee-e10b-464f-aab3-0e1f77fbf1e8",
+      "action": "{\"waktu\":\"2026-06-25T08:35:50.638Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:35:50.642Z"
+    },
+    {
+      "id": "887f93ea-144e-4629-b73e-fa0ed59c62d0",
+      "action": "Super Admin \"superadmin\" menambahkan berkas dokumen baru \"jkas\".",
+      "createdAt": "2026-06-25T08:35:50.579Z"
+    },
+    {
+      "id": "188d7caf-f718-4d76-b8bc-3d245ded3d68",
+      "action": "{\"waktu\":\"2026-06-25T08:35:42.583Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:35:42.587Z"
+    },
+    {
+      "id": "a92749b4-3ae4-444f-81ca-2baefab98a73",
+      "action": "Super Admin \"superadmin\" menambahkan berkas dokumen baru \"zca,\".",
+      "createdAt": "2026-06-25T08:35:42.541Z"
+    },
+    {
+      "id": "850c8bda-5069-44c2-9645-667ac5e566d8",
+      "action": "{\"waktu\":\"2026-06-25T08:33:25.508Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:33:25.522Z"
+    },
+    {
+      "id": "af9de8ba-adfe-4268-b60e-c0b63a2aafd3",
+      "action": "{\"waktu\":\"2026-06-25T08:33:06.673Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:33:06.677Z"
+    },
+    {
+      "id": "29ef7b2c-bc11-4470-9174-c1099fc29de0",
+      "action": "{\"waktu\":\"2026-06-25T08:33:02.031Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:33:02.035Z"
+    },
+    {
+      "id": "9fef2f49-b1a7-4be8-83ea-da98454323d2",
+      "action": "{\"waktu\":\"2026-06-25T08:32:55.980Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:32:55.983Z"
+    },
+    {
+      "id": "16b7a60d-f8f4-4a6f-8d36-cebf72593c1a",
+      "action": "{\"waktu\":\"2026-06-25T08:16:35.645Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:16:35.649Z"
+    },
+    {
+      "id": "1707983d-4c41-42a5-ae83-bcf360e89ec3",
+      "action": "Super Admin \"superadmin\" menghapus berkas dokumen \"caoca\".",
+      "createdAt": "2026-06-25T08:16:35.596Z"
+    },
+    {
+      "id": "4e833f2b-711d-4ece-b752-1d4c76dfe6fd",
+      "action": "{\"waktu\":\"2026-06-25T08:16:28.142Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:16:28.148Z"
+    },
+    {
+      "id": "b6598da5-0ca6-4a5f-8899-75f9fd1f80e9",
+      "action": "Super Admin \"superadmin\" menambahkan berkas dokumen baru \"caoca\".",
+      "createdAt": "2026-06-25T08:16:28.082Z"
+    },
+    {
+      "id": "58698d25-0719-42e7-a7a5-cd9c803c0ace",
+      "action": "{\"waktu\":\"2026-06-25T08:11:34.429Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:11:34.432Z"
+    },
+    {
+      "id": "807ab1da-a0a0-49c3-98fd-be88d92903cd",
+      "action": "{\"waktu\":\"2026-06-25T08:09:35.923Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:09:35.926Z"
+    },
+    {
+      "id": "8236b21e-8eb0-4833-807e-1da1fcd4c5b1",
+      "action": "{\"waktu\":\"2026-06-25T08:09:22.671Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:09:22.678Z"
+    },
+    {
+      "id": "cf718a44-01e1-4379-84b9-bdd24a856577",
+      "action": "{\"waktu\":\"2026-06-25T08:09:03.547Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:09:03.551Z"
+    },
+    {
+      "id": "52cde1bb-720b-4604-bdee-2255f460614b",
+      "action": "{\"waktu\":\"2026-06-25T08:07:02.676Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:07:02.682Z"
+    },
+    {
+      "id": "6713b07f-6361-48e1-8e90-616dab3bdd47",
+      "action": "{\"waktu\":\"2026-06-25T08:06:32.700Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:06:32.704Z"
+    },
+    {
+      "id": "10479400-a7f4-4eb1-8ac3-90ebac4f4906",
+      "action": "{\"waktu\":\"2026-06-25T08:04:29.276Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:04:29.280Z"
+    },
+    {
+      "id": "18c0bac6-40e1-49d4-9cf8-d9c4a259a95e",
+      "action": "{\"waktu\":\"2026-06-25T08:02:15.132Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T08:02:15.136Z"
+    },
+    {
+      "id": "8990eeff-08c1-43cf-aa98-a8d1a1630120",
+      "action": "{\"waktu\":\"2026-06-25T07:59:43.029Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/admins\",\"aksi\":\"Hapus Admin: admincontoh (ADMIN)\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:59:43.032Z"
+    },
+    {
+      "id": "608ac6fe-05dc-4f95-a037-c1ef01067bf4",
+      "action": "{\"waktu\":\"2026-06-25T07:58:14.568Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:58:14.582Z"
+    },
+    {
+      "id": "6b3a506d-abe0-44d1-a8ab-664976ba4a64",
+      "action": "{\"waktu\":\"2026-06-25T07:16:27.099Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:16:27.104Z"
+    },
+    {
+      "id": "3cfff554-fc58-4898-a499-b01390117165",
+      "action": "{\"waktu\":\"2026-06-25T07:14:46.989Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:14:46.993Z"
+    },
+    {
+      "id": "4c772d95-ded6-4688-bdaa-535fc08c9e20",
+      "action": "{\"waktu\":\"2026-06-25T07:11:46.886Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:11:46.892Z"
+    },
+    {
+      "id": "80b6e5b8-d925-4fdc-8b2f-e9d56c64b91b",
+      "action": "Admin \"admincontoh\" menghapus berkas dokumen \"Sop peminjaman gor\".",
+      "createdAt": "2026-06-25T07:11:46.818Z"
+    },
+    {
+      "id": "9bef85a9-b5a5-47ae-b1b8-ea393d48a3fd",
+      "action": "{\"waktu\":\"2026-06-25T07:10:47.816Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:10:47.820Z"
+    },
+    {
+      "id": "016cf727-a0dc-4674-ac56-9afc23c83196",
+      "action": "Admin \"admincontoh\" mengubah berkas dokumen \"Sop peminjaman gor\" (berkas diperbarui, ukuran berkas diubah menjadi \"1.1 MB\").",
+      "createdAt": "2026-06-25T07:10:47.761Z"
+    },
+    {
+      "id": "6d5d1c28-b639-4d9c-b9be-523cc51ecbb2",
+      "action": "{\"waktu\":\"2026-06-25T07:10:45.059Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/dokumen/1782371445054_538f4776-f5ea-4a57-9cbe-986204e85929.docx\",\"size\":1195245}",
+      "createdAt": "2026-06-25T07:10:45.064Z"
+    },
+    {
+      "id": "b43d6565-352a-4c4e-9ef0-e51d56842993",
+      "action": "{\"waktu\":\"2026-06-25T07:09:52.265Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:09:52.270Z"
+    },
+    {
+      "id": "20c75d66-f868-4daa-a0d2-aaf4b5d74445",
+      "action": "Admin \"admincontoh\" menambahkan berkas dokumen baru \"Sop peminjaman gor\".",
+      "createdAt": "2026-06-25T07:09:52.193Z"
+    },
+    {
+      "id": "a352952b-d12a-46c0-8fe9-63a456aacf92",
+      "action": "{\"waktu\":\"2026-06-25T07:09:52.108Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/dokumen/1782371392104_ac79fd89-9900-460a-a030-fc1edfa9d973.pdf\",\"size\":194188}",
+      "createdAt": "2026-06-25T07:09:52.113Z"
+    },
+    {
+      "id": "9c7f8934-0d51-49a9-aefd-b54efc870dfc",
+      "action": "{\"waktu\":\"2026-06-25T07:08:37.790Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:08:37.797Z"
+    },
+    {
+      "id": "ec0d282a-f195-4cd8-9134-026b265fe1a4",
+      "action": "{\"waktu\":\"2026-06-25T07:08:33.844Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:08:33.853Z"
+    },
+    {
+      "id": "02854171-5251-45bb-9eb2-dd377845d974",
+      "action": "{\"waktu\":\"2026-06-25T07:08:15.347Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:08:15.350Z"
+    },
+    {
+      "id": "cf5c662c-b1ae-45f4-9058-4608bd162cc8",
+      "action": "{\"waktu\":\"2026-06-25T07:05:57.143Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T07:05:57.147Z"
+    },
+    {
+      "id": "dab063fc-7db8-47bb-be9e-8b17675be4a9",
+      "action": "{\"waktu\":\"2026-06-25T07:02:20.213Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1782370940204_a3cd877a-15df-4cd8-84da-79ea552b598b.webp\",\"size\":6514}",
+      "createdAt": "2026-06-25T07:02:20.218Z"
+    },
+    {
+      "id": "02bac664-cc32-4590-b7ec-2c08c3794cc1",
+      "action": "{\"waktu\":\"2026-06-25T07:00:54.993Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1782370854989_0af446e7-1050-4c5c-991b-015bfcb09f34.webp\",\"size\":6514}",
+      "createdAt": "2026-06-25T07:00:55.011Z"
+    },
+    {
+      "id": "756cb07b-ce7a-46c0-9bc6-13653782b570",
+      "action": "{\"waktu\":\"2026-06-25T07:00:34.894Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1782370834889_ce10bfa8-2acc-4198-87bb-e44db8055677.webp\",\"size\":45956}",
+      "createdAt": "2026-06-25T07:00:34.912Z"
+    },
+    {
+      "id": "d50c7aec-58e4-4ef9-bc30-569a9993a682",
+      "action": "{\"waktu\":\"2026-06-25T07:00:11.768Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1782370811763_e40d70f4-b777-44d6-a173-da577027ca56.webp\",\"size\":20268}",
+      "createdAt": "2026-06-25T07:00:11.771Z"
+    },
+    {
+      "id": "58a01227-8325-4217-b9b8-1b821dab5f45",
+      "action": "{\"waktu\":\"2026-06-25T06:58:51.779Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T06:58:51.781Z"
+    },
+    {
+      "id": "85bdaf72-408e-4716-bc0e-153cc6b10d1d",
+      "action": "{\"waktu\":\"2026-06-25T06:55:36.257Z\",\"user\":\"admincontoh\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T06:55:36.259Z"
+    },
+    {
+      "id": "1456a56e-f4f9-4caa-b957-72e08a028bf6",
+      "action": "{\"waktu\":\"2026-06-25T06:54:39.789Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T06:54:39.792Z"
+    },
+    {
+      "id": "1f4841cf-32e4-4d81-9568-676f3f1fe71e",
+      "action": "{\"waktu\":\"2026-06-25T06:54:25.577Z\",\"user\":\"superadmin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T06:54:25.580Z"
+    },
+    {
+      "id": "fbf64159-6771-4ef0-9b98-1c705249f86c",
+      "action": "{\"waktu\":\"2026-06-25T06:54:14.427Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/admins\",\"aksi\":\"Tambah Admin Baru: admincontoh (ADMIN)\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T06:54:14.431Z"
+    },
+    {
+      "id": "678cf2d2-f614-4d30-85aa-f8c9197fb0a0",
+      "action": "{\"waktu\":\"2026-06-25T06:53:25.270Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T06:53:25.274Z"
+    },
+    {
+      "id": "8a22ed55-308c-4c64-abde-e083fa633ad7",
+      "action": "{\"waktu\":\"2026-06-25T05:03:19.490Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T05:03:19.494Z"
+    },
+    {
+      "id": "2b5356f0-b928-44c3-bfd7-691e44f89666",
+      "action": "{\"waktu\":\"2026-06-25T05:03:19.483Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Password Migration to Argon2\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T05:03:19.486Z"
+    },
+    {
+      "id": "be9d9200-cdd0-482e-ade3-a532241a9b55",
+      "action": "{\"waktu\":\"2026-06-25T05:03:13.767Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
+      "createdAt": "2026-06-25T05:03:13.771Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "0e4a604b-17b6-43fb-a540-323eca20ac66",
+      "username": "admin",
+      "password": "$argon2id$v=19$m=65536,t=3,p=1$E/BihPyhVEhNaSefYKds2w$bBMLz9x2FVy02s/9jG0TDVzv6ra0KB4DYLrnVW6YmSo",
+      "role": "ADMIN",
+      "createdAt": "2026-06-24T18:14:14.611Z"
+    },
+    {
+      "id": "8adbd2bf-8726-40a1-b9a2-a64c4ee00f9b",
+      "username": "superadmin",
+      "password": "$argon2id$v=19$m=65536,t=3,p=1$dpMqyC/jd9Z/v1aPEuOAPQ$WRIi7BeNlsO202PWR8q7N0FoK4W3UyHUFkCZD53PjzQ",
+      "role": "SUPER_ADMIN",
+      "createdAt": "2026-06-24T18:14:14.598Z"
+    }
+  ]
 }

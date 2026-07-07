@@ -15,6 +15,7 @@ import {
   CheckSquare
 } from 'lucide-react';
 import { useGallery, useCategories } from '@/lib/data-store';
+import { sortItemsByDateTime } from '@/lib/utils';
 
 // Helper to parse Indonesian date format (e.g. "24 Mei 2026") to YYYY-MM-DD
 const parseIndonesianDateToYYYYMMDD = (dateStr: string): string => {
@@ -60,7 +61,7 @@ const convertImageToWebP = (file: File): Promise<string> => {
           return;
         }
         ctx.drawImage(img, 0, 0);
-        const webpBase64 = canvas.toDataURL('image/webp', 0.85);
+        const webpBase64 = canvas.toDataURL('image/webp', 0.80);
         resolve(webpBase64);
       };
       img.onerror = () => {
@@ -106,12 +107,14 @@ export default function GaleriFotoAdminPage() {
   const [isDragOverModal, setIsDragOverModal] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const filteredGallery = gallery.filter(item => {
-    const q = searchQuery.toLowerCase().trim();
-    const matchQuery = !q || item.title.toLowerCase().includes(q);
-    const matchCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
-    return matchQuery && matchCategory;
-  });
+  const filteredGallery = [...gallery]
+    .sort(sortItemsByDateTime)
+    .filter(item => {
+      const q = searchQuery.toLowerCase().trim();
+      const matchQuery = !q || item.title.toLowerCase().includes(q);
+      const matchCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
+      return matchQuery && matchCategory;
+    });
 
   // Notifications
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -225,8 +228,8 @@ export default function GaleriFotoAdminPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        showNotification('Ukuran gambar maksimal 2MB.', 'error');
+      if (file.size > 3 * 1024 * 1024) {
+        showNotification('Ukuran gambar maksimal 3MB.', 'error');
         e.target.value = '';
         return;
       }
@@ -268,7 +271,7 @@ export default function GaleriFotoAdminPage() {
     const title = formData.get('title') as string;
     const category = formData.get('category') as string;
     const dateVal = formData.get('date') as string;
-    const imageUrl = uploadedImageBase64 || formData.get('imageUrl') as string || '';
+    const imageUrl = uploadedImageBase64;
 
     if (!title.trim()) {
       showNotification('Judul foto wajib diisi.', 'error');
@@ -644,7 +647,7 @@ export default function GaleriFotoAdminPage() {
                       }`}>
                       <Upload className="w-5 h-5 text-slate-400" />
                       <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Foto</span>
-                      <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG)</span>
+                      <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 3MB (WEBP/PNG/JPG)</span>
                       <input
                         type="file"
                         accept="image/webp, image/png, image/jpeg, image/jpg"
@@ -662,20 +665,20 @@ export default function GaleriFotoAdminPage() {
                       <input
                         type="text"
                         name="imageUrl"
-                        value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.imageUrl || ''}
+                        value={uploadedImageBase64 && !uploadedImageBase64.startsWith('data:') ? uploadedImageBase64 : ''}
                         onChange={(e) => setUploadedImageBase64(e.target.value)}
-                        placeholder="https://images.unsplash.com/..."
+                        placeholder="Masukkan tautan gambar..."
                         className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                       />
                     </div>
                   </div>
 
-                  {(uploadedImageBase64 || editingItem?.imageUrl) && (
+                  {uploadedImageBase64 && (
                     <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
                       <div className="flex items-center gap-2 min-w-0">
                         <ImageIcon className="w-4 h-4 text-accent shrink-0" />
                         <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                          {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.imageUrl}
+                          {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64}
                         </span>
                       </div>
                       <button

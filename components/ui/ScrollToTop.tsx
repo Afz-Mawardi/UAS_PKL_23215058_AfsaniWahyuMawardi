@@ -19,7 +19,7 @@ export default function ScrollToTop() {
     };
 
     window.addEventListener('scroll', toggleVisibility);
-    
+
     // Check initial state in case page is loaded already scrolled
     toggleVisibility();
 
@@ -41,9 +41,8 @@ export default function ScrollToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center w-12 h-12 rounded-full bg-primary text-white shadow-lg cursor-pointer focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 transition-all duration-300 hover:bg-accent ${
-        isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-      }`}
+      className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center w-12 h-12 rounded-full bg-primary text-white shadow-lg cursor-pointer focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 transition-all duration-300 hover:bg-accent ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
       aria-label="Kembali ke atas"
     >
       <ChevronUp className="h-6 w-6 stroke-[2.5]" />

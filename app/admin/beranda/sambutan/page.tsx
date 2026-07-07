@@ -32,7 +32,7 @@ const convertImageToWebP = (file: File): Promise<string> => {
           return;
         }
         ctx.drawImage(img, 0, 0);
-        const webpBase64 = canvas.toDataURL('image/webp', 0.85);
+        const webpBase64 = canvas.toDataURL('image/webp', 0.80);
         resolve(webpBase64);
       };
       img.onerror = () => {
@@ -48,11 +48,7 @@ const convertImageToWebP = (file: File): Promise<string> => {
 };
 
 const isValidUrlOrPath = (url?: string): boolean => {
-  if (!url || url === '#' || url === '') return true;
-  if (/^(https?:\/\/)/i.test(url)) return true;
-  if (/^(\/|\.\/|\.\.\/)/.test(url)) return true;
-  if (/^[a-zA-Z0-9_\-\.\/?=#%&]+$/.test(url)) return true;
-  return false;
+  return true;
 };
 
 export default function SambutanPage() {
@@ -82,8 +78,8 @@ export default function SambutanPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        showNotification('Ukuran gambar maksimal 2MB.', 'error');
+      if (file.size > 3 * 1024 * 1024) {
+        showNotification('Ukuran gambar maksimal 3MB.', 'error');
         return;
       }
       showNotification('Sedang mengompresi dan mengunggah gambar...', 'success');
@@ -122,12 +118,7 @@ export default function SambutanPage() {
     const name = formData.get('welcomeName') as string;
     const nip = formData.get('welcomeNip') as string;
     const content = formData.get('welcomeContent') as string;
-    const imageUrl = welcomeImage || formData.get('welcomeImageUrl') as string || '';
-
-    if (imageUrl && !isValidUrlOrPath(imageUrl)) {
-      showNotification('Tautan URL gambar tidak valid.', 'error');
-      return;
-    }
+    const imageUrl = welcomeImage;
 
     if (!name.trim() || !content.trim()) {
       showNotification('Nama dan Isi Sambutan wajib diisi.', 'error');
@@ -266,6 +257,7 @@ export default function SambutanPage() {
                     }`}>
                     <Upload className="w-5 h-5 text-slate-400" />
                     <span className="text-[9px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Pilih Foto</span>
+                    <span className="text-[7px] text-slate-400 block font-light leading-none">Maksimal 3MB (WEBP/PNG/JPG/JPEG)</span>
                     <input
                       type="file"
                       accept="image/webp, image/png, image/jpeg, image/jpg"
@@ -282,11 +274,11 @@ export default function SambutanPage() {
                 <div className="sm:col-span-8 space-y-1.5">
                   <span className="text-[8.5px] font-bold text-slate-400 font-mono block">Atau Masukkan URL Link Foto:</span>
                   <input
-                    type="url"
+                    type="text"
                     name="welcomeImageUrl"
                     value={welcomeImage && !welcomeImage.startsWith('data:') ? welcomeImage : ''}
                     onChange={(e) => setWelcomeImage(e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
+                    placeholder="Masukkan tautan foto..."
                     className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
                   />
                 </div>

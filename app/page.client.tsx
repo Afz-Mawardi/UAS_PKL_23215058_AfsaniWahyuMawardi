@@ -813,11 +813,6 @@ export default function HomePageClient({
                             <h4 className="font-bold text-xs sm:text-sm text-white leading-snug tracking-tight">
                               {photo.title}
                             </h4>
-                            {photo.date && (
-                              <span className="text-[9px] font-bold text-slate-350 font-mono tracking-wider block uppercase mt-0.5">
-                                {photo.date}
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>

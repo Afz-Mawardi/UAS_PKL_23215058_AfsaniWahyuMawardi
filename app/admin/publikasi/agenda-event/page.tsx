@@ -16,6 +16,7 @@ import {
   CheckSquare
 } from 'lucide-react';
 import { useEvents } from '@/lib/data-store';
+import { sortItemsByDateTime } from '@/lib/utils';
 
 // Helper to parse Indonesian date format (e.g. "24 Mei 2026") to YYYY-MM-DD
 const parseIndonesianDateToYYYYMMDD = (dateStr: string): string => {
@@ -73,14 +74,16 @@ export default function AgendaEventAdminPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const filteredEvents = events.filter(item => {
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return true;
-    return (
-      item.title.toLowerCase().includes(q) ||
-      (item.location && item.location.toLowerCase().includes(q))
-    );
-  });
+  const filteredEvents = [...events]
+    .sort(sortItemsByDateTime)
+    .filter(item => {
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return true;
+      return (
+        item.title.toLowerCase().includes(q) ||
+        (item.location && item.location.toLowerCase().includes(q))
+      );
+    });
 
   // Notifications
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);

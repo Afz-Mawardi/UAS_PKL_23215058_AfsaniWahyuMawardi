@@ -109,7 +109,7 @@ export default function AgendaPageClient({
         return 0;
       }
     })
-    .slice(0, 3);
+    .slice(0, 5);
 
   const formatDateHeading = (date: Date) => {
     return date.toLocaleDateString('id-ID', {

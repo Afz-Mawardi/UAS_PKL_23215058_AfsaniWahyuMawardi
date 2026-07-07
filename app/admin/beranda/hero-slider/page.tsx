@@ -39,7 +39,7 @@ const convertImageToWebP = (file: File): Promise<string> => {
           return;
         }
         ctx.drawImage(img, 0, 0);
-        const webpBase64 = canvas.toDataURL('image/webp', 0.85);
+        const webpBase64 = canvas.toDataURL('image/webp', 0.80);
         resolve(webpBase64);
       };
       img.onerror = () => {
@@ -55,11 +55,7 @@ const convertImageToWebP = (file: File): Promise<string> => {
 };
 
 const isValidUrlOrPath = (url?: string): boolean => {
-  if (!url || url === '#' || url === '') return true;
-  if (/^(https?:\/\/)/i.test(url)) return true;
-  if (/^(\/|\.\/|\.\.\/)/.test(url)) return true;
-  if (/^[a-zA-Z0-9_\-\.\/?=#%&]+$/.test(url)) return true;
-  return false;
+  return true;
 };
 
 export default function HeroSliderPage() {
@@ -85,8 +81,8 @@ export default function HeroSliderPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        showNotification('Ukuran gambar maksimal 2MB.', 'error');
+      if (file.size > 3 * 1024 * 1024) {
+        showNotification('Ukuran gambar maksimal 3MB.', 'error');
         e.target.value = '';
         return;
       }
@@ -152,12 +148,7 @@ export default function HeroSliderPage() {
     const title = formData.get('title') as string;
     const cta = formData.get('cta') as string;
     const href = formData.get('href') as string;
-    const image = uploadedImageBase64 || formData.get('imageUrl') as string || '';
-
-    if (image && !isValidUrlOrPath(image)) {
-      showNotification('Tautan URL gambar tidak valid.', 'error');
-      return;
-    }
+    const image = uploadedImageBase64;
 
     if (!title.trim() || !cta.trim() || !href.trim()) {
       showNotification('Semua bidang wajib diisi.', 'error');
@@ -374,7 +365,7 @@ export default function HeroSliderPage() {
                         }`}>
                         <Upload className="w-5 h-5 text-slate-400" />
                         <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Gambar</span>
-                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG/JPEG)</span>
+                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 3MB (WEBP/PNG/JPG/JPEG)</span>
                         <input
                           type="file"
                           accept="image/webp, image/png, image/jpeg, image/jpg"
@@ -390,22 +381,22 @@ export default function HeroSliderPage() {
                       <div className="space-y-1.5 flex flex-col justify-center">
                         <span className="text-[8.5px] font-bold text-slate-400 font-mono">Atau Masukkan URL Link:</span>
                         <input
-                          type="url"
+                          type="text"
                           name="imageUrl"
                           value={uploadedImageBase64 && !uploadedImageBase64.startsWith('data:') ? uploadedImageBase64 : ''}
                           onChange={(e) => setUploadedImageBase64(e.target.value)}
-                          placeholder="https://images.unsplash.com/..."
+                          placeholder="Masukkan tautan gambar..."
                           className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                         />
                       </div>
                     </div>
 
-                    {(uploadedImageBase64 || editingItem?.image) && (
+                    {uploadedImageBase64 && (
                       <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
                         <div className="flex items-center gap-2 min-w-0">
                           <ImageIcon className="w-4 h-4 text-accent shrink-0" />
                           <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.image}
+                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64}
                           </span>
                         </div>
                         <button
