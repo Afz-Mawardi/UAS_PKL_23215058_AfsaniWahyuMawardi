@@ -1,8 +1,16 @@
-<div align="center">
+   ```bash
+Nama         : Afsani Wahyu Mawardi
+NIM          : 23215058
+Tempat PKL   : Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal
+   ```
 
+---
+
+<div align="center">
+   
 # 🏛️ Portal DISPORAPAR Kota Tegal
 
-Aplikasi portal informasi terintegrasi dan database modern terpusat milik **Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal**.
+Aplikasi portal informasi terintegrasi dan database modern terpusat untuk **Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal**.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.4-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
